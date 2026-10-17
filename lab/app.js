@@ -4,7 +4,7 @@
 'use strict';
 const $ = id => document.getElementById(id);
 const HISTORY_KEY='aetherion-native-log-v1';
-const BIAS='Not a language-generation model. Classifies intent using learned weights and authored responses.';
+// This is a trained intent classifier with templated responses, not a language-generation model.
 let model=null,device=null,adapter=null,pipeline=null,bindGroup=null;
 let inputBuffer=null,logitsBuffer=null,readback=null,loading=false,busy=false,history=[];
 const time=()=>performance.now();
@@ -57,7 +57,7 @@ async function initialize(){
  try{
   if(!isSecureContext)throw new Error('HTTPS 연결이 필요합니다.');
   if(!navigator.gpu)throw new Error('이 브라우저는 WebGPU를 제공하지 않습니다.');
-  const r=await fetch('./model.json',{cache:'force-cache'});
+  const r=await fetch('./model.json?v=2',{cache:'no-cache'});
   if(!r.ok)throw new Error('모델 가중치 다운로드 실패 (HTTP '+r.status+')');
   model=await r.json();
   if(model.dimensions!==512||model.labels.length!==15||model.weights.length!==7680||model.bias.length!==15)throw new Error('모델 데이터의 크기가 올바르지 않습니다.');
@@ -158,6 +158,7 @@ function formatReply(label,text,confidence){
  return descriptions[label]||'이 범위는 아직 학습되지 않았습니다.';
 }
 function addMessage(role,text){
+ $('messages').querySelector('.empty')?.remove();
  const msg=document.createElement('div');msg.className='message '+role;
  const name=document.createElement('span');name.className='messageLabel';name.textContent=role==='user'?'YOU':'NATIVE CORE';
  const content=document.createElement('p');content.textContent=text;
