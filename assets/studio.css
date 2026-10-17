@@ -67,3 +67,7 @@ html{scroll-behavior:auto}body{font-family:-apple-system,BlinkMacSystemFont,"App
  .page-agent .routeintro,.page-chat .routeintro{padding-top:24px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* GPU inference status for Chat and Agent consoles */
+#backendLabel{font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+#hardwareText{overflow-wrap:anywhere}
