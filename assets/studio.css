@@ -71,3 +71,9 @@ html{scroll-behavior:auto}body{font-family:-apple-system,BlinkMacSystemFont,"App
 /* GPU inference status for Chat and Agent consoles */
 #backendLabel{font-size:11px;line-height:1.6;overflow-wrap:anywhere}
 #hardwareText{overflow-wrap:anywhere}
+
+.gpuHealth{padding:12px 0 16px;border-top:1px solid #ddd8d0;display:grid;gap:9px;font-size:11px}
+.gpuHealth button{border:1px solid #d9c9b9;border-radius:6px;background:#f5eee7;color:#a34727;padding:11px 8px;font-size:11px;font-weight:700}
+.gpuHealth output{display:block;color:#676961;line-height:1.65;overflow-wrap:anywhere}
+.gpuHang{border:1px solid #d99c88;background:#fff0e7;color:#a44527;border-radius:6px;padding:12px;line-height:1.8}
+.gpuHang[hidden]{display:none}.gpuHang button{display:block;margin-top:8px;width:100%;background:#fff}

@@ -56,6 +56,9 @@ async function loadModel(){
  }
  loading=true;busyUi();status('loading','WebGPU 장치 확인 중…');
  $('loadBtn').textContent='WebGPU 준비 중…';progress(0);
+ $('initHangWarning').hidden=true;
+ let downloadDoneAt=0;
+ const monitor=setInterval(()=>{if(loading&&downloadDoneAt&&Date.now()-downloadDoneAt>45000){$('initHangWarning').hidden=false;$('initHangWarningText').textContent='다운로드 이후 초기화가 45초 넘게 진행 중입니다. iPhone의 브라우저 메모리 제한 또는 모델·엔진 호환성 문제일 수 있습니다. 계속 멈춰 있으면 페이지를 재시작하고 아래 WebGPU 계산 테스트를 먼저 실행하세요.';}},5000);
  let lastProgressAt=0,lastPercent=-1;
  const onProgress=p=>{
    const raw=p?.total?100*p.loaded/p.total:(typeof p?.progress==='number'?100*p.progress:null);
@@ -64,6 +67,7 @@ async function loadModel(){
    if(v<100&&v===lastPercent)return;
    if(v<100&&now-lastProgressAt<240&&v-lastPercent<4)return;
    lastProgressAt=now;lastPercent=v;
+   if(v>=100 && !downloadDoneAt)downloadDoneAt=Date.now();
    progress(v);status('loading',v>=100?'다운로드 100% · GPU 메모리 초기화 중…':`모델 다운로드 ${v}%`);
  };
  try{
@@ -71,23 +75,25 @@ async function loadModel(){
    await unloadEngine();
    engine=await createRuntime();
    const mobile=matchMedia('(max-width:650px)').matches;
-   const gpuLayers=mobile?8:-1;
+   const gpuLayers=mobile?2:8;
    gpuState.requested=gpuLayers;gpuState.offloaded=0;
-   gpuInfo('Engine: Wllama / WebGPU · GPU 레이어 '+(mobile?'8개':'가능한 전체')+' 요청');
+   gpuInfo('Engine: Wllama / WebGPU · GPU '+gpuLayers+'레이어 요청 · 저메모리 설정');
    status('loading','WebGPU 모델 파일 요청 중…');
    const url=`https://huggingface.co/${m.repo}/resolve/main/${m.file}`;
    await engine.loadModelFromUrl(url,{
-     n_ctx:mobile?1024:2048,
+     n_ctx:mobile?512:1536,
      n_gpu_layers:gpuLayers,
      n_threads:1,
-     n_batch:mobile?96:256,
-     n_ubatch:mobile?64:128,
+     n_batch:mobile?32:128,
+     n_ubatch:mobile?16:64,
+     n_parallel:1,
+     warmup:false,
      progressCallback:onProgress
    });
    if(!engine.isModelLoaded())throw new Error('Wllama가 모델 로드를 완료하지 못했습니다.');
    loaded=chosen;
    status('ready','모델 준비 완료 · WebGPU 오프로딩 요청됨');
-   gpuInfo('Engine: Wllama / WebGPU · GPU 레이어 '+(mobile?'8개':'전체')+' 요청 (실제 오프로딩 별도 검증 필요)');
+   gpuInfo('Engine: Wllama / WebGPU · GPU '+gpuLayers+'레이어 요청 (실제 오프로딩은 별도 확인 필요)');
    progress(100);$('loadBtn').textContent='모델 사용 중 ✓';
    $('composerHint').textContent='로컬 모델이 준비됐습니다. WebGPU 레이어를 요청했지만 GPU 사용량은 기기에서 확인해야 합니다.';
    notice(`${m.label} 로드 완료`);
@@ -101,7 +107,7 @@ async function loadModel(){
    $('composerHint').textContent='WebGPU 로딩 실패: '+msg;
    gpuInfo('Engine: WebGPU 로딩 오류 · CPU 전환 안 함');
    notice('GPU 오류: '+msg);
- }finally{loading=false;busyUi()}
+ }finally{clearInterval(monitor);loading=false;busyUi()}
 }
 
 function createMsg(role,content,save=true,target=$('messages'),silent=false){
@@ -173,6 +179,40 @@ $('agentStateText').textContent='RUNNING / Quality review';const review=await in
 function downloadText(text,name){const blob=new Blob([text],{type:'text/plain;charset=utf-8'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 function toggleAgent(open){$('agentOverlay').classList.toggle('open',open);document.body.style.overflow=open?'hidden':'';if(open)$('agentInput').focus()}
 $('modelGrid').addEventListener('click',e=>{const b=e.target.closest('[data-model]');if(!b||loading||engineBusy||agentBusy)return;chosen=b.dataset.model;refreshModel();$('playground').scrollIntoView({behavior:matchMedia('(max-width:650px)').matches?'instant':'smooth',block:'start'})});
+
+async function testWebGPU(){
+ const result=$('gpuComputeResult');
+ if(!result)return;
+ result.textContent='WebGPU 연산 테스트 중…';
+ let device=null;
+ try{
+  if(!isSecureContext||!navigator.gpu)throw Error('HTTPS 또는 WebGPU API가 없습니다.');
+  const adapter=await navigator.gpu.requestAdapter();
+  if(!adapter)throw Error('GPU 어댑터가 없습니다.');
+  device=await adapter.requestDevice();
+  const shader=device.createShaderModule({code:'@group(0) @binding(0) var<storage, read_write> a: array<u32>; @compute @workgroup_size(1) fn main(){a[0] = 42u;}'});
+  const layout=device.createBindGroupLayout({entries:[{binding:0,visibility:GPUShaderStage.COMPUTE,buffer:{type:'storage'}}]});
+  const pipelineLayout=device.createPipelineLayout({bindGroupLayouts:[layout]});
+  const pipeline=await device.createComputePipelineAsync({layout:pipelineLayout,compute:{module:shader,entryPoint:'main'}});
+  const output=device.createBuffer({size:4,usage:GPUBufferUsage.STORAGE|GPUBufferUsage.COPY_SRC});
+  const readback=device.createBuffer({size:4,usage:GPUBufferUsage.COPY_DST|GPUBufferUsage.MAP_READ});
+  const group=device.createBindGroup({layout,entries:[{binding:0,resource:{buffer:output}}]});
+  const encoder=device.createCommandEncoder();
+  const pass=encoder.beginComputePass();pass.setPipeline(pipeline);pass.setBindGroup(0,group);pass.dispatchWorkgroups(1);pass.end();
+  encoder.copyBufferToBuffer(output,0,readback,0,4);
+  device.queue.submit([encoder.finish()]);
+  await readback.mapAsync(GPUMapMode.READ);
+  const value=new Uint32Array(readback.getMappedRange())[0];
+  readback.unmap();output.destroy();readback.destroy();
+  if(value!==42)throw Error('연산 결과 오류 ('+value+')');
+  result.textContent='WebGPU 계산 성공 (42) · GPU 기본 연산은 정상. Noema 2B 메모리/호환성은 별도 문제일 수 있습니다.';
+ }catch(error){
+  result.textContent='WebGPU 계산 실패: '+(error?.message||error);
+ }finally{try{device?.destroy()}catch{}}
+}
+
+$('gpuComputeTest').addEventListener('click',testWebGPU);
+$('initHangReset').addEventListener('click',()=>location.reload());
 $('loadBtn').addEventListener('click',loadModel);$('sendBtn').addEventListener('click',send);$('messageInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}});
 document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{$('messageInput').value=b.dataset.prompt;$('messageInput').focus()}));
 $('exportChat').addEventListener('click',()=>{if(!history.length)return notice('내보낼 채팅이 없습니다.');downloadText(history.map(x=>(x.role==='user'?'YOU':'AETHERION')+'\n'+x.content).join('\n\n---\n\n'),'aetherion-conversation.txt')});
