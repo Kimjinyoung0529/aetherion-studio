@@ -88,6 +88,10 @@ async function initialize(){
    {binding:2,resource:{buffer:bBuf}},
    {binding:3,resource:{buffer:logitsBuffer}}
   ]});
+  // Actual GPU self-test before marking the engine as ready (not just navigator.gpu detection).
+  const smoke=await inferNative('안녕하세요');
+  if(smoke.top.label!=='greeting')throw new Error('GPU 첫 추론 검증 실패: '+smoke.top.label);
+  emit('실제 WebGPU 추론 자체 테스트 통과 · greeting · '+smoke.elapsed.toFixed(2)+' ms');
   $('sendButton').disabled=false;
   const name=[adapter.info?.vendor,adapter.info?.device].filter(Boolean).join(' / ')||'WebGPU Adapter';
   $('deviceValue').textContent=name;
