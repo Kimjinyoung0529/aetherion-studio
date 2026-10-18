@@ -20,17 +20,17 @@ td,th{padding:14px;border-bottom:1px solid #e1e8e5;white-space:nowrap}th{backgro
 @media(max-width:600px){.fields{grid-template-columns:1fr}.wrap{padding:18px}}
 </style></head><body>
 <header class="hero"><div class="wrap"><div class="kicker">AETHERION / INDEPENDENT WEBGPU KERNEL TOURNAMENT</div>
-<h1>만들고, 겨루고,<br>가장 빠른 것만 남긴다.</h1><p>완전히 다른 다섯 가지 양자화 행렬 연산을 CPU 정확도 검사와 실제 GPU 작업 완료 시간으로 비교합니다. 모델 채팅 전체 성능은 별도 검사 대상입니다.</p>
+<h1>만들고, 겨루고,<br>가장 빠른 것만 남긴다.</h1><p>완전히 다른 여섯 가지 양자화 행렬 연산을 CPU 정확도 검사와 실제 GPU 작업 완료 시간으로 비교합니다. 모델 채팅 전체 성능은 별도 검사 대상입니다.</p>
 <a href="/runtime/" style="color:#ffd0bb">← 로컬 AI 실행기로 돌아가기</a></div></header>
 <main class="wrap"><section class="card">
-<h2>5개 독립 전략</h2>
-<p class="note">A: 직렬 · B: 공유 메모리 병렬 · C: 압축 바이트 직접 해독 · D: Split-K 두 단계 · E: 모델 로드시 선해독(추가 메모리 소모). 정밀도 실패 후보는 채택 불가.</p>
+<h2>6개 독립 전략</h2>
+<p class="note">A: 직렬 · B: 공유 메모리 병렬 · C: 압축 바이트 병렬 해독 · F: 압축 바이트 직렬 해독 · D: Split-K 두 단계 · E: 모델 로드시 선해독(추가 메모리 소모). 정밀도 실패 후보는 채택 불가.</p>
 <div class="fields">
 <label>행 수<select id="rows"><option value="128">128</option><option value="256" selected>256</option></select></label>
 <label>열 수<select id="cols"><option value="256">256</option><option value="512" selected>512</option><option value="1024">1024</option></select></label>
 <label>압축 방식<select id="format"><option value="142">PQ2_0</option><option value="143" selected>PTQ1_0</option></select></label>
 </div>
-<p><button id="run">GPU 5개 구현 직접 실행 · 속도 비교</button></p>
+<p><button id="run">GPU 6개 구현 직접 실행 · 속도 비교</button></p>
 <div id="status" class="status" role="status">기기 검사 대기 중</div>
 </section><section class="card">
 <h2>실험 결과</h2><p class="winner" id="winner">아직 측정하지 않았습니다.</p>
