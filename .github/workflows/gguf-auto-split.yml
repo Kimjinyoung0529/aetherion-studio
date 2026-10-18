@@ -1,0 +1,95 @@
+name: AETHERION GGUF Auto Split
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_id:
+        description: 'Hugging Face repo (must already contain a GGUF file)'
+        type: string
+        required: true
+      gguf_file:
+        description: 'Exact .gguf filename in that repo'
+        type: string
+        required: true
+      max_shard_mb:
+        description: 'Max size per shard in MB (100-1900)'
+        type: string
+        required: true
+        default: '1800'
+      fallback_shard_mb:
+        description: 'Max size per shard on fallback (MB)'
+        type: string
+        required: true
+        default: '750'
+      llama_source:
+        description: 'Use PrismML fork for private PTQ1_0/PQ2_0 tensor types'
+        type: choice
+        required: true
+        default: official
+        options: [official, prism]
+      destination:
+        description: 'Where to deliver shards'
+        type: choice
+        required: true
+        default: artifact
+        options: [artifact, huggingface]
+      hf_target_repo:
+        description: 'My Hugging Face output repo (required for huggingface destination)'
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      SOURCE_REPO: ${{ inputs.repo_id }}
+      SOURCE_FILE: ${{ inputs.gguf_file }}
+      MAX_MB: ${{ inputs.max_shard_mb }}
+      FALLBACK_MB: ${{ inputs.fallback_shard_mb }}
+      TARGET_REPO: ${{ inputs.hf_target_repo }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      LLAMA_SOURCE: ${{ inputs.llama_source }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Hugging Face CLI and build tools
+        run: |
+          python3 -m pip install --user --upgrade huggingface_hub
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: Build official llama-gguf-split
+        run: |
+          if [ "$LLAMA_SOURCE" = "prism" ]; then
+            git clone --depth 1 --branch prism https://github.com/PrismML-Eng/llama.cpp.git "$RUNNER_TEMP/llama.cpp"
+          else
+            git clone --depth 1 https://github.com/ggml-org/llama.cpp.git "$RUNNER_TEMP/llama.cpp"
+          fi
+          cmake -S "$RUNNER_TEMP/llama.cpp" -B "$RUNNER_TEMP/llama.cpp/build" -DLLAMA_BUILD_TESTS=OFF -DLLAMA_CURL=OFF
+          cmake --build "$RUNNER_TEMP/llama.cpp/build" --target llama-gguf-split --parallel 2
+      - name: Download, split and hash model
+        run: |
+          python3 tools/gguf_auto_split.py \
+            --hf-repo "$SOURCE_REPO" --hf-file "$SOURCE_FILE" \
+            --binary "$RUNNER_TEMP/llama.cpp/build/bin/llama-gguf-split" \
+            --max-shard-mb "$MAX_MB" --fallback-shard-mb "$FALLBACK_MB" \
+            --out-dir "$RUNNER_TEMP/gguf-shards"
+          ls -lh "$RUNNER_TEMP/gguf-shards"
+      - name: Save results as GitHub artifact
+        if: inputs.destination == 'artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: aetherion-gguf-shards
+          path: ${{ runner.temp }}/gguf-shards/*
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+      - name: Publish to my Hugging Face model repo
+        if: inputs.destination == 'huggingface'
+        run: |
+          if [ -z "$HF_TOKEN" ] || [ -z "$TARGET_REPO" ]; then
+            echo "HF_TOKEN secret and hf_target_repo input are required" >&2
+            exit 1
+          fi
+          hf upload "$TARGET_REPO" "$RUNNER_TEMP/gguf-shards" . --repo-type model
