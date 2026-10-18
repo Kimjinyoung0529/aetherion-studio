@@ -40,8 +40,10 @@ const BonsaiAudit=(()=>{
       valid=false;why='부호 폭이 유효하지 않거나 중복';break;
      }
      if(offset+width>signs.length){valid=false;why='부호 값 배열 길이 부족';break;}
-     const array=Int8Array.from(signs.slice(offset,offset+width));
-     for(let i=0;i<array.length;i++)if(array[i]!==1&&array[i]!==-1){valid=false;why='부호 값은 +1/-1만 허용';break;}
+     const raw=signs.slice(offset,offset+width);
+     for(const sign of raw)if(sign!==1&&sign!==-1){valid=false;why='부호 값은 +1/-1만 허용';break;}
+     if(!valid)break;
+     const array=Int8Array.from(raw);
      if(!valid)break;
      signTables.set(width,array);offset+=width;
     }
