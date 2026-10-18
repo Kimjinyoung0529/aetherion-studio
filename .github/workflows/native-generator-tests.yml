@@ -1,0 +1,26 @@
+name: AETHERION Native Generator Tests
+on:
+  push:
+    paths:
+      - 'lab/generate/**'
+      - '.github/workflows/native-generator-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  generator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test quantized transformer weights and CPU generation
+        run: node lab/generate/test_generator.mjs
+      - name: Check inference and browser JavaScript
+        run: |
+          node --check lab/generate/engine.js
+          node --check lab/generate/app.js
