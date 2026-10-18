@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111214"><meta name="description" content="AETHERION Bonsai Codec Lab — PrismML PTQ1_0, PQ2_0 포맷을 직접 읽는 WebGPU 연구 실험실.">
+<title>AETHERION · Bonsai Native Codec</title>
+<style>
+:root{--bg:#f4f2ed;--surface:#fffefa;--dark:#121414;--ink:#1b1d1c;--muted:#81837c;--line:#e3ded5;--orange:#e65e3a}
+*{box-sizing:border-box}html{background:var(--bg)}body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible,select:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.container{width:min(1100px,calc(100% - 36px));margin:0 auto}
+.top{background:#141616;border-bottom:1px solid #303230;color:white}
+.top .container{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:66px}
+.brand{font-size:17px;letter-spacing:-.08em;font-weight:900;white-space:nowrap}.brand em{font-style:normal;color:var(--orange)}.links{display:flex;gap:16px;font-size:11px;font-weight:750;color:#c5c5c0}.links a.active{color:#fff}
+.hero{color:#fff;background:var(--dark);position:relative;overflow:hidden;padding:66px 0 60px}
+.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(#969894 1px,transparent 1px),linear-gradient(90deg,#969894 1px,transparent 1px);background-size:66px 66px;opacity:.12}
+.hero .container{position:relative}
+.tag{color:#ea967b;font-weight:900;font-size:10px;letter-spacing:.19em}
+h1{font-size:clamp(42px,7vw,75px);line-height:1.08;letter-spacing:-.09em;margin:17px 0 21px}h1 em{font-style:normal;color:var(--orange)}
+.hero p{max-width:760px;color:#c5c5c0;font-size:13px;line-height:1.9;margin:0;word-break:keep-all}
+.ribbon{background:#e9e5de;border-bottom:1px solid var(--line);font-size:10px;font-weight:850;color:#6a6964;letter-spacing:.08em}
+.ribbon .container{display:flex;gap:14px;flex-wrap:wrap;justify-content:space-between;padding:16px 0}
+.main{padding:50px 0 82px}
+.kicker{color:#ca5332;font-size:10px;letter-spacing:.16em;font-weight:900;margin-bottom:13px}
+h2{font-size:28px;letter-spacing:-.06em;margin:0 0 25px}
+.columns{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 13px 37px #00000009}
+.panelHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:21px 23px;border-bottom:1px solid var(--line)}
+.panelHead b{font-size:13px;letter-spacing:-.025em}.panelHead small{color:#8c8c85;font-size:10px}
+.inside{padding:22px}
+.field{display:grid;gap:8px;margin:0 0 23px}.field label{font-size:11px;font-weight:800}.field select{appearance:auto;border:1px solid #d9d6cf;border-radius:6px;min-height:46px;padding:10px;background:#fff;color:#262725;font-size:12px}
+.hint{color:var(--muted);font-size:11px;line-height:1.8;margin:0}
+.run{width:100%;background:var(--orange);color:white;border:0;border-radius:6px;padding:16px;font-weight:900;font-size:13px}.run:disabled{opacity:.45}
+.status{font-size:12px;font-weight:800;color:#63635f;margin-top:21px}.status:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#92948e;margin-right:9px}
+.status[data-kind=ready]{color:#369259}.status[data-kind=ready]:before{background:#41ab68}
+.status[data-kind=error]{color:#be5335}.status[data-kind=error]:before{background:#df6844}
+.log{height:210px;overflow:auto;padding:15px;border-radius:8px;background:#181a19;margin-top:14px;color:#d8d9d3}
+.log p{font-family:ui-monospace,Menlo,monospace;margin:0 0 11px;line-height:1.65;font-size:10px;overflow-wrap:anywhere}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.metric{background:#faf9f6;padding:18px;border:1px solid var(--line);border-radius:8px;min-width:0}
+.metric small{font-size:10px;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:12px}.metric b{font-size:17px;letter-spacing:-.05em;overflow-wrap:anywhere}
+#validation[data-ok=yes]{color:#338e56}#validation[data-ok=no]{color:#bd5135}
+.note{margin-top:18px;padding:15px;background:#f0ece5;border-radius:8px;font-size:11px;color:#74766f;line-height:1.8}
+.steps{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.step{background:#ebe7df;border:1px solid #dedad2;border-radius:9px;padding:22px}
+.step span{font-weight:900;font-size:11px;color:#ca5938}.step b{display:block;font-size:15px;letter-spacing:-.04em;margin:14px 0 10px}.step p{font-size:11px;line-height:1.8;color:#74756f;margin:0}
+.disclaimer{font-size:11px;line-height:1.9;color:#777972;margin:23px 0 0}
+.disclaimer strong{color:#353733}
+footer{background:#131515;color:#b8b9b3;padding:35px 0;font-size:11px;line-height:1.8}footer .container{display:flex;gap:18px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+footer b{color:white;font-size:14px}
+@media(max-width:850px){.columns{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
+@media(max-width:520px){.container{width:calc(100% - 28px)}.brand{font-size:14px}.links{font-size:10px;gap:10px}.hero{padding:49px 0}.hero p{font-size:12px}.main{padding:32px 0 60px}.panelHead,.inside{padding:17px}.metrics{gap:8px}.metric{padding:13px}.metric b{font-size:14px}}
+</style></head>
+<body>
+<nav class="top"><div class="container"><a class="brand" href="/">AETHERION <em>/ BONSAI CORE</em></a><div class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/bonsai/" class="active">Bonsai</a></div></div></nav>
+<main>
+<section class="hero"><div class="container"><div class="tag">AETHERION / NATIVE SYSTEMS / RESEARCH 003</div>
+<h1>Read the bits.<br><em>Run the GPU.</em></h1>
+<p>PrismML의 실제 GGUF 양자화 블록 구조인 PTQ1_0·PQ2_0을 분석하여 직접 구현한 디코더와 WebGPU WGSL 행렬 연산 실험실입니다. 기존 단순 삼진 압축이 아니라, 공식 레이아웃의 블록 데이터를 GPU에서 읽어 계산합니다.</p>
+</div></section>
+<div class="ribbon"><div class="container"><span>PTQ1_0 · 1.75 BITS/WEIGHT</span><span>PQ2_0 · 2.125 BITS/WEIGHT</span><span>NO WLLAMA / NO EXTERNAL INFERENCE</span></div></div>
+<section class="main"><div class="container">
+<div class="kicker">01 / PRISM BLOCK CONFORMANCE</div><h2>Real formats. Native compute.</h2>
+<div class="columns">
+<div class="panel"><div class="panelHead"><b>CODEC / GPU EXECUTION</b><small>WGSL native</small></div><div class="inside">
+<div class="field"><label for="format">PrismML 블록 형식</label><select id="format"><option value="143">PTQ1_0 · 128개/28바이트</option><option value="142">PQ2_0 · 128개/34바이트</option></select><p class="hint">공식 Prism fork 포맷과 동일한 바이트 배열을 사용하는 시험 데이터를 생성합니다.</p></div>
+<div class="field"><label for="rows">출력 행 수</label><select id="rows"><option value="64">64개 · 안전한 테스트</option><option value="128" selected>128개 · 권장</option><option value="256">256개 · 고성능 테스트</option></select></div>
+<div class="field"><label for="cols">입력 차원</label><select id="cols"><option value="128">128개</option><option value="512" selected>512개</option><option value="1024">1024개</option></select></div>
+<button id="run" type="button" class="run">Prism 블록 WebGPU 연산 ↗</button>
+<p class="hint" style="margin-top:13px">실제 모델 가중치 전체를 다운로드하지 않는 형식·연산 검증입니다. 외부 LLM 런타임은 쓰지 않습니다.</p>
+<div id="status" class="status" aria-live="polite">GPU 초기화 전</div><div id="log" class="log"><p>WebGPU 준비 중. GPU 어댑터를 확인합니다.</p></div>
+</div></div>
+<div class="panel"><div class="panelHead"><b>BENCHMARK / RESULTS</b><small>Measured locally</small></div><div class="inside">
+<div class="metrics">
+<div class="metric"><small>GPU ADAPTER</small><b id="adapter">미확인</b></div>
+<div class="metric"><small>GGML TENSOR FORMAT</small><b id="type">—</b></div>
+<div class="metric"><small>COMPRESSED BLOCKS</small><b id="weightBytes">—</b></div>
+<div class="metric"><small>FP16 WEIGHT RATIO</small><b id="fp16ratio">—</b></div>
+<div class="metric"><small>WEBGPU DISPATCH</small><b id="gpuTime">—</b></div>
+<div class="metric"><small>MAX NUMERIC ERROR</small><b id="error">—</b></div>
+<div class="metric" style="grid-column:1/-1"><small>CPU REFERENCE PARITY</small><b id="validation">WAITING</b></div>
+</div>
+<div class="note">CPU는 검증용 정답만 계산합니다. 실제 벡터 곱은 압축 가중치를 WGSL에서 직접 해석하는 GPU Compute Shader가 처리합니다.</div>
+</div></div>
+</div>
+<div class="steps"><div class="step"><span>01 / PRISM FORMATS</span><b>Read PTQ1_0 / PQ2_0</b><p>128개 삼진 가중치를 28바이트 또는 34바이트 블록으로 읽고 fp16 스케일을 적용합니다.</p></div><div class="step"><span>02 / DIRECT GPU</span><b>Decode inside WGSL</b><p>프레임워크 없이 GPU에 압축 블록을 전송하고, 셰이더에서 가중치를 복원하면서 곱셈·누산을 수행합니다.</p></div><div class="step"><span>03 / VALIDATE</span><b>Compare with CPU reference</b><p>CPU 기준 디코더로 구한 결과와 GPU의 출력을 모두 비교하고 최댓값 오차를 표시합니다.</p></div></div>
+<p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. GGUF 컨테이너 파싱, 실제 모델 파일 연결, Hadamard/사인플립, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
+</div></section></main>
+<footer><div class="container"><div><b>AETHERION / Bonsai Native Codec</b><div>Prism-format study · independently written WGSL</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/bonsai">Source ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML model ↗</a></div></div></footer>
+<script src="./codec.js?v=1" defer></script><script src="./engine.js?v=1" defer></script>
+</body></html>
