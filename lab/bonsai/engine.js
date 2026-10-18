@@ -58,7 +58,7 @@ const gpuSource=[
 '}'
 ].join('\n');
 
-let gpu=null,adapter=null,pipeline=null,running=false;
+let gpu=null,adapter=null,pipeline=null,running=false,modelFile=null,modelHeader=null;
 function note(msg){const el=$('log'),p=document.createElement('p');p.textContent=new Date().toLocaleTimeString()+' — '+msg;el.prepend(p);while(el.childElementCount>14)el.lastElementChild.remove();}
 function setStatus(msg,type=''){const x=$('status');x.textContent=msg;x.dataset.kind=type;}
 function update(id,s){$(id).textContent=s;}
@@ -116,14 +116,15 @@ async function runMatvec(fixture,input){
   return {result,ms:times[Math.floor(times.length/2)]};
  }finally{resources.forEach(x=>{try{x.destroy()}catch{}});}
 }
-async function run(){
+async function run(fixtureOverride=null){
  if(running)return;running=true;$('run').disabled=true;setStatus('검증 준비 중…');
  try{
-  const rows=Number($('rows').value),cols=Number($('cols').value),format=Number($('format').value);
+  const rows=fixtureOverride?fixtureOverride.rows:Number($('rows').value),cols=fixtureOverride?fixtureOverride.cols:Number($('cols').value),format=fixtureOverride?fixtureOverride.format:Number($('format').value);
   await initialize();
-  const fixture=PrismBlocks.packFixture(rows,cols,format);
+  const fixture=fixtureOverride||PrismBlocks.packFixture(rows,cols,format);
   const x=PrismBlocks.randomActivation(cols);
-  const ref=PrismBlocks.referenceMatvec(fixture.reference,rows,cols,x);
+  const referenceWeights=fixture.reference||PrismBlocks.decodeMatrix(fixture.bytes,rows,cols,format);
+  const ref=PrismBlocks.referenceMatvec(referenceWeights,rows,cols,x);
   const start=performance.now();
   const result=await runMatvec(fixture,x);
   const elapsed=performance.now()-start;
@@ -140,14 +141,54 @@ async function run(){
   setStatus(ok?'실제 WebGPU 패킹 연산 통과':'GPU 계산 불일치',ok?'ready':'error');
   note('CPU 참조 대비 최대 오차 '+diff.toExponential(4)+' (허용 '+tolerance+')');
   note('GPU 중앙 지연 '+result.ms.toFixed(2)+'ms · 총 테스트 '+elapsed.toFixed(2)+'ms');
-  note(PrismBlocks.FORMATS[format].name+' · '+rows+'×'+cols+' · '+fixture.blockCount+'개 공식 레이아웃 블록');
+  note((fixtureOverride?'실제 파일 텐서 ':'시험 데이터 ')+PrismBlocks.FORMATS[format].name+' · '+rows+'×'+cols+' · '+fixture.blockCount+'개 블록');
  }catch(e){
   console.error(e);setStatus('검증 실패','error');
   update('validation','ERROR · '+(e.message||String(e)));
   $('validation').dataset.ok='no';note('오류: '+(e.message||String(e)));
  }finally{running=false;$('run').disabled=false;}
 }
-$('run').addEventListener('click',run);
+async function inspectSelectedGGUF(){
+ const file=$('ggufFile').files?.[0];if(!file)return;
+ modelFile=null;modelHeader=null;$('tensorName').textContent='';$('runFile').disabled=true;
+ $('ggufInfo').textContent='GGUF 메타데이터를 스트리밍으로 검사 중입니다…';
+ try{
+  const header=await GGUFInspector.inspect(file);
+  modelFile=file;modelHeader=header;
+  const selector=$('tensorName');
+  header.tensors.forEach((tensor,index)=>{
+   const option=document.createElement('option');
+   option.value=String(index);
+   option.textContent=tensor.name+' · '+tensor.dims.join('×')+' · '+PrismBlocks.FORMATS[tensor.type].name;
+   selector.append(option);
+  });
+  $('ggufInfo').textContent='GGUF v'+header.version+' · '+(file.size/1e6).toFixed(1)+' MB · '+header.nTensors+'개 텐서 · PTQ/PQ '+header.supportedCount+'개 사용 가능 · '+(header.metadata['general.architecture']||'아키텍처 미기재');
+  $('runFile').disabled=header.supportedCount===0;
+  note('사용자 로컬 GGUF 메타데이터 분석 완료 · 실제 텐서 '+header.supportedCount+'개 발견');
+ }catch(err){
+  $('ggufInfo').textContent='파일 검사 실패: '+(err?.message||err);
+  note('GGUF 파싱 오류: '+(err?.message||err));
+ }
+}
+async function runGGUFSample(){
+ if(!modelFile||!modelHeader)return;
+ if(running)return;
+ const tensor=modelHeader.tensors[Number($('tensorName').value)];
+ if(!tensor)return;
+ try{
+  $('runFile').disabled=true;
+  $('ggufInfo').textContent='선택 텐서의 처음 32행만 읽어 CPU/GPU 비교 준비 중…';
+  const fixture=await GGUFInspector.readTensorRows(modelFile,modelHeader,tensor,32);
+  $('ggufInfo').textContent='실제 '+tensor.name+' · '+fixture.rows+'×'+fixture.cols+' · '+(fixture.bytes.length/1024).toFixed(1)+' KB만 로드';
+  await run(fixture);
+ }catch(err){
+  $('ggufInfo').textContent='텐서 샘플 오류: '+(err?.message||err);
+  note('텐서 오류: '+(err?.message||err));
+ }finally{$('runFile').disabled=!modelHeader?.supportedCount;}
+}
+$('run').addEventListener('click',()=>run());
+$('ggufFile').addEventListener('change',inspectSelectedGGUF);
+$('runFile').addEventListener('click',runGGUFSample);
 note('공식 PrismML PTQ1_0 / PQ2_0 레이아웃용 블록 디코더 준비.');
 if(isSecureContext&&navigator.gpu)run();
 else setStatus('WebGPU 지원 브라우저에서 실행하세요','error');

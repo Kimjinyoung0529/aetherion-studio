@@ -13,7 +13,7 @@ const PrismBlocks=(()=>{
   const POW3=[1,3,9,27,81];
   function assertShape(rows,cols,format){
     if(!FORMATS[format])throw Error('지원하지 않는 GGML 텐서 타입: '+format);
-    if(!Number.isSafeInteger(rows)||!Number.isSafeInteger(cols)||rows<1||cols<128||cols%128!==0||rows>4096||cols>4096)throw Error('블록 형태가 올바르지 않습니다: cols는 128의 배수여야 합니다.');
+    if(!Number.isSafeInteger(rows)||!Number.isSafeInteger(cols)||rows<1||cols<128||cols%128!==0||rows>4096||cols>16384)throw Error('블록 형태가 올바르지 않습니다: cols는 128의 배수여야 합니다.');
   }
   function f16ToNumber(h){
     const s=h&0x8000?-1:1, exp=(h>>>10)&31, frac=h&1023;

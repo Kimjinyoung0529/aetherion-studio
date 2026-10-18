@@ -38,7 +38,7 @@ h2{font-size:28px;letter-spacing:-.06em;margin:0 0 25px}
 .metric{background:#faf9f6;padding:18px;border:1px solid var(--line);border-radius:8px;min-width:0}
 .metric small{font-size:10px;letter-spacing:.05em;color:var(--muted);display:block;margin-bottom:12px}.metric b{font-size:17px;letter-spacing:-.05em;overflow-wrap:anywhere}
 #validation[data-ok=yes]{color:#338e56}#validation[data-ok=no]{color:#bd5135}
-.note{margin-top:18px;padding:15px;background:#f0ece5;border-radius:8px;font-size:11px;color:#74766f;line-height:1.8}
+.filezone{margin-top:27px;border-top:1px solid var(--line);padding-top:22px;display:grid;gap:10px}.filezone label{font-size:11px;font-weight:800}.filezone input{width:100%;font-size:11px;overflow-wrap:anywhere}.filezone select{border:1px solid var(--line);background:#fff;min-height:43px;border-radius:6px;padding:8px;font-size:11px;max-width:100%}.fileBtn{background:#222525;color:white;border:0;border-radius:6px;padding:12px;font-size:11px;font-weight:800}.fileBtn:disabled{opacity:.35}.filezone .kicker{margin:0 0 4px}.note{margin-top:18px;padding:15px;background:#f0ece5;border-radius:8px;font-size:11px;color:#74766f;line-height:1.8}
 .steps{margin-top:42px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .step{background:#ebe7df;border:1px solid #dedad2;border-radius:9px;padding:22px}
 .step span{font-weight:900;font-size:11px;color:#ca5938}.step b{display:block;font-size:15px;letter-spacing:-.04em;margin:14px 0 10px}.step p{font-size:11px;line-height:1.8;color:#74756f;margin:0}
@@ -65,6 +65,14 @@ footer b{color:white;font-size:14px}
 <div class="field"><label for="rows">출력 행 수</label><select id="rows"><option value="64">64개 · 안전한 테스트</option><option value="128" selected>128개 · 권장</option><option value="256">256개 · 고성능 테스트</option></select></div>
 <div class="field"><label for="cols">입력 차원</label><select id="cols"><option value="128">128개</option><option value="512" selected>512개</option><option value="1024">1024개</option></select></div>
 <button id="run" type="button" class="run">Prism 블록 WebGPU 연산 ↗</button>
+<div class="filezone"><div class="kicker">02 / ACTUAL GGUF FILE INSPECTOR</div>
+<label for="ggufFile">내 기기의 GGUF 파일 선택 (서버 업로드 없음)</label>
+<input id="ggufFile" type="file" accept=".gguf">
+<div id="ggufInfo" class="hint">파일을 선택하면 헤더와 양자화된 텐서 목록만 확인합니다. 2B 모델 전체를 GPU 메모리에 올리지 않습니다.</div>
+<label for="tensorName">PTQ1_0 / PQ2_0 텐서 선택</label>
+<select id="tensorName"><option value="">먼저 GGUF 파일을 선택해 주세요</option></select>
+<button id="runFile" class="fileBtn" type="button" disabled>실제 텐서 32행만 GPU로 검증 ↗</button>
+</div>
 <p class="hint" style="margin-top:13px">실제 모델 가중치 전체를 다운로드하지 않는 형식·연산 검증입니다. 외부 LLM 런타임은 쓰지 않습니다.</p>
 <div id="status" class="status" aria-live="polite">GPU 초기화 전</div><div id="log" class="log"><p>WebGPU 준비 중. GPU 어댑터를 확인합니다.</p></div>
 </div></div>
@@ -82,8 +90,8 @@ footer b{color:white;font-size:14px}
 </div></div>
 </div>
 <div class="steps"><div class="step"><span>01 / PRISM FORMATS</span><b>Read PTQ1_0 / PQ2_0</b><p>128개 삼진 가중치를 28바이트 또는 34바이트 블록으로 읽고 fp16 스케일을 적용합니다.</p></div><div class="step"><span>02 / DIRECT GPU</span><b>Decode inside WGSL</b><p>프레임워크 없이 GPU에 압축 블록을 전송하고, 셰이더에서 가중치를 복원하면서 곱셈·누산을 수행합니다.</p></div><div class="step"><span>03 / VALIDATE</span><b>Compare with CPU reference</b><p>CPU 기준 디코더로 구한 결과와 GPU의 출력을 모두 비교하고 최댓값 오차를 표시합니다.</p></div></div>
-<p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. GGUF 컨테이너 파싱, 실제 모델 파일 연결, Hadamard/사인플립, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
+<p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. 전체 모델 실행, Hadamard/사인플립, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
 </div></section></main>
 <footer><div class="container"><div><b>AETHERION / Bonsai Native Codec</b><div>Prism-format study · independently written WGSL</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/bonsai">Source ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML model ↗</a></div></div></footer>
-<script src="./codec.js?v=1" defer></script><script src="./engine.js?v=1" defer></script>
+<script src="./codec.js?v=2" defer></script><script src="./gguf.js?v=1" defer></script><script src="./engine.js?v=2" defer></script>
 </body></html>
