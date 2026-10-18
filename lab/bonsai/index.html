@@ -113,6 +113,12 @@ footer b{color:white;font-size:14px}
 </div>
 <p id="hwLog" class="hint" style="margin-top:13px" aria-live="polite">GPU 검증 전</p>
 </section>
+<div class="hadamardPanel" style="margin-top:16px"><div class="kicker">04 / GGUF AUTO SHARDING</div>
+<h2>Split safely. Load deliberately.</h2>
+<p class="hint" style="margin-bottom:19px">GGUF 파일을 무작정 반으로 자르지 않고 공식 llama.cpp의 텐서 보존 분할 기능을 사용합니다. 가능하면 2개, 용량 제한을 넘으면 더 많은 조각으로 분할하고 체크섬을 기록합니다. 2B 모델의 전체 메모리 사용량이 줄어드는 것은 아닙니다.</p>
+<a href="https://github.com/Kimjinyoung0529/aetherion-studio/actions/workflows/gguf-auto-split.yml" target="_blank" rel="noopener" class="fileBtn" style="display:inline-block">GitHub Actions 자동 GGUF 분할 열기 ↗</a>
+<p class="hint" style="margin-top:11px">Prism 전용 PTQ1_0/PQ2_0 모델은 실행 옵션에서 <strong>llama_source: prism</strong>을 선택해야 합니다. 실제 대용량 분할은 사용자가 Actions에서 직접 실행합니다.</p>
+</div>
 <p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. 전체 모델 실행, Bonsai 전용 Hadamard/사인플립 통합, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
 </div></section></main>
 <footer><div class="container"><div><b>AETHERION / Bonsai Native Codec</b><div>Prism-format study · independently written WGSL</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/bonsai">Source ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML model ↗</a></div></div></footer>
