@@ -96,6 +96,13 @@ footer b{color:white;font-size:14px}
  <div class="hint">GPU: <b id="signedFoldTime">—</b> · 최댓값 오차: <b id="signedFoldError">—</b></div>
  <div id="signedFoldResult" class="hint" aria-live="polite">아직 실행하지 않음</div>
 </div>
+<div class="auditBox">
+ <strong>ONE REAL BONSAI TENSOR / STAGED WEBGPU PATH</strong>
+ <p class="hint">선택한 실제 접힌 텐서의 16행을 읽고, GPU에서 <b>부호 반전 → Hadamard → PTQ/PQ 압축 행렬곱</b>을 차례로 실행해 CPU 기준과 비교합니다. 중간 벡터를 읽어 다른 GPU 패스로 재업로드하는 연구용 경로입니다. GDN ssm_out 순열 및 전체 2B 모델 추론은 포함하지 않습니다.</p>
+ <button id="runFoldedPath" class="fileBtn" type="button" disabled>실제 Bonsai 텐서 GPU 연속 검증 ↗</button>
+ <div id="foldedPathResult" class="hint" aria-live="polite">GGUF 파일을 선택한 뒤 PTQ/PQ 텐서를 골라 주세요.</div>
+ <div id="foldedPathDetails" class="hint"></div>
+</div>
 </div>
 <p class="hint" style="margin-top:13px">실제 모델 가중치 전체를 다운로드하지 않는 형식·연산 검증입니다. 외부 LLM 런타임은 쓰지 않습니다.</p>
 <div id="status" class="status" aria-live="polite">GPU 초기화 전</div><div id="log" class="log"><p>WebGPU 준비 중. GPU 어댑터를 확인합니다.</p></div>
@@ -138,5 +145,5 @@ footer b{color:white;font-size:14px}
 <p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. 전체 모델 실행, Bonsai 전용 Hadamard/사인플립 통합, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
 </div></section></main>
 <footer><div class="container"><div><b>AETHERION / Bonsai Native Codec</b><div>Prism-format study · independently written WGSL</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/bonsai">Source ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML model ↗</a></div></div></footer>
-<script src="./codec.js?v=2" defer></script><script src="./gguf.js?v=3" defer></script><script src="./audit.js?v=1" defer></script><script src="./engine.js?v=3" defer></script><script src="./signed_fold.js?v=1" defer></script><script src="./hadamard.js?v=1" defer></script>
+<script src="./codec.js?v=2" defer></script><script src="./gguf.js?v=3" defer></script><script src="./audit.js?v=1" defer></script><script src="./engine.js?v=4" defer></script><script src="./signed_fold.js?v=1" defer></script><script src="./hadamard.js?v=1" defer></script>
 </body></html>
