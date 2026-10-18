@@ -22,6 +22,8 @@ jobs:
         run: node lab/bonsai/test_codec.mjs
       - name: Test Prism Hadamard metadata, sign vectors and tensor fold mapping
         run: node lab/bonsai/test_audit.mjs
+      - name: Test actual Prism sign-vector FWHT order and inversion
+        run: node lab/bonsai/test_signed_fold.mjs
       - name: Test Hadamard CPU reference and involution
         run: node lab/bonsai/test_hadamard.mjs
       - name: Syntax check browser assets
@@ -31,3 +33,4 @@ jobs:
           node --check lab/bonsai/engine.js
           node --check lab/bonsai/hadamard.js
           node --check lab/bonsai/audit.js
+          node --check lab/bonsai/signed_fold.js
