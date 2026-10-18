@@ -6,6 +6,9 @@ This is a native, browser-only WebGPU codec and matvec experiment for **PrismML 
 
 ## What works
 
+- Parses **actual `prism.hadamard` metadata** (folded tensor names, inverse embedding list, block size, per-width explicit sign vectors) and the `qwen35` hybrid attention layer counts from a user-selected GGUF. Reports strict compatibility issues; the audit does not claim successful model inference.
+- Runs a **signed WebGPU blockwise Hadamard** (`signs × activation → normalized FWHT`) and compares it against an independent CPU inverse / parity reference. The sign vectors can come directly from the GGUF metadata.
+- Adds a **staged single-real-tensor test**: GGUF compressed rows → GPU sign+Hadamard → readback → GPU packed matvec → CPU reference parity. The intermediary readback is intentionally simple and must be eliminated in a future fused production pipeline. `ssm_out` weights requiring GDN head permutation are guarded and not executed.
 - Reads the actual published Prism fork **PTQ1_0 (GGML type 143)** block representation: 128 trits, 24 base-3 packed bytes, 2 tail bytes, and one little-endian FP16 scale = **28 bytes** (1.75 bits/weight).
 - Reads Prism **PQ2_0 (type 142)**: 128 packed 2-bit values and one little-endian FP16 scale = **34 bytes** (2.125 bits/weight).
 - The WGSL shader fetches packed bytes and decodes weights **inside the matvec loop**, without allocating a full FP32 weight tensor on GPU.
@@ -18,11 +21,14 @@ This is a native, browser-only WebGPU codec and matvec experiment for **PrismML 
 ## Architecture
 
 - `codec.js`: PTQ1_0/PQ2_0 block layouts, FP16 scaling, round-trip fixture encoding, CPU reference matvec.
-- `gguf.js`: independent read-only GGUF v2/v3 metadata/tensor inspector.
+- `gguf.js`: independent read-only GGUF v2/v3 metadata/tensor inspector, including selected Prism sign metadata.
 - `engine.js`: first-party WGSL WebGPU packed matvec, numerical comparison, and file-picker integration.
 - `index.html`: interactive research interface.
 - `test_codec.mjs`: standalone Node conformance tests, no external npm packages.
 - `hadamard.js`: independent direct WebGPU normalized FWHT and CPU reference, with GPU result comparison.
+- `audit.js`: Prism explicit sign-map and folded-weight header validation.
+- `signed_fold.js`: sign-first FWHT WGSL kernel and CPU inverse reference.
+- `test_audit.mjs`, `test_signed_fold.mjs`: synthetic GGUF metadata, sign order, and orthogonality regression checks.
 - `ffn.js`: first-party WGSL RMSNorm + SwiGLU dense feed-forward + residual kernel with deterministic CPU reference.
 - `test_ffn.mjs`: checks FFN reference, zero-weight residual behavior, and shape guards (GPU output verification requires on-device browser).
 - `test_hadamard.mjs`: standalone normalized FWHT algebraic / inverse test.
@@ -44,7 +50,7 @@ This is a native, browser-only WebGPU codec and matvec experiment for **PrismML 
 
 ## Next implementation milestones
 
-1. Compare against real PrismML reference fixture bytes, and reject unsupported GGUF tensor types visibly.
+1. Compare **real PrismML fixture/logits** to the existing decoder and transform steps. CPU self-parity alone cannot prove full PrismML compatibility.
 2. Integrate the correct Prism Bonsai 2 sign-flip/Hadamard transforms at the verified model graph locations (the generic FWHT proof of concept is implemented separately).
 3. Implement the Qwen3.5 hybrid model graph, tokenizer, state cache, KV cache, streaming autoregressive decode.
 4. Logit/token parity testing against a trusted reference across multiple prompts and browsers.
