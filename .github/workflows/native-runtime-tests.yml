@@ -22,6 +22,8 @@ jobs:
         run: node runtime/test_native.mjs
       - name: Test v2 multi-kernel autotune correctness gating
         run: node runtime/test_autotune.mjs
+      - name: Simulate GPU buffer reuse and corrupted-kernel fallback
+        run: node runtime/test_session.mjs
       - name: Validate browser JavaScript syntax
         run: |
           node --check runtime/tuner.js
@@ -30,3 +32,4 @@ jobs:
           node --check runtime/native-kernel.js
           node --check runtime/autotune-v2.js
           node --check runtime/autotune-ui.js
+          node --check runtime/native-session.js
