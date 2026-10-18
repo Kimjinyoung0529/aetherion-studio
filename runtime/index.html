@@ -101,7 +101,8 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <div id="ggufFields" hidden>
 <div class="field"><label for="sourceKind">GGUF 데이터 위치</label><select id="sourceKind"><option value="url">HTTPS URL (분할 파일의 첫 shard도 가능)</option><option value="files">내 기기의 GGUF 파일 선택</option></select></div>
 <div class="field" id="sourceUrl"><label for="ggufUrl">GGUF 직접 다운로드 URL</label><input type="url" id="ggufUrl" placeholder="https://huggingface.co/owner/repo/resolve/main/model.gguf" autocomplete="off" spellcheck="false"/>
-<p class="help">Hugging Face 또는 CORS가 허용된 HTTPS URL. 모델과 저작권·라이선스를 확인하세요.</p></div>
+<p class="help">Hugging Face 또는 CORS가 허용된 HTTPS URL. 모델과 저작권·라이선스를 확인하세요.</p><button id="qwenPreset" class="lightButton" type="button" style="margin-top:10px;width:100%">Qwen3-0.6B · Q4_K_M 약 484MB 프리셋 입력 ↗</button>
+<p class="help">외부 커뮤니티 GGUF 파일입니다. 직접 로드하기 전에는 모델을 다운로드하지 않습니다.</p></div>
 <div class="field" id="sourceFiles" hidden><label for="fileSelect">GGUF 파일(분할 시 모두 선택)</label><input type="file" accept=".gguf" multiple id="fileSelect"/>
 <p class="help">파일은 서버에 업로드되지 않습니다. 2GB 초과 모델은 올바른 GGUF 텐서 샤드로 분할해야 합니다.</p></div>
 </div>
