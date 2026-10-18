@@ -2,6 +2,8 @@
 <html lang="ko"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AETHERION / GPU Strategy Tournament</title>
+<link rel="stylesheet" href="/assets/brand.css?v=4">
+<link rel="stylesheet" href="/assets/interior.css?v=2">
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,sans-serif;color:#122638;background:#f1f4f2}
 *{box-sizing:border-box}body{margin:0}.wrap{max-width:1000px;margin:auto;padding:24px}
@@ -18,11 +20,19 @@ button:disabled{opacity:.5;cursor:not-allowed}
 td,th{padding:14px;border-bottom:1px solid #e1e8e5;white-space:nowrap}th{background:#edf3f0}.pass{color:#168153}.fail{color:#ba413c}
 .note{color:#697981;font-size:12px;line-height:1.8}.winner{font-weight:900;font-size:19px}.status{font-size:12px;color:#536b74;margin:16px 0}
 @media(max-width:600px){.fields{grid-template-columns:1fr}.wrap{padding:18px}}
-</style></head><body>
+</style></head><body class="ae-interior ae-kernel-race">
+<a class="ae-skip" href="#main">본문 바로가기</a>
+<header class="ae-header"><div class="ae-header__wrap">
+<a href="/" class="ae-header__brand" aria-label="AETHERION 홈페이지"><span class="ae-symbol" aria-hidden="true">A</span><span class="ae-wordmark">AETHERION</span><span class="ae-header__descriptor">KOREA · AI</span></a>
+<nav class="ae-header__links" aria-label="주 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/" aria-current="page">로컬 실행기</a><a href="/lab/">연구실</a></nav>
+<div class="ae-header__right"><span class="ae-header__region">KO / KR</span><a href="/runtime/" class="ae-header__action">실행기로 돌아가기 ↗</a>
+<details class="ae-menu"><summary>메뉴 ☰</summary><nav class="ae-drawer" aria-label="모바일 전체 메뉴"><a href="/">브랜드</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">연구실</a></nav></details>
+</div></div></header>
+<div class="ae-pagebar"><div class="ae-pagebar__inner"><div class="ae-pagebar__crumb"><a href="/runtime/">AETHERION Runtime</a><span>/</span><strong>GPU 커널 경쟁 실험</strong></div><span class="ae-pagebar__status">6개 독립 구현 · 실제 GPU 벤치마크</span></div></div>
 <header class="hero"><div class="wrap"><div class="kicker">AETHERION / INDEPENDENT WEBGPU KERNEL TOURNAMENT</div>
 <h1>만들고, 겨루고,<br>가장 빠른 것만 남긴다.</h1><p>완전히 다른 여섯 가지 양자화 행렬 연산을 CPU 정확도 검사와 실제 GPU 작업 완료 시간으로 비교합니다. 모델 채팅 전체 성능은 별도 검사 대상입니다.</p>
 <a href="/runtime/" style="color:#ffd0bb">← 로컬 AI 실행기로 돌아가기</a></div></header>
-<main class="wrap"><section class="card">
+<main id="main" class="wrap"><section class="card">
 <h2>6개 독립 전략</h2>
 <p class="note">A: 직렬 · B: 공유 메모리 병렬 · C: 압축 바이트 병렬 해독 · F: 압축 바이트 직렬 해독 · D: Split-K 두 단계 · E: 모델 로드시 선해독(추가 메모리 소모). 정밀도 실패 후보는 채택 불가.</p>
 <div class="fields">
@@ -39,6 +49,7 @@ td,th{padding:14px;border-bottom:1px solid #e1e8e5;white-space:nowrap}th{backgro
 <p class="note">실측 순위는 기기마다 달라질 수 있습니다. SwiftShader처럼 CPU에서 GPU 명령을 구현하는 소프트웨어 어댑터의 결과는 아이폰·PC 하드웨어 GPU 순위에 적용할 수 없습니다.</p>
 <button id="save" disabled>결과 JSON 저장</button>
 </section></main>
+<footer class="ae-footer"><div class="ae-footer__wrap"><div class="ae-footer__top"><div><div class="ae-footer__brand">AETHERION AI</div><p class="ae-footer__promise">최적화는 주장보다 검증입니다.<br>같은 입력으로 경쟁하고 결과를 공개합니다.</p></div><nav class="ae-footer__nav" aria-label="하단 페이지 경로"><a href="/">브랜드</a><a href="/chat/">AI 채팅</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">Native Lab</a><a href="/lab/bonsai/">Bonsai Core</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio">GitHub ↗</a></nav></div><div class="ae-footer__bottom"><p>© 2026 AETHERION AI · 한국어 중심 AI 연구 프로젝트. 소프트웨어 GPU 실험 결과를 실제 하드웨어 GPU 또는 전체 LLM 성능으로 주장하지 않습니다.</p><p>INDEPENDENT KERNEL RESEARCH</p></div></div></footer>
 <script src="/lab/bonsai/codec.js?v=2"></script>
 <script src="/runtime/native-kernel.js?v=1"></script>
 <script src="./kernel-strategies.js?v=1"></script>
