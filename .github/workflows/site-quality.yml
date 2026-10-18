@@ -24,3 +24,41 @@ jobs:
           node --check runtime/app.js
           node --check runtime/autotune-v2.js
           node --check runtime/autotune-ui.js
+          node --check tools/site_browser_smoke.cjs
+  browser-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare headless Chrome and browser controller
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER_EXECUTABLE="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER_EXECUTABLE" ]; then
+            echo "Chrome/Chromium is not present on this runner"
+            exit 1
+          fi
+          echo "BROWSER_EXECUTABLE=$BROWSER_EXECUTABLE" >> "$GITHUB_ENV"
+          echo "PW_CORE_DIR=$RUNNER_TEMP/aetherion-browser/node_modules/playwright-core" >> "$GITHUB_ENV"
+          npm install --prefix "$RUNNER_TEMP/aetherion-browser" --no-save --ignore-scripts playwright-core@1.56.1
+      - name: Smoke test ten HTML pages on mobile and desktop
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/aetherion-http.log 2>&1 &
+          SERVER=$!
+          trap 'kill "$SERVER" || true' EXIT
+          sleep 2
+          node tools/site_browser_smoke.cjs
+      - name: Keep visual regression screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aetherion-visual-smoke
+          path: browser-smoke-screenshots/
+          if-no-files-found: ignore
+          retention-days: 3
