@@ -45,7 +45,7 @@ jobs:
           echo "BROWSER_EXECUTABLE=$CHROME" >> "$GITHUB_ENV"
           echo "PW_CORE_DIR=$RUNNER_TEMP/aetherion-bench/node_modules/playwright-core" >> "$GITHUB_ENV"
           npm install --prefix "$RUNNER_TEMP/aetherion-bench" --no-save --ignore-scripts playwright-core@1.56.1
-      - name: Execute five real WGSL implementations on Chrome SwiftShader
+      - name: Execute six independently designed WGSL implementations on Chrome SwiftShader
         shell: bash
         run: |
           set -euo pipefail
