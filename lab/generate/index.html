@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ko"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111313"><meta name="description" content="AETHERION Native Generator — 외부 AI 추론 라이브러리 없이 직접 만든 WebGPU 기반 초소형 Transformer 실험실.">
+<title>AETHERION / Native Generator 0.3</title>
+<style>
+:root{--ink:#171818;--bg:#f5f3ef;--cream:#fffefa;--line:#e3dfd8;--muted:#757872;--accent:#e3613e;--dark:#111313}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}button,input,textarea,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.container{width:min(1130px,calc(100% - 44px));margin:auto}
+header{background:var(--dark);color:#f0f0ed;border-bottom:1px solid #353735}
+header .container{display:flex;min-height:68px;align-items:center;justify-content:space-between;gap:15px}
+.brand{font-size:19px;font-weight:900;letter-spacing:-.07em;white-space:nowrap}
+.brand em{font-style:normal;color:var(--accent)}
+.links{display:flex;gap:17px;color:#b8bbb7;font-size:11px;font-weight:750}.links a.active{color:#fff}
+.hero{background:#111313;color:#fff;padding:67px 0 60px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0;opacity:.1;background-image:linear-gradient(#b5b6b2 1px,transparent 1px),linear-gradient(90deg,#b5b6b2 1px,transparent 1px);background-size:70px 70px}
+.hero .container{position:relative}
+.kicker{font-size:10px;font-weight:850;color:#e98468;letter-spacing:.19em}
+h1{font-size:clamp(43px,7vw,77px);line-height:1.08;letter-spacing:-.09em;margin:17px 0 23px;font-weight:760}
+h1 em{font-style:normal;color:var(--accent)}
+.hero p{color:#bfc0ba;max-width:720px;font-size:13px;line-height:1.9;margin:0;word-break:keep-all}
+.banner{background:#ebe8e2;border-bottom:1px solid var(--line)}
+.banner .container{padding:16px 0;display:flex;justify-content:space-between;gap:11px;flex-wrap:wrap;font-size:10px;letter-spacing:.08em;color:#71736d;font-weight:850}
+.main{padding:48px 0 75px}
+.secLabel{font-size:10px;font-weight:850;letter-spacing:.14em;color:#cf5d3d;margin-bottom:13px}
+h2{font-size:29px;letter-spacing:-.055em;margin:0 0 27px;font-weight:760}
+.layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(290px,.8fr);gap:18px;align-items:start}
+.card{background:var(--cream);border:1px solid var(--line);border-radius:13px;overflow:hidden;box-shadow:0 15px 37px #00000008}
+.cardHead{padding:20px 23px;display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--line)}
+.cardHead b{font-size:14px;letter-spacing:-.025em}.cardHead small{font-size:10px;color:#90918c}
+.messages{height:390px;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:16px;overscroll-behavior:contain}
+.welcome{margin:auto;text-align:center;color:#8a8c86;max-width:390px}
+.welcome strong{display:block;font-size:26px;letter-spacing:-.05em;color:#292b29;margin-bottom:11px}.welcome p{font-size:12px;line-height:1.8;margin:0}
+.bubble{max-width:min(92%,500px);display:flex;flex-direction:column;gap:6px}.bubble.user{align-self:flex-end}.bubble.assistant{align-self:flex-start}
+.speaker{font-size:10px;letter-spacing:.1em;font-weight:900;color:#9c9e97}.bubbleText{white-space:pre-wrap;overflow-wrap:anywhere;border-radius:9px;background:#edeae3;padding:14px 16px;font-size:13px;line-height:1.85;min-height:25px}
+.bubble.user .bubbleText{color:white;background:#272929}
+.examples{display:flex;gap:7px;flex-wrap:wrap;padding:13px 18px;border-top:1px solid var(--line)}
+.examples button{border:1px solid #e0ddd6;background:#f5f2ec;border-radius:7px;padding:8px 11px;color:#60625d;font-size:11px}
+.editor{padding:18px;border-top:1px solid var(--line)}
+.editor textarea{width:100%;min-height:70px;max-height:170px;resize:vertical;border:1px solid #d9d6cd;border-radius:7px;background:white;padding:13px 14px;font-size:13px;line-height:1.7}
+.editorBtns{display:flex;gap:8px;margin-top:9px}
+.primary{background:var(--accent);color:white;border:1px solid var(--accent);border-radius:7px;padding:13px 18px;font-size:12px;font-weight:900}
+.secondary{background:#fff;border:1px solid #d7d4ce;color:#53554f;border-radius:7px;padding:12px 16px;font-size:11px;font-weight:800}
+button:disabled{opacity:.45;cursor:not-allowed}
+.note{color:#80817b;font-size:10px;line-height:1.9;margin:13px 0 0}
+.side{display:flex;flex-direction:column;gap:17px}
+.panelContent{padding:21px}
+.status{font-size:12px;font-weight:850;color:#656763;line-height:1.6}
+.status:before{content:"";display:inline-block;width:8px;height:8px;background:#8c8e89;border-radius:50%;margin-right:8px}
+.status[data-kind=ready]{color:#368658}.status[data-kind=ready]:before{background:#3fb56b}
+.status[data-kind=error]{color:#b4472b}.status[data-kind=error]:before{background:#cf583a}
+.full{width:100%;margin:17px 0 4px}
+.metrics{margin-top:13px}
+.metric{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #ebe9e4;font-size:11px}
+.metric:last-child{border-bottom:0}.metric span{color:#888a85}.metric b{text-align:right;max-width:66%;overflow-wrap:anywhere;font-weight:780}
+.inputRow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;font-size:11px;border-top:1px solid #ebe9e4}
+.inputRow select{padding:9px;max-width:60%;border:1px solid #dedbd5;border-radius:6px;background:#fff;color:#303230;font-size:11px}
+.inputRow input{width:140px;max-width:55%;accent-color:var(--accent)}
+.log{height:172px;background:#181a19;color:#cccfc9;border-radius:7px;padding:15px;overflow:auto}
+.log p{font-family:ui-monospace,Menlo,monospace;font-size:10px;line-height:1.6;margin:0 0 10px;overflow-wrap:anywhere}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:38px}
+.step{background:#ebe8e1;border:1px solid #dedbd5;border-radius:10px;padding:22px}
+.step small{color:#d65d3d;font-size:11px;font-weight:900}.step h3{font-size:16px;letter-spacing:-.05em;margin:14px 0 12px}.step p{font-size:11px;line-height:1.8;color:#757872;margin:0}
+.disclaimer{font-size:11px;color:#71736d;line-height:1.95;margin:23px 0 0}.disclaimer b{color:#363833}
+footer{background:#121313;color:#b2b5b0;padding:34px 0;font-size:11px;line-height:1.8}
+footer .container{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}footer b{color:#f5f4f1;font-size:14px}
+#errorDetail{color:#b84d31;overflow-wrap:anywhere}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
+@media(max-width:560px){.container{width:calc(100% - 30px)}header .container{min-height:62px}.brand{font-size:15px}.links{gap:9px;font-size:10px}.hero{padding:48px 0}.hero p{font-size:12px}.main{padding:30px 0 55px}.cardHead,.panelContent{padding:16px}.messages{padding:15px;height:355px}.editor{padding:15px}.steps .step{padding:17px}h2{font-size:25px}}
+</style>
+</head>
+<body>
+<header><div class="container"><a href="/" class="brand">AETHERION <em>/ GENERATOR</em></a><nav class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/generate/" class="active">Generate</a></nav></div></header>
+<main>
+<section class="hero"><div class="container"><div class="kicker">AETHERION / NATIVE SYSTEMS / EXPERIMENT 004</div><h1>From numbers<br><em>to language.</em></h1>
+<p>학습된 초소형 인과적 Transformer 가중치를 직접 만든 WebGPU 셰이더에서 추론하고, 다음 글자를 한 개씩 생성합니다. 문장 템플릿을 고르는 기존 의도 분류기와 달리 실제 토큰 예측을 반복하는 실험입니다.</p>
+</div></section>
+<div class="banner"><div class="container"><span>HANDWRITTEN WGSL INFERENCE</span><span>ONE CAUSAL ATTENTION LAYER</span><span>Q8 WEIGHTS · 202-CHARACTER VOCAB</span></div></div>
+<section class="main"><div class="container"><div class="secLabel">01 / AUTOREGRESSIVE GENERATION</div><h2>Learned weights. Real tokens.</h2>
+<div class="layout">
+<section class="card"><div class="cardHead"><b>LIVE / NATIVE GENERATOR</b><small>WebGPU · offline inference</small></div>
+<div class="messages" id="messages" aria-live="polite"><div class="welcome"><strong>Generate with the GPU.</strong><p>먼저 엔진 초기화를 눌러 GPU와 CPU의 실제 로그잇 계산이 같은지 확인해 주세요. 짧은 한국어 예문 범위에 대해서만 학습된 작은 모델입니다.</p></div></div>
+<div class="examples"><button type="button" data-example="안녕">안녕 ↗</button><button type="button" data-example="너 누구야">너 누구야 ↗</button><button type="button" data-example="WebGPU가 뭐야">WebGPU란? ↗</button><button type="button" data-example="최적화 해줘">최적화 ↗</button></div>
+<div class="editor"><form id="sendForm"><textarea id="prompt" maxlength="120" rows="2" placeholder="짧은 한국어로 질문하기 · 예: 안녕"></textarea><div class="editorBtns"><button type="submit" class="primary" id="send" disabled style="flex:1">GPU 토큰 생성 ↗</button><button type="button" class="secondary" id="stop" disabled>중지</button><button type="button" class="secondary" id="clear">지우기</button></div></form>
+<p class="note">202개 문자에 없는 글자는 미등록 토큰으로 치환돼. <b>범용 챗봇이 아니며 출력에 오류·반복·무의미한 문장이 생길 수 있어.</b></p></div>
+</section>
+<div class="side">
+<section class="card"><div class="cardHead"><b>ENGINE / SELF-TEST</b><small>GPU vs CPU logit parity</small></div><div class="panelContent"><div id="status" class="status" aria-live="polite">GPU 초기화 대기</div>
+<button type="button" id="start" class="primary full">WebGPU 엔진 초기화 ↗</button><p id="errorDetail" class="note" hidden></p>
+<div class="metrics">
+<div class="metric"><span>DEVICE</span><b id="gpu">미확인</b></div>
+<div class="metric"><span>MODEL</span><b id="modelName">Native Transformer 0.3</b></div>
+<div class="metric"><span>QUANTIZED WEIGHTS</span><b id="weightSize">—</b></div>
+<div class="metric"><span>MAX LOGIT ERROR</span><b id="parity">—</b></div>
+<div class="metric"><span>INITIAL GPU LATENCY</span><b id="latency">—</b></div>
+<div class="metric"><span>GENERATED CHARACTERS</span><b id="outputTokens">0</b></div>
+<div class="metric"><span>GENERATION SPEED</span><b id="tokenSpeed">—</b></div></div>
+<div style="margin-top:21px"><div class="secLabel">GENERATION / CONTROLS</div><div class="inputRow"><label for="maxTokens">최대 생성 길이</label><select id="maxTokens"><option value="32">32자</option><option value="64" selected>64자</option><option value="96">96자</option></select></div>
+<div class="inputRow"><label for="temperature">Temperature: <span id="tempValue">0.3</span></label><input id="temperature" type="range" min="0" max="1" step="0.1" value="0.3"></div></div>
+</div></section>
+<section class="card"><div class="cardHead"><b>GPU / DIAGNOSTICS</b><small>No CPU inference fallback</small></div><div class="panelContent"><div id="runtimeLog" class="log" aria-label="GPU diagnostics"><p>신경망 가중치 및 WGSL 컴파일 대기 중.</p></div><p class="note">모델 가중치와 셰이더는 정적 파일로 다운로드되지만, 질문 처리와 추론 연산은 브라우저에서 수행됩니다. GPU 검증에 실패하면 생성 버튼을 활성화하지 않습니다.</p></div></section>
+</div>
+</div>
+<div class="steps">
+<div class="step"><small>01 / Q8 MODEL</small><h3>Compact learned weights</h3><p>직접 학습시킨 1층 Transformer의 임베딩과 투사 행렬을 Q8 가중치로 저장해 WebGPU에 전송합니다.</p></div>
+<div class="step"><small>02 / CAUSAL ATTENTION</small><h3>Predict the next character</h3><p>레이어 정규화, Q/K/V, 인과적 어텐션, FFN, 출력 로짓을 GPU 셰이더에서 직접 계산합니다.</p></div>
+<div class="step"><small>03 / GENERATION</small><h3>One token at a time</h3><p>다음 글자를 선택하고 새 입력에 추가하는 작업을 반복합니다. GPU 로그잇과 별도 CPU 기준 구현의 오차를 측정합니다.</p></div>
+</div>
+<p class="disclaimer"><b>연구 목적:</b> 202자 어휘, 16차원 임베딩, 단일 인과적 어텐션 레이어, 48자 컨텍스트를 가진 초소형 실험 모델입니다. 한국어 질문 24쌍의 자체 예문으로 학습했으며, 자유 대화 성능은 제한적입니다. <b>PrismML Bonsai 2B 가중치나 Qwen3.5 하이브리드 어텐션을 실행하는 엔진이 아닙니다.</b> 이 실험은 LLM 추론의 구성 요소 중 하나인 실제 토큰 생성 경로를 검증하기 위한 것입니다.</p>
+</div></section></main>
+<footer><div class="container"><div><b>AETHERION / NATIVE GENERATOR</b><div>Experimental WebGPU implementation · v0.3</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/generate">Source ↗</a> · <a href="/lab/bonsai/">Bonsai Codec Lab ↗</a></div></div></footer>
+<script src="./engine.js?v=1" defer></script>
+<script src="./app.js?v=1" defer></script>
+</body></html>
