@@ -12,7 +12,7 @@ vm.runInContext(read('../native-kernel.js'),env);
 vm.runInContext(read('kernel-strategies.js')+'\nglobalThis.S=AetherionKernelStrategies;',env);
 vm.runInContext(read('kernel-race.js')+'\nglobalThis.B=AetherionKernelRace;',env);
 const S=env.S,B=env.B;
-assert.deepEqual(Array.from(S.STRATEGIES,x=>x.id),['scalar','lane32','packed_byte','split_k','predecode']);
+assert.deepEqual(Array.from(S.STRATEGIES,x=>x.id),['scalar','lane32','packed_byte','packed_row','split_k','predecode']);
 for(const rows of [128,256]){
  for(const cols of [256,512]){
   for(const s of S.STRATEGIES){
@@ -27,6 +27,10 @@ for(const rows of [128,256]){
    if(s.id==='predecode'){
     assert.ok(plan.preprocess);
     assert.equal(plan.bytesDense,rows*cols*4);
+   }
+   if(s.id==='packed_row'){
+    assert.match(plan.stages[0].code,/byteIndex<26u/);
+    assert.doesNotMatch(plan.stages[0].code,/workgroupBarrier/);
    }
    if(s.id==='packed_byte'){
     assert.match(plan.stages[0].code,/let bits=getByte\(baseOff\+2u\+lane\)/);
@@ -43,4 +47,4 @@ assert.equal(B.pick([{id:'scalar',status:'pass',ms:10},{id:'packed_byte',status:
 assert.equal(B.pick([{id:'scalar',status:'pass',ms:10},{id:'predecode',status:'pass',ms:1}]).id,'scalar','expanded FP32 should not be auto-selected as compact');
 const html=read('index.html');
 for(const name of ['./kernel-strategies.js','./kernel-race.js','/lab/bonsai/codec.js'])assert.ok(html.includes(name));
-console.log('PASS: 5 structurally independent WGSL strategies, CPU parity guard, expansion policy, 16 source plans');
+console.log('PASS: 6 structurally independent WGSL strategies, CPU parity guard, expansion policy, 16 source plans');
