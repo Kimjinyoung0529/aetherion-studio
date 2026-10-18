@@ -150,11 +150,24 @@ async function run(fixtureOverride=null){
 }
 async function inspectSelectedGGUF(){
  const file=$('ggufFile').files?.[0];if(!file)return;
- modelFile=null;modelHeader=null;$('tensorName').textContent='';$('runFile').disabled=true;
+ modelFile=null;modelHeader=null;window.currentBonsaiAudit=null;
+ $('tensorName').textContent='';$('runFile').disabled=true;
+ $('signedFoldWidth').textContent='';$('signedFoldRun').disabled=true;
+ $('auditReport').textContent='검사 준비 중…';
  $('ggufInfo').textContent='GGUF 메타데이터를 스트리밍으로 검사 중입니다…';
  try{
   const header=await GGUFInspector.inspect(file);
   modelFile=file;modelHeader=header;
+  const modelAudit=BonsaiAudit.audit(header);
+  window.currentBonsaiAudit=modelAudit;
+  $('auditReport').textContent=BonsaiAudit.printable(modelAudit);
+  $('auditSummary').textContent=modelAudit.compatibleMetadata?'Bonsai 헤더/부호/텐서 검증 통과 · 실제 생성은 별도 구현 필요':'모델 헤더 검증: '+modelAudit.errors+'개 오류 / '+modelAudit.warnings+'개 주의';
+  const foldSelect=$('signedFoldWidth');
+  for(const width of modelAudit.info.signWidths){
+   const option=document.createElement('option');option.value=String(width);option.textContent=width+'개 부호 값';
+   foldSelect.append(option);
+  }
+  $('signedFoldRun').disabled=!modelAudit.compatibleMetadata||!modelAudit.info.signWidths.length||modelAudit.info.blocks>1024;
   const selector=$('tensorName');
   header.tensors.forEach((tensor,index)=>{
    const option=document.createElement('option');
@@ -167,6 +180,8 @@ async function inspectSelectedGGUF(){
   note('사용자 로컬 GGUF 메타데이터 분석 완료 · 실제 텐서 '+header.supportedCount+'개 발견');
  }catch(err){
   $('ggufInfo').textContent='파일 검사 실패: '+(err?.message||err);
+  $('auditReport').textContent=err?.message||String(err);
+  $('auditSummary').textContent='파일 검증 실패';
   note('GGUF 파싱 오류: '+(err?.message||err));
  }
 }
