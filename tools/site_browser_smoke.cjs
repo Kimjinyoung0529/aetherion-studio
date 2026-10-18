@@ -12,7 +12,7 @@ const {chromium}=require(pwPath);
 const host='http://127.0.0.1:8765';
 const cases=[
  ['/', '홈페이지'],['/chat/','AI 채팅'],['/agent/','에이전트'],
- ['/runtime/','로컬 실행기'],['/lab/','Native Lab'],
+ ['/runtime/','로컬 실행기'],['/runtime/experiments/','커널 실험'],['/lab/','Native Lab'],
  ['/lab/ternary/','Ternary'],['/lab/bonsai/','Bonsai'],
  ['/lab/generate/','Generator 0.3'],['/lab/generate/v4/','Generator 0.4'],
  ['/legacy/','Legacy']
@@ -71,6 +71,10 @@ const cases=[
      }else{
       assert.equal(await page.locator('.ae-header__links').isVisible(),true);
      }
+     if(route==='/runtime/experiments/'){
+      assert.equal(await page.locator('#run').count(),1,'Independent six-way GPU button missing');
+      assert.equal(await page.locator('#results').count(),1,'Independent GPU result table missing');
+     }
      if(route==='/runtime/'){
       assert.equal(await page.locator('#autoRun').count(),1,'GPU v2 button missing');
       assert.equal(await page.locator('#autoResults').count(),1,'GPU score table missing');
@@ -98,5 +102,5 @@ const cases=[
  if(failures.length){
   console.error('\nSITE BROWSER SMOKE FAILED '+failures.length+' checks:\n'+failures.join('\n'));
   process.exitCode=1;
- }else console.log('PASS 10 pages × 2 viewports, Chromium DOM and mobile menu interactions, no script errors or local 404s');
+ }else console.log('PASS 11 pages × 2 viewports, Chromium DOM and mobile menu interactions, no script errors or local 404s');
 })().catch(e=>{console.error(e);process.exitCode=1});
