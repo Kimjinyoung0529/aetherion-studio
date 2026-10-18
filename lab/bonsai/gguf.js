@@ -43,17 +43,24 @@ const GGUFInspector=(()=>{
     case 9:{
      const elemType=await this.u32(),count=await this.u64();
      if(count>5e6)throw Error('Metadata array too large');
-     const record=/^qwen35\.(attention\.recurrent_layers|rope\.dimension_sections)$/.test(key)&&count<=4096&&[0,1,2,3,4,5,7].includes(elemType);
+     const record=(
+      /^qwen35\.(attention\.recurrent_layers|rope\.dimension_sections)$/.test(key) && count<=4096 ||
+      /^prism\.hadamard\.(sign_values|sign_widths)$/.test(key) && count<=100000
+     ) && [0,1,2,3,4,5,7,10,11].includes(elemType);
      if(record){
       const items=[];
       for(let i=0;i<count;i++)items.push(await this.metadataValue(elemType,depth+1,''));
       return items;
      }
      if(elemType===8){
+      const capture=/^prism\.hadamard\.(weight_names|inverse_weight_names)$/.test(key) && count<=4000;
+      const values=capture?[]:null;
       for(let i=0;i<count;i++){
-       await this.str(0); // skip token strings instead of allocating entire vocabulary
+       const item=await this.str(capture?256:0);
+       if(capture)values.push(item);
        if(i%2048===0 && typeof requestAnimationFrame==='function')await new Promise(requestAnimationFrame);
       }
+      if(capture)return values;
      }else{
       const size=TYPE_SIZE[elemType];
       if(!size)throw Error('Unsupported GGUF metadata array type '+elemType);
@@ -84,7 +91,7 @@ const GGUFInspector=(()=>{
    if(key===null)throw Error('GGUF metadata key too long');
    const type=await r.u32();
    const value=await r.metadataValue(type,0,key);
-   if(value!==null && (/^qwen35\.(block_count|context_length|embedding_length|feed_forward_length|full_attention_interval|nextn_predict_layers|attention\.(head_count|head_count_kv|key_length|value_length|layer_norm_rms_epsilon|recurrent_layers)|rope\.(dimension_sections|dimension_count|freq_base)|ssm\.(conv_kernel|inner_size|state_size|group_count|time_step_rank))$/.test(key)||['general.alignment','general.architecture','general.name','tokenizer.ggml.model','general.file_type'].includes(key)))metadata[key]=value;
+   if(value!==null && ((/^(qwen35|qwen35moe|qwen3next)\.(block_count|context_length|embedding_length|feed_forward_length|full_attention_interval|nextn_predict_layers|attention\.(head_count|head_count_kv|key_length|value_length|layer_norm_rms_epsilon|recurrent_layers)|rope\.(dimension_sections|dimension_count|freq_base)|ssm\.(conv_kernel|inner_size|state_size|group_count|time_step_rank))$/.test(key)||/^prism\.hadamard\.(version|block_size|transform|axis|sign_mode|weight_names|inverse_weight_names|sign_widths|sign_values|gdn_v_grouped|tied_output)$/.test(key))||['general.alignment','general.architecture','general.name','tokenizer.ggml.model','general.file_type'].includes(key)))metadata[key]=value;
   }
   const tensors=[];
   for(let t=0;t<nTensors;t++){
