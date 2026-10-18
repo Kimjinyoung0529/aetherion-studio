@@ -48,9 +48,17 @@ footer{background:#131515;color:#b8b9b3;padding:35px 0;font-size:11px;line-heigh
 footer b{color:white;font-size:14px}
 @media(max-width:850px){.columns{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
 @media(max-width:520px){.container{width:calc(100% - 28px)}.brand{font-size:14px}.links{font-size:10px;gap:10px}.hero{padding:49px 0}.hero p{font-size:12px}.main{padding:32px 0 60px}.panelHead,.inside{padding:17px}.metrics{gap:8px}.metric{padding:13px}.metric b{font-size:14px}}
+
+.hadamardPanel{margin-top:42px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:23px}
+.hadamardGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:17px}
+.hadamardGrid label{display:grid;gap:9px;font-size:11px;font-weight:800}
+.hadamardGrid select{background:white;padding:12px;border:1px solid #ddd8d0;border-radius:7px;color:#292a28}
+.hadamardGrid .metric{padding:13px}
+#hwResult[data-ok=yes]{color:#3c9761}#hwResult[data-ok=no]{color:#c05237}
+@media(max-width:540px){.hadamardPanel{padding:15px}.hadamardGrid{gap:8px}.hadamardGrid .metric b{font-size:12px}}
 </style></head>
 <body>
-<nav class="top"><div class="container"><a class="brand" href="/">AETHERION <em>/ BONSAI CORE</em></a><div class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/bonsai/" class="active">Bonsai</a></div></div></nav>
+<nav class="top"><div class="container"><a class="brand" href="/">AETHERION <em>/ BONSAI CORE</em></a><div class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/bonsai/" class="active">Bonsai</a><a href="/lab/generate/">Generator</a></div></div></nav>
 <main>
 <section class="hero"><div class="container"><div class="tag">AETHERION / NATIVE SYSTEMS / RESEARCH 003</div>
 <h1>Read the bits.<br><em>Run the GPU.</em></h1>
@@ -90,8 +98,23 @@ footer b{color:white;font-size:14px}
 </div></div>
 </div>
 <div class="steps"><div class="step"><span>01 / PRISM FORMATS</span><b>Read PTQ1_0 / PQ2_0</b><p>128개 삼진 가중치를 28바이트 또는 34바이트 블록으로 읽고 fp16 스케일을 적용합니다.</p></div><div class="step"><span>02 / DIRECT GPU</span><b>Decode inside WGSL</b><p>프레임워크 없이 GPU에 압축 블록을 전송하고, 셰이더에서 가중치를 복원하면서 곱셈·누산을 수행합니다.</p></div><div class="step"><span>03 / VALIDATE</span><b>Compare with CPU reference</b><p>CPU 기준 디코더로 구한 결과와 GPU의 출력을 모두 비교하고 최댓값 오차를 표시합니다.</p></div></div>
-<p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. 전체 모델 실행, Hadamard/사인플립, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
+<section class="hadamardPanel"><div class="kicker">03 / HADAMARD GPU TRANSFORM</div>
+<h2>One more native primitive.</h2>
+<p class="hint" style="margin-bottom:18px">별도로 구현한 정규화 Fast Walsh-Hadamard Transform(FWHT)를 GPU에서 계산하고 CPU 기준값과 자기 역변환 결과를 함께 검증합니다. 이것은 <strong>Bonsai 2 모델의 실제 변환·부호 설정 전체를 구현한 것은 아닙니다.</strong></p>
+<div class="hadamardGrid">
+<label for="hwWidth">벡터 길이<select id="hwWidth"><option value="64">64</option><option value="128" selected>128</option><option value="256">256</option><option value="512">512</option></select></label>
+<label for="hwRows">동시 벡터 수<select id="hwRows"><option value="4">4</option><option value="8" selected>8</option><option value="16">16</option></select></label>
+</div>
+<button type="button" id="hwRun" class="run">WGSL Hadamard 변환 및 역변환 검증 ↗</button>
+<div class="hadamardGrid" style="margin-top:14px">
+<div class="metric"><small>GPU FWHT</small><b id="hwTime">—</b></div>
+<div class="metric"><small>MAX ABS ERROR</small><b id="hwError">—</b></div>
+<div class="metric" style="grid-column:1/-1"><small>GPU / CPU PARITY</small><b id="hwResult">WAITING</b></div>
+</div>
+<p id="hwLog" class="hint" style="margin-top:13px" aria-live="polite">GPU 검증 전</p>
+</section>
+<p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. 전체 모델 실행, Bonsai 전용 Hadamard/사인플립 통합, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
 </div></section></main>
 <footer><div class="container"><div><b>AETHERION / Bonsai Native Codec</b><div>Prism-format study · independently written WGSL</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/bonsai">Source ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML model ↗</a></div></div></footer>
-<script src="./codec.js?v=2" defer></script><script src="./gguf.js?v=1" defer></script><script src="./engine.js?v=2" defer></script>
+<script src="./codec.js?v=2" defer></script><script src="./gguf.js?v=2" defer></script><script src="./engine.js?v=2" defer></script><script src="./hadamard.js?v=1" defer></script>
 </body></html>
