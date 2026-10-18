@@ -190,10 +190,11 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 </div></div>
 </section>
 
+<p class="help" style="margin:24px 0;font-size:12px"><a href="/runtime/experiments/" style="color:#c45d3b;text-decoration:underline;font-weight:850">독립 알고리즘 6개를 실제 GPU에서 비교하는 실험실 보기 ↗</a> · 첫 실측 우승 후보 Packed Row가 아래 8개 자동 튜닝 후보에도 추가됐습니다.</p>
 <section id="autotuneV2" class="ae-gpu-v2" aria-labelledby="autoTitle">
 <div class="kicker">04 / NATIVE WEBGPU V2 · AUTOMATED KERNEL RACE</div>
 <h2 id="autoTitle" class="sectionTitle">성능이 입증된 커널만 살아남습니다.</h2>
-<p class="help" style="font-size:13px;max-width:900px;margin-bottom:20px">직접 만든 WGSL 커널 7종을 <strong>같은 GPU·동일한 PTQ/PQ 가중치·동일한 입력</strong>으로 검증합니다. 수치 불일치·GPU 작업 그룹 제한·컴파일 오류 후보는 자동 탈락. 충분한 속도 이득이 없으면 기존 직렬 커널을 유지합니다.</p>
+<p class="help" style="font-size:13px;max-width:900px;margin-bottom:20px">직접 만든 WGSL 커널 8종을 <strong>같은 GPU·동일한 PTQ/PQ 가중치·동일한 입력</strong>으로 검증합니다. 수치 불일치·GPU 작업 그룹 제한·컴파일 오류 후보는 자동 탈락. 충분한 속도 이득이 없으면 기존 직렬 커널을 유지합니다.</p>
 <div class="panel"><div class="panelHead"><b>GPU / MULTI-KERNEL AUTOTUNER</b><small>v2 · 정확도 게이트 + 실측 승자 선택</small></div>
 <div class="panelBody">
 <div class="ae-gpu-v2__fields">
@@ -201,7 +202,7 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <div class="field"><label for="autoCols">열 수</label><select id="autoCols"><option value="128">128</option><option value="512" selected>512</option><option value="1024">1024</option></select></div>
 <div class="field"><label for="autoFormat">GGUF 블록 포맷</label><select id="autoFormat"><option value="143">PTQ1_0 · 1.75b</option><option value="142">PQ2_0 · 2.125b</option></select></div>
 </div>
-<div class="actions" style="margin-bottom:16px"><button id="autoRun" type="button" class="mainButton">7개 GPU 커널 경쟁 시작 ↗</button><button id="autoDownload" class="lightButton" type="button" disabled>실측 JSON 저장 ↓</button></div>
+<div class="actions" style="margin-bottom:16px"><button id="autoRun" type="button" class="mainButton">8개 GPU 커널 경쟁 시작 ↗</button><button id="autoDownload" class="lightButton" type="button" disabled>실측 JSON 저장 ↓</button></div>
 <div id="autoProgress" class="ae-gpu-v2__progress" role="status" aria-live="polite">검증 전 · 사용자 기기에서 실행됩니다</div>
 <div class="ae-gpu-v2__stats">
 <div class="metric"><small>채택된 GPU 커널</small><strong id="autoWinner">검증 대기</strong></div>
@@ -209,7 +210,7 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <div class="metric"><small>장치</small><strong id="autoDevice">미확인</strong></div>
 <div class="metric"><small>최대 허용 수치 오차</small><strong id="autoThreshold">—</strong></div>
 </div>
-<div class="ae-gpu-v2__scroll"><table class="ae-gpu-v2__table"><thead><tr><th scope="col">후보 커널</th><th scope="col">결과</th><th scope="col">중앙값</th><th scope="col">변동성</th><th scope="col">CPU 오차</th></tr></thead><tbody id="autoResults"><tr><td colspan="5">7개 후보를 실행하면 검증 결과가 여기에 표시됩니다.</td></tr></tbody></table></div>
+<div class="ae-gpu-v2__scroll"><table class="ae-gpu-v2__table"><thead><tr><th scope="col">후보 커널</th><th scope="col">결과</th><th scope="col">중앙값</th><th scope="col">변동성</th><th scope="col">CPU 오차</th></tr></thead><tbody id="autoResults"><tr><td colspan="5">8개 후보를 실행하면 검증 결과가 여기에 표시됩니다.</td></tr></tbody></table></div>
 <p id="autoReason" class="help" style="margin-top:15px" aria-live="polite">기준 커널이 틀리면 전체 최적화를 중단합니다.</p>
 <div class="ae-session-section">
 <div class="ae-session-section__head"><strong>REUSABLE NATIVE GPU SESSION / v2.1</strong><span>GPU 가중치 상주 · 커널 재사용</span></div>
@@ -250,7 +251,8 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <script src="./app.js?v=1" defer></script>
 <script src="/lab/bonsai/codec.js?v=2" defer></script>
 <script src="./native-kernel.js?v=1" defer></script>
-<script src="./autotune-v2.js?v=1" defer></script>
-<script src="./native-session.js?v=1" defer></script>
-<script src="./autotune-ui.js?v=2" defer></script>
+<script src="./experiments/kernel-strategies.js?v=2" defer></script>
+<script src="./autotune-v2.js?v=2" defer></script>
+<script src="./native-session.js?v=2" defer></script>
+<script src="./autotune-ui.js?v=3" defer></script>
 </body></html>
