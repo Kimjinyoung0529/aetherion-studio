@@ -73,7 +73,7 @@ footer .container{display:flex;justify-content:space-between;gap:20px;flex-wrap:
 </style>
 </head>
 <body>
-<header><div class="container"><a href="/" class="brand">AETHERION <em>/ GENERATOR</em></a><nav class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/generate/" class="active">Generate</a></nav></div></header>
+<header><div class="container"><a href="/" class="brand">AETHERION <em>/ GENERATOR</em></a><nav class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/generate/" class="active">Legacy 0.3</a><a href="/lab/generate/v4/">NEW 0.4</a></nav></div></header>
 <main>
 <section class="hero"><div class="container"><div class="kicker">AETHERION / NATIVE SYSTEMS / EXPERIMENT 004</div><h1>From numbers<br><em>to language.</em></h1>
 <p>학습된 초소형 인과적 Transformer 가중치를 직접 만든 WebGPU 셰이더에서 추론하고, 다음 글자를 한 개씩 생성합니다. 문장 템플릿을 고르는 기존 의도 분류기와 달리 실제 토큰 예측을 반복하는 실험입니다.</p>
@@ -81,6 +81,7 @@ footer .container{display:flex;justify-content:space-between;gap:20px;flex-wrap:
 <div class="banner"><div class="container"><span>HANDWRITTEN WGSL INFERENCE</span><span>ONE CAUSAL ATTENTION LAYER</span><span>Q8 WEIGHTS · 202-CHARACTER VOCAB</span></div></div>
 <section class="main"><div class="container"><div class="secLabel">01 / AUTOREGRESSIVE GENERATION</div><h2>Learned weights. Real tokens.</h2>
 <div class="layout">
+<div class="card" style="margin-bottom:17px;padding:15px 19px;font-size:12px;background:#fff3eb;border-color:#dfc5b6"><strong style="color:#bf5232">NEW · Native Generator 0.4</strong><p style="margin:8px 0 11px;color:#6f706c;line-height:1.8">94개 한국어 Q&A, 32차원 신경망, 96자 문맥으로 확장한 실험 모델을 따로 공개했어. 기존 0.3과 결과를 비교할 수 있어.</p><a href="/lab/generate/v4/" style="color:#c25838;font-weight:800;text-decoration:underline">업그레이드된 0.4 실행하기 ↗</a></div>
 <section class="card"><div class="cardHead"><b>LIVE / NATIVE GENERATOR</b><small>WebGPU · offline inference</small></div>
 <div class="messages" id="messages" aria-live="polite"><div class="welcome"><strong>Generate with the GPU.</strong><p>먼저 엔진 초기화를 눌러 GPU와 CPU의 실제 로그잇 계산이 같은지 확인해 주세요. 짧은 한국어 예문 범위에 대해서만 학습된 작은 모델입니다.</p></div></div>
 <div class="examples"><button type="button" data-example="안녕">안녕 ↗</button><button type="button" data-example="너 누구야">너 누구야 ↗</button><button type="button" data-example="WebGPU가 뭐야">WebGPU란? ↗</button><button type="button" data-example="최적화 해줘">최적화 ↗</button></div>
