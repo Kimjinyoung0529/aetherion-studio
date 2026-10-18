@@ -71,11 +71,11 @@ footer .container{display:flex;justify-content:space-between;gap:20px;flex-wrap:
 @media(max-width:860px){.layout{grid-template-columns:1fr}.steps{grid-template-columns:1fr}}
 @media(max-width:560px){.container{width:calc(100% - 30px)}header .container{min-height:62px}.brand{font-size:15px}.links{gap:9px;font-size:10px}.hero{padding:48px 0}.hero p{font-size:12px}.main{padding:30px 0 55px}.cardHead,.panelContent{padding:16px}.messages{padding:15px;height:355px}.editor{padding:15px}.steps .step{padding:17px}h2{font-size:25px}}
 </style>
-</head>
-<body>
-<header><div class="container"><a href="/" class="brand">AETHERION <em>/ GENERATOR</em></a><nav class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/generate/">Legacy 0.3</a><a href="/lab/generate/v4/" class="active">Generate 0.4</a></nav></div></header>
-<main>
-<section class="hero"><div class="container"><div class="kicker">AETHERION / NATIVE SYSTEMS / EXPERIMENT 004 · v0.4 BETA</div><h1>From numbers<br><em>to language.</em></h1>
+<meta property="og:locale" content="ko_KR"><meta name="color-scheme" content="light"><link rel="stylesheet" href="/assets/brand.css?v=4"><link rel="stylesheet" href="/assets/interior.css?v=2"></head>
+<body class="ae-interior ae-generator04">
+<a class="ae-skip" href="#main">본문으로 바로가기</a><header class="ae-header"><div class="ae-header__wrap"><a href="/" class="ae-header__brand" aria-label="AETHERION 한국어 홈페이지"><span class="ae-symbol" aria-hidden="true">A</span><span class="ae-wordmark">AETHERION</span><span class="ae-header__descriptor">KOREA · AI</span></a><nav class="ae-header__links" aria-label="주 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/" aria-current="page">연구실</a></nav><div class="ae-header__right"><span class="ae-header__region">KO / KR</span><a class="ae-header__action" href="/runtime/">로컬 실행기 ↗</a><details class="ae-menu"><summary>메뉴 ☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">연구실</a><a href="/lab/generate/v4/">Generator 0.4</a><a href="/lab/bonsai/">Bonsai Core</a></nav></details></div></div></header><div class="ae-pagebar"><div class="ae-pagebar__inner"><div class="ae-pagebar__crumb"><a href="/lab/">Research</a><span>/</span><strong>Generator 0.4</strong></div><span class="ae-pagebar__status">소형 직접 학습 모델 · 연구 단계</span></div></div>
+<main id="main">
+<section class="hero"><div class="container"><div class="kicker">AETHERION / NATIVE SYSTEMS / EXPERIMENT 004 · v0.4 BETA</div><h1>한국어 소형 AI를<br><em>직접 학습하고 실행.</em></h1>
 <p>기존보다 확장 학습한 초소형 인과적 Transformer 가중치를 직접 만든 WebGPU 셰이더에서 추론하고, 다음 글자를 한 개씩 생성합니다. 문장 템플릿을 고르는 기존 의도 분류기와 달리 실제 토큰 예측을 반복하는 실험입니다.</p>
 </div></section>
 <div class="banner"><div class="container"><span>HANDWRITTEN WGSL INFERENCE</span><span>ONE CAUSAL ATTENTION LAYER</span><span>Q8 WEIGHTS · 376-CHARACTER VOCAB</span></div></div>
@@ -111,7 +111,7 @@ footer .container{display:flex;justify-content:space-between;gap:20px;flex-wrap:
 </div>
 <p class="disclaimer"><b>연구 목적:</b> 376자 어휘, 32차원 임베딩, 단일 인과적 어텐션 레이어, 96자 컨텍스트를 가진 초소형 실험 모델입니다. 한국어 질문 94쌍의 자체 예문과 376개 표현 변형으로 학습했으며, 자유 대화 성능은 제한적입니다. <b>PrismML Bonsai 2B 가중치나 Qwen3.5 하이브리드 어텐션을 실행하는 엔진이 아닙니다.</b> 이 실험은 LLM 추론의 구성 요소 중 하나인 실제 토큰 생성 경로를 검증하기 위한 것입니다.</p>
 </div></section></main>
-<footer><div class="container"><div><b>AETHERION / NATIVE GENERATOR</b><div>Experimental WebGPU implementation · v0.4</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/generate">Source ↗</a> · <a href="/lab/bonsai/">Bonsai Codec Lab ↗</a></div></div></footer>
+<footer class="ae-footer"><div class="ae-footer__wrap"><div class="ae-footer__top"><div><div class="ae-footer__brand">AETHERION AI</div><p class="ae-footer__promise">한국어 중심 로컬 AI 연구.<br>신경망부터 GPU 코어까지 직접 검증합니다.</p></div><nav class="ae-footer__nav" aria-label="전체 사이트"><a href="/">브랜드</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">Native Lab</a><a href="/lab/generate/v4/">Generator 0.4</a><a href="/lab/bonsai/">Bonsai Core</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio">GitHub ↗</a></nav></div><div class="ae-footer__bottom"><p>© 2026 AETHERION AI · 한국어 중심 AI 연구·포트폴리오 프로젝트. 법인 등록이나 공식 기업 인증을 뜻하지 않습니다. 연구 결과와 공개 모델의 출처를 구분합니다.</p><p>MODEL RESEARCH · KOREAN FIRST</p></div></div></footer>
 <script src="./engine.js?v=4" defer></script>
 <script src="./app.js?v=4" defer></script>
 </body></html>
