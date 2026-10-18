@@ -1,0 +1,21 @@
+name: AETHERION GGUF Splitter Unit Tests
+on:
+  push:
+    paths:
+      - 'tools/gguf_auto_split.py'
+      - 'tools/test_gguf_auto_split.py'
+      - '.github/workflows/gguf-splitter-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Test two-shard orchestration with fake GGUF
+        run: python3 tools/test_gguf_auto_split.py -v
+      - name: Python syntax check
+        run: python3 -m py_compile tools/gguf_auto_split.py
