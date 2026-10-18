@@ -59,5 +59,5 @@ for(const id of ['autoRows','autoCols','autoFormat','autoRun','autoDownload','au
  assert.ok(page.includes('id="'+id+'"'),'Missing HTML ID '+id);
 }
 assert.match(page,/src="\.\/autotune-v2\.js\?v=1"/);
-assert.match(page,/src="\.\/autotune-ui\.js\?v=1"/);
+assert.match(page,/src="\.\/autotune-ui\.js\?v=2"/);
 console.log('PASS 7 GPU kernels, parallel shader constraints, 7 selection/fallback rules, CPU parity guards and UI bindings');
