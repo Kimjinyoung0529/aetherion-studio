@@ -1,0 +1,45 @@
+# AETHERION Bonsai Native Codec Lab v0.2
+
+**Live:** https://hii.o-r.kr/lab/bonsai/
+
+This is a native, browser-only WebGPU codec and matvec experiment for **PrismML Bonsai 2** quantized tensor formats. **It is not a completed Bonsai LLM runtime or chatbot.**
+
+## What works
+
+- Reads the actual published Prism fork **PTQ1_0 (GGML type 143)** block representation: 128 trits, 24 base-3 packed bytes, 2 tail bytes, and one little-endian FP16 scale = **28 bytes** (1.75 bits/weight).
+- Reads Prism **PQ2_0 (type 142)**: 128 packed 2-bit values and one little-endian FP16 scale = **34 bytes** (2.125 bits/weight).
+- The WGSL shader fetches packed bytes and decodes weights **inside the matvec loop**, without allocating a full FP32 weight tensor on GPU.
+- Compares **every output row** against an independently calculated CPU reference. The CPU reference is a check, not a fallback backend.
+- Accepts a locally selected GGUF file. It **streams metadata and selected bytes using File.slice**, lists supported PTQ1_0/PQ2_0 tensors, and lets the user test only the first 32 rows of a selected tensor.
+- Browser file selection does **not** upload files to a server.
+- Automatically executes GitHub Actions Node conformance tests on changes, including 5-trit code checks, PTQ/PQ round-trips, and synthetic GGUF streaming inspection.
+
+## Architecture
+
+- `codec.js`: PTQ1_0/PQ2_0 block layouts, FP16 scaling, round-trip fixture encoding, CPU reference matvec.
+- `gguf.js`: independent read-only GGUF v2/v3 metadata/tensor inspector.
+- `engine.js`: first-party WGSL WebGPU packed matvec, numerical comparison, and file-picker integration.
+- `index.html`: interactive research interface.
+- `test_codec.mjs`: standalone Node conformance tests, no external npm packages.
+
+## Critical limits
+
+- No full Bonsai 2 generation, tokenizer, real-model logits, full GGUF loading, Hadamard/sign-flip transform, or Qwen3.5 hybrid attention implementation yet.
+- Real GGUF inspection requires the user to **already have the GGUF file** on the device.
+- A pass here means **some tensor data was decoded and its matvec output matched the CPU reference**. It does not prove that Bonsai chat works or that all its tensors are supported.
+- A ~430 MB ternary weight file does not mean the full model consumes only 430 MB at runtime.
+- Native Safari/iPhone WebGPU compute still needs user-device verification. CI validates JavaScript and codec logic; it does not run a genuine iPhone GPU.
+
+## Upstream references
+
+- [PrismML llama.cpp fork / actual PTQ/PQ codec source](https://github.com/PrismML-Eng/llama.cpp/blob/prism/ggml/src/ggml-quants.c)
+- [PrismML GGUF layout definitions](https://github.com/PrismML-Eng/llama.cpp/blob/prism/ggml/src/ggml-common.h)
+- [Bonsai 2 2B model](https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf)
+- [Format and backend notes](https://github.com/PrismML-Eng/Bonsai-demo/blob/main/MODEL-FORMATS.md)
+
+## Next implementation milestones
+
+1. Compare against real PrismML reference fixture bytes, and reject unsupported GGUF tensor types visibly.
+2. Implement and validate Bonsai's sign-flip/Hadamard transform at actual tensor integration locations.
+3. Implement the Qwen3.5 hybrid model graph, tokenizer, state cache, KV cache, streaming autoregressive decode.
+4. Logit/token parity testing against a trusted reference across multiple prompts and browsers.
