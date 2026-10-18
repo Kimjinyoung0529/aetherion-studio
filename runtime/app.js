@@ -204,7 +204,9 @@
    set('benchSpeed',(record.rate?.toFixed(2)||'—')+' '+record.unit);
    const prior=benchRecords.slice(0,-1).reverse().find(x=>x.profile!==record.profile&&
     x.backend===record.backend&&x.modelKey===record.modelKey&&x.deviceKey===record.deviceKey&&x.promptKey===record.promptKey&&x.maxTokens===record.maxTokens&&x.unit===record.unit);
-   if(prior){
+   if(current.backend==='mlc'){
+    set('compare','MLC 백엔드는 이 프로필로 컴파일된 커널을 변경하지 않으므로 프로필 차이를 최적화 배속으로 표시하지 않습니다.');
+   }else if(prior){
     const cmp=T.compare(prior,record);
     set('compare',cmp.comparable?(cmp.ratio>=1?'실측 '+cmp.ratio.toFixed(2)+'× · +'+cmp.percent.toFixed(1)+'%':'실측 '+cmp.ratio.toFixed(2)+'× · '+cmp.percent.toFixed(1)+'% (느려짐)'):cmp.reason);
    }else set('compare','다른 프로필로 같은 모델·프롬프트를 측정하면 실제 개선율을 계산합니다.');
