@@ -1,4 +1,4 @@
-/* Run AETHERION five-way kernel tournament in GitHub Actions Chromium.
+/* Run AETHERION six-way kernel tournament in GitHub Actions Chromium.
  * This performs actual WGSL compilation and GPU API execution via SwiftShader,
  * a SOFTWARE adapter. It is not Apple/NVIDIA hardware GPU evidence.
  */
@@ -44,7 +44,7 @@ async function main(){
    }
    if(!record.software)console.warn('Adapter not recognized as software; identify before using results');
    if(record.reports.some(r=>r.id==='scalar'&&r.status!=='pass'))fatal.push(k+' scalar numerical baseline failed');
-   if(!record.reports.some(r=>r.status==='pass'&&r.id==='packed_byte'))fatal.push(k+' packed-byte implementation did not pass accuracy/compilation');
+   if(!record.reports.some(r=>r.status==='pass'&&r.id==='packed_row'))fatal.push(k+' packed-row implementation did not pass accuracy/compilation');
    if(!record.reports.some(r=>r.status==='pass'&&r.id==='split_k'))fatal.push(k+' split-K implementation did not pass accuracy/compilation');
   }
  }catch(e){fatal.push(String(e.stack||e))}
@@ -58,12 +58,12 @@ async function main(){
  if(summary){
   let text='# AETHERION Native WGSL Kernel Tournament — Software GPU\n\n';
   text+='**Adapter:** '+(results[0]?.adapter||'unavailable')+'\n\n';
-  text+='| Case | Scalar | Cooperative | Packed byte | Split-K | Predecode | Compact winner |\n';
+  text+='| Case | Scalar | Cooperative | Packed lane | Packed row | Split-K | Predecode | Compact winner |\n';
   text+='|---|---:|---:|---:|---:|---:|---|\n';
   for(const r of results){
    const map=Object.fromEntries(r.reports.map(x=>[x.id,x]));
    const fmt=id=>map[id]?.status==='pass'?map[id].ms.toFixed(4)+'ms':map[id]?.status||'—';
-   text+='| '+r.rows+'×'+r.cols+'/'+r.format+' | '+fmt('scalar')+' | '+fmt('lane32')+' | '+fmt('packed_byte')+' | '+fmt('split_k')+' | '+fmt('predecode')+' | '+(r.selection.id||'none')+' |\n';
+   text+='| '+r.rows+'×'+r.cols+'/'+r.format+' | '+fmt('scalar')+' | '+fmt('lane32')+' | '+fmt('packed_byte')+' | '+fmt('packed_row')+' | '+fmt('split_k')+' | '+fmt('predecode')+' | '+(r.selection.id||'none')+' |\n';
   }
   text+='\n**Important:** software SwiftShader result cannot predict physical GPU performance. No LLM tokens were generated.\n';
   if(fatal.length)text+='\n**Failures:** '+fatal.join('; ')+'\n';
@@ -72,6 +72,6 @@ async function main(){
  if(fatal.length){
   console.error('KERNEL GPU EXPERIMENT FAILURES:\n'+fatal.join('\n'));
   process.exitCode=1;
- }else console.log('PASS: '+results.length+' matrices/formats on real browser WebGPU software adapter; CPU parity and 5 independent strategies measured');
+ }else console.log('PASS: '+results.length+' matrices/formats on real browser WebGPU software adapter; CPU parity and 6 independent strategies measured');
 }
 main().catch(e=>{console.error(e);process.exitCode=1});
