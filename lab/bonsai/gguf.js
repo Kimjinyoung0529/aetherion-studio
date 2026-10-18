@@ -28,7 +28,7 @@ const GGUFInspector=(()=>{
    await this.ensure(n);
    const s=this.decoder.decode(this.cache.subarray(this.pos-this.base,this.pos-this.base+n));this.pos+=n;return s;
   }
-  async metadataValue(type,depth=0){
+  async metadataValue(type,depth=0,key=''){
    if(depth>1)throw Error('Nested metadata too deep');
    switch(type){
     case 0:return this.u8();
@@ -43,9 +43,15 @@ const GGUFInspector=(()=>{
     case 9:{
      const elemType=await this.u32(),count=await this.u64();
      if(count>5e6)throw Error('Metadata array too large');
+     const record=/^qwen35\.(attention\.recurrent_layers|rope\.dimension_sections)$/.test(key)&&count<=4096&&[0,1,2,3,4,5,7].includes(elemType);
+     if(record){
+      const items=[];
+      for(let i=0;i<count;i++)items.push(await this.metadataValue(elemType,depth+1,''));
+      return items;
+     }
      if(elemType===8){
       for(let i=0;i<count;i++){
-       await this.str(0); // skip strings without allocating token-vocabulary arrays
+       await this.str(0); // skip token strings instead of allocating entire vocabulary
        if(i%2048===0 && typeof requestAnimationFrame==='function')await new Promise(requestAnimationFrame);
       }
      }else{
@@ -77,8 +83,8 @@ const GGUFInspector=(()=>{
    const key=await r.str(2048);
    if(key===null)throw Error('GGUF metadata key too long');
    const type=await r.u32();
-   const value=await r.metadataValue(type);
-   if(value!==null && (key==='general.alignment'||key==='general.architecture'||key==='general.name'||key==='tokenizer.ggml.model'||key==='general.file_type'))metadata[key]=value;
+   const value=await r.metadataValue(type,0,key);
+   if(value!==null && (/^qwen35\.(block_count|context_length|embedding_length|feed_forward_length|full_attention_interval|nextn_predict_layers|attention\.(head_count|head_count_kv|key_length|value_length|layer_norm_rms_epsilon|recurrent_layers)|rope\.(dimension_sections|dimension_count|freq_base)|ssm\.(conv_kernel|inner_size|state_size|group_count|time_step_rank))$/.test(key)||['general.alignment','general.architecture','general.name','tokenizer.ggml.model','general.file_type'].includes(key)))metadata[key]=value;
   }
   const tensors=[];
   for(let t=0;t<nTensors;t++){
@@ -101,7 +107,8 @@ const GGUFInspector=(()=>{
   const supported=tensors.filter(x=>(x.type===142||x.type===143)&&x.dims[0]%128===0&&x.dims.length>=2);
   const summary={
    fileName:file.name,size:file.size,version,nTensors,nMeta,alignment,dataStart,
-   metadata,supportedCount:supported.length,tensors:supported
+   metadata,supportedCount:supported.length,tensors:supported,allTensorHeaders:tensors,
+   tensorTypes:tensors.reduce((acc,t)=>(acc[t.type]=(acc[t.type]||0)+1,acc),{})
   };
   return summary;
  }
