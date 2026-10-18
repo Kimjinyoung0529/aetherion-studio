@@ -44,9 +44,9 @@ fn linear(input:array<f32,16>,offset:u32,scaleId:u32)->array<f32,16> {
 }
 @compute @workgroup_size(1)
 fn main(@builtin(global_invocation_id) gid:vec3<u32>){
- if(gid.x!=0u)return;
+ if(gid.x!=0u){return;}
  let T=min(options.count,48u);
- if(T==0u)return;
+ if(T==0u){return;}
  let residual=embed(T-1u);
  let q=linear(norm(residual),4000u,2u);
  var weighted:array<f32,16>;
