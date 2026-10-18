@@ -220,6 +220,12 @@
   const a=document.createElement('a');a.href=url;a.download='aetherion-local-llm-benchmarks.json';a.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
+ $('qwenPreset').addEventListener('click',()=>{
+  $('backend').value='gguf';$('sourceKind').value='url';
+  switchInput();
+  $('ggufUrl').value='https://huggingface.co/tensorblock/Qwen_Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q4_K_M.gguf';
+  log('Qwen3-0.6B · Q4_K_M 프리셋 입력 완료. 파일은 모델 로드 버튼을 누를 때만 다운로드됩니다.');
+ });
  $('backend').addEventListener('change',switchInput);
  $('sourceKind').addEventListener('change',switchInput);
  $('profile').addEventListener('change',settingsSummary);
