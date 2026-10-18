@@ -1,0 +1,49 @@
+/* AETHERION SITE-WIDE DESIGN SYSTEM / INTERIOR PAGES · 2026 */
+body.ae-interior{--ae-ink:#142431;--ae-deep:#0c1823;--ae-accent:#ef704b;--ink:#142431;--paper:#f5f7f6;--bg:#f5f7f6;--surface:#ffffff;--cream:#ffffff;--orange:#ef704b;background:#f5f7f6;color:#142431;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+body.ae-interior *{box-sizing:border-box}
+body.ae-interior .ae-header{isolation:isolate}
+.ae-pagebar{background:#e9f0f1;border-bottom:1px solid #d7e0e2;color:#3a5360}
+.ae-pagebar__inner{max-width:1280px;margin:0 auto;padding:12px 30px;display:flex;justify-content:space-between;align-items:center;gap:15px;min-height:49px}
+.ae-pagebar__crumb{display:flex;align-items:center;gap:9px;font-weight:800;font-size:11px}
+.ae-pagebar__crumb a{color:#5f7885!important;text-decoration:none!important}
+.ae-pagebar__crumb strong{color:#142d3d}
+.ae-pagebar__crumb span{color:#8ea6b2}
+.ae-pagebar__status{font-size:10px;font-weight:850;letter-spacing:.045em;color:#597785;text-align:right}
+body.ae-interior main{min-height:40vh}
+body.ae-interior main .hero{background:#0d1c28!important;color:#f3f7f6!important;position:relative;isolation:isolate}
+body.ae-interior main .hero:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 30%,#46768830,transparent 45%);pointer-events:none;z-index:-1}
+body.ae-interior main .hero h1{color:#f4f8f9!important;letter-spacing:-.075em!important;line-height:1.13!important;font-size:clamp(40px,6vw,75px)!important;word-break:keep-all}
+body.ae-interior main .hero h1 em{color:#fc9872!important;font-style:normal}
+body.ae-interior main .hero p,body.ae-interior main .lead{color:#bac9d3!important;line-height:1.95!important;word-break:keep-all}
+body.ae-interior main .hero .eyebrow,body.ae-interior main .hero .micro,body.ae-interior main .hero .kicker,body.ae-interior main .hero .tag{color:#fca381!important}
+body.ae-interior main .hero a.solidbtn,body.ae-interior main .hero a.mainButton,body.ae-interior main .hero .primary{background:#ef704b!important;color:white!important}
+body.ae-interior main .ticker,body.ae-interior main .ribbon,body.ae-interior main .banner{background:#e9eff0!important;border-color:#d3e0e3!important;color:#4e6877!important}
+body.ae-interior main .ticker *,body.ae-interior main .ribbon *,body.ae-interior main .banner *{color:#4e6877!important}
+body.ae-interior main .panel,body.ae-interior main .card,body.ae-interior main .console,body.ae-interior main .step,body.ae-interior main .metric,body.ae-interior main .model-card,body.ae-interior main .routecard{border-color:#dfe6e7;box-shadow:0 12px 36px #13273608}
+body.ae-interior main button.primary,body.ae-interior main button.mainButton,body.ae-interior main button.run{background:#e86442;color:white}
+body.ae-interior main button.primary:hover:not(:disabled),body.ae-interior main button.mainButton:hover:not(:disabled),body.ae-interior main button.run:hover:not(:disabled){background:#ce502f}
+body.ae-interior main button:focus-visible,body.ae-interior main a:focus-visible,body.ae-interior main input:focus-visible,body.ae-interior main textarea:focus-visible,body.ae-interior main select:focus-visible{outline:2px solid #e96a43;outline-offset:3px}
+body.ae-interior .ae-footer{margin-top:0}
+body.ae-interior .ae-footer a{font-size:12px}
+.ae-interior-banner{background:#fff4ed;color:#924b32;font-size:11px;font-weight:750;line-height:1.8;padding:13px max(24px,calc((100% - 1200px)/2));border-bottom:1px solid #f0d9ce}
+.ae-interior-banner strong{color:#783b24}
+body.ae-interior main .log,body.ae-interior main .runtimeLog,body.ae-interior main pre.history{border:1px solid #233d4b}
+body.ae-interior .ae-drawer a{color:#cbdae0!important}
+body.ae-interior .ae-header__links{display:flex}
+body.ae-interior .ae-menu{display:none}
+@media(max-width:870px){
+ body.ae-interior .ae-header__links{display:none}
+ body.ae-interior .ae-menu{display:block}
+ body.ae-interior main .hero h1{font-size:clamp(39px,8.5vw,64px)!important}
+}
+@media(max-width:610px){
+ .ae-pagebar__inner{padding:10px 16px;min-height:45px}
+ .ae-pagebar__status{font-size:9px;max-width:45%}
+ body.ae-interior .ae-header__region{display:none}
+ body.ae-interior .ae-header__descriptor{display:none}
+ body.ae-interior main .hero h1{font-size:clamp(36px,10vw,53px)!important}
+ .ae-interior-banner{padding:12px 17px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.ae-interior *{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
