@@ -70,7 +70,7 @@ footer strong{color:#fff;font-size:15px}
 </style>
 </head>
 <body>
-<header class="nav"><div class="wrap"><a href="/" class="brand" aria-label="AETHERION Home"><span class="emblem" aria-hidden="true">A</span>AETHERION <small>NATIVE LAB</small></a><nav class="navlinks" aria-label="주 메뉴"><a href="/">Company</a><a href="/chat/">Chat</a><a href="/agent/">Agent</a><a class="current" href="/lab/">Lab</a><a href="/lab/ternary/">Ternary</a><a href="/lab/bonsai/">Bonsai</a><a href="/lab/generate/">Generator</a></nav></div></header>
+<header class="nav"><div class="wrap"><a href="/" class="brand" aria-label="AETHERION Home"><span class="emblem" aria-hidden="true">A</span>AETHERION <small>NATIVE LAB</small></a><nav class="navlinks" aria-label="주 메뉴"><a href="/">Company</a><a href="/chat/">Chat</a><a href="/agent/">Agent</a><a class="current" href="/lab/">Lab</a><a href="/lab/ternary/">Ternary</a><a href="/lab/bonsai/">Bonsai</a><a href="/lab/generate/v4/">Generator 0.4</a></nav></div></header>
 <main>
 <section class="hero"><div class="wrap"><div><div class="eyebrow">AETHERION / EXPERIMENTAL SYSTEMS / 001</div><h1>Built from<br><em>first principles.</em></h1><p>외부 AI 추론 엔진 없이 직접 구현하는 브라우저 신경망. 우리가 학습시킨 가중치를 WebGPU Compute Shader에 로드해 기기에서 직접 연산합니다. 이 단계는 한국어 요청 의도 분류 엔진이며, 생성형 언어모델은 아닙니다.</p></div><div class="heroStats"><b>100%</b><span>FIRST-PARTY INFERENCE CODE</span><span>WGSL · WEBGPU · LOCAL</span></div></div></section>
 <div class="ribbon"><div class="wrap"><span>ENGINE 0.1 / EXPERIMENTAL</span><span>GPU MATRIX–VECTOR MULTIPLICATION</span><span>15 INTENTS / 512 FEATURES</span></div></div>
@@ -90,7 +90,7 @@ footer strong{color:#fff;font-size:15px}
 <div class="kicker" style="margin-top:64px">02 / Under the hood</div>
 <div class="technical"><div class="step"><span>01 / INPUT</span><b>Character features</b><p>한글·영문 문자열을 정규화한 뒤 해시 기반 512차원 숫자 벡터로 인코딩합니다.</p></div><div class="step"><span>02 / COMPUTE</span><b>WGSL shader</b><p>GPU에서 학습된 7,680개 가중치와 15개 편향을 사용해 행렬-벡터 곱을 수행합니다.</p></div><div class="step"><span>03 / OUTPUT</span><b>Decision layer</b><p>GPU가 계산한 점수에 소프트맥스를 적용해 의도를 선택하고, 설명용 템플릿을 출력합니다.</p></div></div>
 <p class="disclaimer" style="margin:18px 0 10px"><strong>새로운 실험:</strong> <a href="/lab/ternary/" style="color:#c95a38;text-decoration:underline">AETHERION Ternary Lab →</a> 자체 2비트 / 1.6비트 WebGPU 삼진 행렬 연산 및 정확도 테스트를 실행할 수 있습니다.</p>
-<p class="disclaimer"><strong>Native Generator:</strong> <a href="/lab/generate/" style="color:#c95a38;text-decoration:underline">직접 만든 WebGPU 생성형 Transformer →</a> 202문자 초소형 모델이 다음 글자를 GPU에서 반복 계산합니다.</p>
+<p class="disclaimer"><strong>Native Generator:</strong> <a href="/lab/generate/v4/" style="color:#c95a38;text-decoration:underline">새 WebGPU 생성형 Transformer 0.4 →</a> 202문자 초소형 모델이 다음 글자를 GPU에서 반복 계산합니다.</p>
 <p class="disclaimer"><strong>Bonsai Core:</strong> <a href="/lab/bonsai/" style="color:#c95a38;text-decoration:underline">PTQ1_0·PQ2_0 직접 WebGPU 실험실 →</a> 공식 Prism 포맷 시험과 로컬 GGUF 파일 텐서 부분 검사를 제공합니다.</p>
 <p class="disclaimer"><strong>현재 구현의 한계:</strong> WebGPU로 실행되는 실제 분류 신경망이지만, 범용 채팅·텍스트 생성·Noema 2B/4B 추론은 아직 제공하지 않습니다. 가중치는 실험용 한국어 예문으로 직접 학습했습니다. 다음 단계는 토큰화, 양자화 행렬 연산, 정규화, RoPE, 인과적 어텐션, KV 캐시, 자동 회귀 생성을 구현하는 것입니다. GPU 지연시간 측정값은 소형 분류 모델의 결과이며 대형 LLM의 속도를 의미하지 않습니다.</p>
 </div></section>
