@@ -18,7 +18,7 @@
    tr.append(makeCell(item.name),makeCell(status),makeCell(item.ms),makeCell(item.jitter),makeCell(item.error));
    body.append(tr);
   }
-  label('autoProgress','7 / 7 · 실측 완료');
+  label('autoProgress',report.results.length+' / '+report.results.length+' · 실측 완료');
   label('autoWinner',report.winner?list.find(x=>x.id===report.winner).name:'적합한 GPU 커널 없음');
   label('autoSpeedup',report.winner==='serial'?'기존 커널 유지':report.winner?((1+report.gain).toFixed(2)+'× · 후보 벤치마크 개선'):'개선 없음');
   label('autoReason',report.reason);
@@ -38,7 +38,7 @@
   label('autoSessionDetail','승자 커널을 선택한 뒤 GPU 세션을 실행하세요.');
   label('autoWinner','GPU 검사 준비 중…');
   label('autoSpeedup','—');
-  label('autoReason','실제 수치 검증 후 7개 후보의 GPU 실행 시간을 비교합니다.');
+  label('autoReason','실제 수치 검증 후 8개 후보의 GPU 실행 시간을 비교합니다.');
   label('autoProgress','GPU 초기화 중');
   try{
    const rows=Number($('autoRows').value),cols=Number($('autoCols').value),format=Number($('autoFormat').value);
