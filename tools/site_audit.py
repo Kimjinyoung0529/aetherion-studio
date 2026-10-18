@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 IGNORE_DIRS = {".git", "node_modules", "vendor", "_site"}
 CORE_PAGES = [
     "index.html", "chat/index.html", "agent/index.html",
-    "runtime/index.html", "lab/index.html", "lab/ternary/index.html",
+    "runtime/index.html", "runtime/experiments/index.html", "lab/index.html", "lab/ternary/index.html",
     "lab/bonsai/index.html", "lab/generate/index.html",
     "lab/generate/v4/index.html", "legacy/index.html"
 ]
