@@ -59,12 +59,12 @@ footer b{color:white;font-size:14px}
 .hadamardGrid .metric{padding:13px}
 #hwResult[data-ok=yes]{color:#3c9761}#hwResult[data-ok=no]{color:#c05237}
 @media(max-width:540px){.hadamardPanel{padding:15px}.hadamardGrid{gap:8px}.hadamardGrid .metric b{font-size:12px}}
-</style></head>
-<body>
-<nav class="top"><div class="container"><a class="brand" href="/">AETHERION <em>/ BONSAI CORE</em></a><div class="links"><a href="/">Company</a><a href="/lab/">Native</a><a href="/lab/ternary/">Ternary</a><a href="/lab/bonsai/" class="active">Bonsai</a><a href="/lab/generate/">Generator</a></div></div></nav>
-<main>
+</style><meta property="og:locale" content="ko_KR"><meta name="color-scheme" content="light"><link rel="stylesheet" href="/assets/brand.css?v=4"><link rel="stylesheet" href="/assets/interior.css?v=2"></head>
+<body class="ae-interior ae-bonsai">
+<a class="ae-skip" href="#main">본문으로 바로가기</a><header class="ae-header"><div class="ae-header__wrap"><a href="/" class="ae-header__brand" aria-label="AETHERION 홈페이지"><span class="ae-symbol" aria-hidden="true">A</span><span class="ae-wordmark">AETHERION</span><span class="ae-header__descriptor">KOREA · AI</span></a><nav class="ae-header__links" aria-label="주 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/" aria-current="page">연구실</a></nav><div class="ae-header__right"><span class="ae-header__region">KO / KR</span><a class="ae-header__action" href="/runtime/">로컬 AI 실행 ↗</a><details class="ae-menu"><summary>메뉴 ☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">연구실</a><a href="/lab/generate/v4/">Generator 0.4</a><a href="/lab/bonsai/">Bonsai Core</a><a href="/lab/ternary/">Ternary</a></nav></details></div></div></header><div class="ae-pagebar"><div class="ae-pagebar__inner"><div class="ae-pagebar__crumb"><a href="/lab/">Native Lab</a><span>/</span><strong>Bonsai Core</strong></div><span class="ae-pagebar__status">직접 만든 WebGPU 코어 · 연구 단계</span></div></div>
+<main id="main">
 <section class="hero"><div class="container"><div class="tag">AETHERION / NATIVE SYSTEMS / RESEARCH 003</div>
-<h1>Read the bits.<br><em>Run the GPU.</em></h1>
+<h1>압축된 숫자에서<br><em>GPU 연산까지.</em></h1>
 <p>PrismML의 실제 GGUF 양자화 블록 구조인 PTQ1_0·PQ2_0을 분석하여 직접 구현한 디코더와 WebGPU WGSL 행렬 연산 실험실입니다. 기존 단순 삼진 압축이 아니라, 공식 레이아웃의 블록 데이터를 GPU에서 읽어 계산합니다.</p>
 </div></section>
 <div class="ribbon"><div class="container"><span>PTQ1_0 · 1.75 BITS/WEIGHT</span><span>PQ2_0 · 2.125 BITS/WEIGHT</span><span>NO WLLAMA / NO EXTERNAL INFERENCE</span></div></div>
@@ -159,7 +159,7 @@ footer b{color:white;font-size:14px}
 
 <p class="disclaimer"><strong>범위 안내:</strong> 이것은 <strong>실제 PrismML 포맷의 압축 텐서 계산 연구</strong>입니다. 아직 Bonsai 2 2B 모델 전체를 로드하거나 채팅하는 구현이 아닙니다. 전체 모델 실행, Bonsai 전용 Hadamard/사인플립 통합, Qwen3.5 하이브리드 아키텍처, 토크나이저와 토큰 생성 구현이 남아 있습니다. 실제 아이폰 속도는 해당 기기에서 테스트해야 합니다.</p>
 </div></section></main>
-<footer><div class="container"><div><b>AETHERION / Bonsai Native Codec</b><div>Prism-format study · independently written WGSL</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/bonsai">Source ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML model ↗</a></div></div></footer>
+<footer class="ae-footer"><div class="ae-footer__wrap"><div class="ae-footer__top"><div><div class="ae-footer__brand">AETHERION AI</div><p class="ae-footer__promise">한국어 중심 로컬 AI 연구.<br>직접 만든 GPU 연산을 검증합니다.</p></div><nav class="ae-footer__nav" aria-label="전체 사이트"><a href="/">브랜드</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">Native Lab</a><a href="/lab/generate/v4/">Generator 0.4</a><a href="/lab/bonsai/">Bonsai Core</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio">GitHub ↗</a></nav></div><div class="ae-footer__bottom"><p>© 2026 AETHERION AI · 한국어 중심 AI 연구·포트폴리오 프로젝트. 법인 등록이나 공식 기업 인증을 뜻하지 않습니다. 연구 단계·검증된 기능을 구분합니다.</p><p>ENGINEERING IN KOREAN</p></div></div></footer>
 <script src="./codec.js?v=2" defer></script><script src="./gguf.js?v=3" defer></script><script src="./audit.js?v=1" defer></script><script src="./engine.js?v=4" defer></script><script src="./signed_fold.js?v=1" defer></script><script src="./hadamard.js?v=1" defer></script>
 <script src="./ffn.js?v=1" defer></script>
 </body></html>

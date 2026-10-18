@@ -62,11 +62,11 @@ footer b{font-size:14px;color:white;letter-spacing:-.04em}
 @media(max-width:840px){.layout{grid-template-columns:1fr}.explain{grid-template-columns:1fr}}
 @media(max-width:560px){.wrap{width:calc(100% - 30px)}.wordmark{font-size:14px}.links{gap:9px;font-size:10px}.hero{padding:50px 0}.hero p{font-size:12px}.main{padding:34px 0 60px}.panelInner{padding:17px}.panelHead{padding:17px}.stat{padding:15px}.stat b{font-size:15px}.kstats{gap:8px}}
 </style>
-</head>
-<body>
-<nav><div class="wrap"><a href="/" class="wordmark">AETHERION <em>/ TERNARY</em></a><div class="links"><a href="/">Company</a><a href="/chat/">Chat</a><a href="/lab/">Native Lab</a><a href="/lab/ternary/" class="here">Ternary</a><a href="/lab/bonsai/">Bonsai Core</a><a href="/lab/generate/">Generator</a></div></div></nav>
-<main>
-<section class="hero"><div class="wrap"><div class="micro">AETHERION / NATIVE SYSTEMS / EXPERIMENT 002</div><h1>Three values.<br><em>One engine.</em></h1><p>우리가 직접 작성한 WebGPU WGSL 셰이더로 삼진 가중치(-1, 0, +1)를 압축하고 행렬 연산을 수행합니다. CPU 결과와 전부 대조해 정확성을 검증합니다. Wllama·WebLLM 없이 GPU를 직접 사용합니다.</p></div></section>
+<meta property="og:locale" content="ko_KR"><meta name="color-scheme" content="light"><link rel="stylesheet" href="/assets/brand.css?v=4"><link rel="stylesheet" href="/assets/interior.css?v=2"></head>
+<body class="ae-interior ae-ternary">
+<a class="ae-skip" href="#main">본문으로 바로가기</a><header class="ae-header"><div class="ae-header__wrap"><a href="/" class="ae-header__brand" aria-label="AETHERION 홈페이지"><span class="ae-symbol" aria-hidden="true">A</span><span class="ae-wordmark">AETHERION</span><span class="ae-header__descriptor">KOREA · AI</span></a><nav class="ae-header__links" aria-label="주 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/" aria-current="page">연구실</a></nav><div class="ae-header__right"><span class="ae-header__region">KO / KR</span><a class="ae-header__action" href="/runtime/">로컬 AI 실행 ↗</a><details class="ae-menu"><summary>메뉴 ☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">회사 소개</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">연구실</a><a href="/lab/generate/v4/">Generator 0.4</a><a href="/lab/bonsai/">Bonsai Core</a><a href="/lab/ternary/">Ternary</a></nav></details></div></div></header><div class="ae-pagebar"><div class="ae-pagebar__inner"><div class="ae-pagebar__crumb"><a href="/lab/">Native Lab</a><span>/</span><strong>Ternary Lab</strong></div><span class="ae-pagebar__status">직접 만든 WebGPU 코어 · 연구 단계</span></div></div>
+<main id="main">
+<section class="hero"><div class="wrap"><div class="micro">AETHERION / NATIVE SYSTEMS / EXPERIMENT 002</div><h1>세 가지 값으로<br><em>더 효율적인 연산.</em></h1><p>우리가 직접 작성한 WebGPU WGSL 셰이더로 삼진 가중치(-1, 0, +1)를 압축하고 행렬 연산을 수행합니다. CPU 결과와 전부 대조해 정확성을 검증합니다. Wllama·WebLLM 없이 GPU를 직접 사용합니다.</p></div></section>
 <div class="ticker"><div class="wrap"><span>NO THIRD-PARTY AI RUNTIME</span><span>2-BIT / 1.6-BIT TERNARY PACKING</span><span>WGSL COMPUTE SHADER</span><span>LOCAL BENCHMARK</span></div></div>
 <section class="main"><div class="wrap"><div class="kicker">01 / DIRECT GPU EXECUTION</div><h2 class="sectiontitle">Build it. Pack it. Run it.</h2>
 <div class="layout">
@@ -100,6 +100,6 @@ footer b{font-size:14px;color:white;letter-spacing:-.04em}
 <p class="disclaimer"><strong>연구 단계 고지:</strong> 이것은 삼진 가중치 행렬 연산 코어와 정확도 벤치마크입니다. <strong>현재 PrismML Bonsai 2 GGUF를 실행하는 LLM이 아닙니다.</strong> 실제 모델에는 PTQ1_0·PQ2_0 블록 포맷, 그룹별 스케일, Hadamard 전처리, Qwen3.5 하이브리드 어텐션, 토크나이저, KV 캐시 등이 필요합니다. 분할·압축 파일 크기만으로 iPhone 모델 실행을 보장할 수 없습니다.</p>
 </div></section>
 </main>
-<footer><div class="wrap"><div><b>AETHERION / Native Ternary Engine</b><div>Experimental WebGPU research · v0.1</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/lab/ternary">소스 코드 ↗</a> · <a href="https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf">PrismML 원본 모델 ↗</a></div></div></footer>
+<footer class="ae-footer"><div class="ae-footer__wrap"><div class="ae-footer__top"><div><div class="ae-footer__brand">AETHERION AI</div><p class="ae-footer__promise">한국어 중심 로컬 AI 연구.<br>직접 만든 GPU 연산을 검증합니다.</p></div><nav class="ae-footer__nav" aria-label="전체 사이트"><a href="/">브랜드</a><a href="/chat/">AI 채팅</a><a href="/agent/">에이전트</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">Native Lab</a><a href="/lab/generate/v4/">Generator 0.4</a><a href="/lab/bonsai/">Bonsai Core</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio">GitHub ↗</a></nav></div><div class="ae-footer__bottom"><p>© 2026 AETHERION AI · 한국어 중심 AI 연구·포트폴리오 프로젝트. 법인 등록이나 공식 기업 인증을 뜻하지 않습니다. 연구 단계·검증된 기능을 구분합니다.</p><p>ENGINEERING IN KOREAN</p></div></div></footer>
 <script src="./engine.js?v=2" defer></script>
 </body></html>
