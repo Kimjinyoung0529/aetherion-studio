@@ -211,10 +211,24 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 </div>
 <div class="ae-gpu-v2__scroll"><table class="ae-gpu-v2__table"><thead><tr><th scope="col">후보 커널</th><th scope="col">결과</th><th scope="col">중앙값</th><th scope="col">변동성</th><th scope="col">CPU 오차</th></tr></thead><tbody id="autoResults"><tr><td colspan="5">7개 후보를 실행하면 검증 결과가 여기에 표시됩니다.</td></tr></tbody></table></div>
 <p id="autoReason" class="help" style="margin-top:15px" aria-live="polite">기준 커널이 틀리면 전체 최적화를 중단합니다.</p>
+<div class="ae-session-section">
+<div class="ae-session-section__head"><strong>REUSABLE NATIVE GPU SESSION / v2.1</strong><span>GPU 가중치 상주 · 커널 재사용</span></div>
+<p class="help">위에서 승자 커널을 선택한 뒤, 같은 PTQ/PQ 가중치를 GPU 버퍼에 계속 유지하며 벡터 곱셈을 2회 실행합니다. 첫 호출에 CPU 기준과 비교하고 수치 오류가 나면 직렬 커널로 자동 복귀합니다.</p>
+<button id="autoSession" type="button" class="lightButton" disabled style="margin:14px 0 12px;width:100%">선정 GPU 커널로 상주 행렬 연산 2회 실행 ↗</button>
+<div class="ae-gpu-v2__stats">
+<div class="metric"><small>재사용 GPU 세션 검증</small><strong id="autoSessionResult">벤치마크 뒤 가능</strong></div>
+<div class="metric"><small>두 번째 GPU 행렬 연산</small><strong id="autoSessionMs">—</strong></div>
+</div>
+<p id="autoSessionDetail" class="help" aria-live="polite" style="margin-top:10px">검증 전에는 최적화 커널을 채택하지 않습니다.</p>
+</div>
 <p class="help" style="margin-top:6px">GPU 작업 완료를 기다리는 브라우저 측정이며, <strong>LLM 전체 토큰 생성이 빨라졌다는 뜻은 아닙니다.</strong> 8·16·32·64-lane 병렬 커널 및 16×8·32×8 행 타일 전략을 실제 기기에서 비교합니다.</p>
 </div></div>
 </section>
 <style>
+.ae-session-section{margin-top:24px;padding:19px;border:1px solid #dbe5e6;background:#f4f8f6;border-radius:11px}
+.ae-session-section__head{display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.ae-session-section__head strong{font-size:12px;color:#23445c}
+.ae-session-section__head span{font-size:10px;color:#71868a}
 .ae-gpu-v2{margin-top:49px}
 .ae-gpu-v2__fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .ae-gpu-v2__stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -237,5 +251,6 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <script src="/lab/bonsai/codec.js?v=2" defer></script>
 <script src="./native-kernel.js?v=1" defer></script>
 <script src="./autotune-v2.js?v=1" defer></script>
-<script src="./autotune-ui.js?v=1" defer></script>
+<script src="./native-session.js?v=1" defer></script>
+<script src="./autotune-ui.js?v=2" defer></script>
 </body></html>
