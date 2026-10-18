@@ -185,6 +185,54 @@ async function inspectSelectedGGUF(){
   note('GGUF 파싱 오류: '+(err?.message||err));
  }
 }
+async function runFoldedBonsaiTensor(){
+ if(running)return;
+ const result=$('foldedPathResult');
+ if(!modelFile||!modelHeader){result.textContent='GGUF 파일을 먼저 선택하세요';return;}
+ const audit=window.currentBonsaiAudit;
+ if(!audit||!audit.compatibleMetadata){result.textContent='GGUF 회전/부호 메타데이터 검증 필요';return;}
+ const index=Number($('tensorName').value),tensor=modelHeader.tensors[index];
+ if(!tensor){result.textContent='텐서를 선택해 주세요';return;}
+ const folded=modelHeader.metadata['prism.hadamard.weight_names'];
+ if(!Array.isArray(folded)||!folded.includes(tensor.name)){
+  result.textContent='회전된 가중치 목록에 없는 텐서입니다. 다른 텐서를 선택하세요.';return;
+ }
+ if(tensor.name.includes('.ssm_out.')&&modelHeader.metadata['prism.hadamard.gdn_v_grouped']===true){
+  result.textContent='GDN ssm_out 전용 헤드 순열이 아직 없어 안전하게 차단했습니다.';return;
+ }
+ const sign=audit.signTables.get(tensor.dims[0]);
+ if(!sign||audit.info.blocks>1024){result.textContent='현재 GPU 부호/블록 조건을 지원하지 않습니다';return;}
+ running=true;$('run').disabled=true;$('runFile').disabled=true;$('runFoldedPath').disabled=true;
+ result.textContent='실제 텐서 GPU 회전 및 행렬곱 중…';
+ try{
+  const fixture=await GGUFInspector.readTensorRows(modelFile,modelHeader,tensor,16);
+  const block=audit.info.blocks,cols=fixture.cols;
+  const original=PrismBlocks.randomActivation(cols,0xabcde);
+  const signs=Float32Array.from(sign);
+  const CPUrotated=AetherionSignedFold.transform(original,signs,block);
+  const GPUrotated=await AetherionSignedFold.runGPU(original,signs,block);
+  const transformError=AetherionSignedFold.maxError(CPUrotated,GPUrotated.result);
+  if(transformError>.012)throw Error('GPU signed FWHT output error '+transformError);
+  await initialize();
+  const weightMatrix=PrismBlocks.decodeMatrix(fixture.bytes,fixture.rows,cols,fixture.format);
+  const expected=PrismBlocks.referenceMatvec(weightMatrix,fixture.rows,cols,CPUrotated);
+  const product=await runMatvec(fixture,GPUrotated.result);
+  const matvecError=PrismBlocks.maxError(expected,product.result);
+  const tolerance=Math.max(.008,cols*.000035);
+  const passed=matvecError<=tolerance;
+  const details=tensor.name+' · '+fixture.rows+'행 × '+cols+'열 · GPU Hadamard '+GPUrotated.ms.toFixed(1)+'ms + GPU ternary '+product.ms.toFixed(1)+'ms · 변환 오차 '+transformError.toExponential(2)+' · 행렬곱 오차 '+matvecError.toExponential(2);
+  $('foldedPathDetails').textContent=details;
+  result.textContent=passed?'PASS · 실제 Bonsai 접힌 단일 텐서 GPU 연산 일치':'FAIL · GPU 텐서 계산 오차 초과';
+  result.dataset.ok=passed?'yes':'no';
+  note('Bonsai rotated tensor staged GPU validation '+(passed?'PASS':'FAIL')+' · '+details);
+ }catch(e){
+  result.textContent='ERROR · '+(e?.message||e);result.dataset.ok='no';note('Folded tensor error: '+(e?.message||e));
+ }finally{
+  running=false;$('run').disabled=false;$('runFile').disabled=!modelHeader?.supportedCount;
+  $('runFoldedPath').disabled=false;
+ }
+}
+
 async function runGGUFSample(){
  if(!modelFile||!modelHeader)return;
  if(running)return;
@@ -204,6 +252,7 @@ async function runGGUFSample(){
 $('run').addEventListener('click',()=>run());
 $('ggufFile').addEventListener('change',inspectSelectedGGUF);
 $('runFile').addEventListener('click',runGGUFSample);
+$('runFoldedPath').addEventListener('click',runFoldedBonsaiTensor);
 note('공식 PrismML PTQ1_0 / PQ2_0 레이아웃용 블록 디코더 준비.');
 if(isSecureContext&&navigator.gpu)run();
 else setStatus('WebGPU 지원 브라우저에서 실행하세요','error');
