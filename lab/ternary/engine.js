@@ -73,9 +73,9 @@ function pack(rows,cols,format) {
     const byte=Math.floor(pos/5);
     const digit=pos%5;
     const pow=[1,3,9,27,81][digit];
-    value=(raw*pow) << (byte*8);
+    value=raw*pow*(2**(byte*8));
    }
-   weights[wordIndex]=(weights[wordIndex]|value)>>>0;
+   weights[wordIndex]=format===0?(weights[wordIndex]|value)>>>0:(weights[wordIndex]+value)>>>0;
   }
  }
  return {weights,source,scales,vec,rows,cols,wordsPerRow,negative,zero,positive,format};
