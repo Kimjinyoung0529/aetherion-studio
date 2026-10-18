@@ -9,15 +9,16 @@ const read=p=>fs.readFileSync(new URL(p,root),'utf8');
 const ctx=vm.createContext({Uint8Array,Uint32Array,Float32Array,Math,Number,ArrayBuffer,DataView,console,Array});
 vm.runInContext(read('../lab/bonsai/codec.js'),ctx);
 vm.runInContext(read('native-kernel.js'),ctx);
+vm.runInContext(read('experiments/kernel-strategies.js'),ctx);
 vm.runInContext(read('autotune-v2.js')+'\nglobalThis.V2=AetherionAutotuneV2;',ctx);
 const V=ctx.V2;
-assert.equal(V.VARIANTS.length,7);
-assert.deepEqual(Array.from(V.VARIANTS,x=>x.id),['serial','lane8','lane16','lane32','lane64','tile16x8','tile32x8']);
+assert.equal(V.VARIANTS.length,8);
+assert.deepEqual(Array.from(V.VARIANTS,x=>x.id),['serial','packed_row','lane8','lane16','lane32','lane64','tile16x8','tile32x8']);
 const limits={maxComputeInvocationsPerWorkgroup:256,maxComputeWorkgroupSizeX:256,maxComputeWorkgroupSizeY:256};
 const lowLimits={...limits,maxComputeInvocationsPerWorkgroup:128};
-assert.equal(V.deviceAllowed(V.VARIANTS[6],limits),true);
-assert.equal(V.deviceAllowed(V.VARIANTS[4],lowLimits),false);
-assert.equal(V.deviceAllowed(V.VARIANTS[2],lowLimits),true);
+assert.equal(V.deviceAllowed(V.VARIANTS[7],limits),true);
+assert.equal(V.deviceAllowed(V.VARIANTS[5],lowLimits),false);
+assert.equal(V.deviceAllowed(V.VARIANTS[3],lowLimits),true);
 for(const candidate of V.VARIANTS){
  const shader=V.shader(candidate);
  assert.match(shader,/fn getTrit/,'Prism PTQ/PQ codec needed');
@@ -25,7 +26,7 @@ for(const candidate of V.VARIANTS){
  assert.match(shader,/unpack2x16float/);
  assert.match(shader,/workgroup_size/);
  assert.match(shader,/y\[row\]/);
- if(candidate.id==='serial')assert.match(shader,/@workgroup_size\(64\)/);
+ if(candidate.id==='serial'||candidate.id==='packed_row')assert.match(shader,/@workgroup_size\(64\)/);
  else{
   const {lanes,tileRows}=candidate;
   assert.match(shader,new RegExp('@workgroup_size\\('+lanes+','+tileRows+'\\)'));
@@ -58,6 +59,6 @@ assert.match(ui,/AetherionAutotuneV2\.run|E\.run/);
 for(const id of ['autoRows','autoCols','autoFormat','autoRun','autoDownload','autoProgress','autoResults','autoWinner','autoSpeedup','autoReason','autoDevice','autoThreshold']){
  assert.ok(page.includes('id="'+id+'"'),'Missing HTML ID '+id);
 }
-assert.match(page,/src="\.\/autotune-v2\.js\?v=1"/);
-assert.match(page,/src="\.\/autotune-ui\.js\?v=2"/);
-console.log('PASS 7 GPU kernels, parallel shader constraints, 7 selection/fallback rules, CPU parity guards and UI bindings');
+assert.match(page,/src="\.\/autotune-v2\.js\?v=2"/);
+assert.match(page,/src="\.\/autotune-ui\.js\?v=3"/);
+console.log('PASS 8 GPU kernels, parallel shader constraints, 7 selection/fallback rules, CPU parity guards and UI bindings');
