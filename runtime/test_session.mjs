@@ -108,6 +108,6 @@ await assert.rejects(()=>broken.multiply(x),/직렬 기준 GPU에서도 CPU 수�
 broken.close();
 const page=read('index.html'),ui=read('autotune-ui.js');
 for(const id of ['autoSession','autoSessionResult','autoSessionMs','autoSessionDetail'])assert.ok(page.includes('id="'+id+'"'));
-assert.match(page,/native-session\.js\?v=1/);
+assert.match(page,/native-session\.js\?v=2/);
 assert.match(ui,/AetherionPackedSession\.create/);
 console.log('PASS native v2.1 persistent GPU buffers, two forwards, numerical parity and forced serial fallback on corrupted output');
