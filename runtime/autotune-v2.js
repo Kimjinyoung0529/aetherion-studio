@@ -8,6 +8,7 @@
 const AetherionAutotuneV2=(()=>{
  const VARIANTS=Object.freeze([
   {id:'serial',name:'직렬 기준',lanes:1,tileRows:1},
+  {id:'packed_row',name:'압축 바이트 직렬 해독 · 독립 실측 우승 후보',lanes:1,tileRows:1},
   {id:'lane8',name:'8-lane 병렬',lanes:8,tileRows:4},
   {id:'lane16',name:'16-lane 병렬',lanes:16,tileRows:4},
   {id:'lane32',name:'32-lane 병렬',lanes:32,tileRows:4},
@@ -34,6 +35,7 @@ const AetherionAutotuneV2=(()=>{
  };
  function shader(variant){
   if(variant.id==='serial')return AetherionNativeBench.SERIAL;
+  if(variant.id==='packed_row')return AetherionKernelStrategies.packedRowShader();
   const lanes=variant.lanes,rows=variant.tileRows;
   if(![8,16,32,64].includes(lanes)||![4,8].includes(rows)||lanes*rows>256)throw Error('GPU 작업 그룹 크기가 유효하지 않습니다');
   const snippet=[
@@ -75,16 +77,17 @@ const AetherionAutotuneV2=(()=>{
   }
   const candidates=results.filter(x=>x.status==='pass'&&x.id!=='serial'&&x.ms>0&&x.jitter<=maximumJitter)
    .sort((a,b)=>a.ms-b.ms);
-  if(!candidates.length)return {winner:baseline,reason:'유효한 병렬 후보가 없어 검증된 직렬 커널을 유지합니다.',gain:0};
+  if(!candidates.length)return {winner:baseline,reason:'유효한 최적화 후보가 없어 검증된 직렬 커널을 유지합니다.',gain:0};
   const candidate=candidates[0],gain=baseline.ms/candidate.ms-1;
-  if(gain<minimumGain)return {winner:baseline,reason:'병렬 최적화 이득이 '+Math.round(minimumGain*100)+'%보다 작아 안전한 직렬 커널을 유지합니다.',gain:0};
+  if(gain<minimumGain)return {winner:baseline,reason:'커널 최적화 이득이 '+Math.round(minimumGain*100)+'%보다 작아 안전한 직렬 커널을 유지합니다.',gain:0};
   return {winner:candidate,reason:'같은 입력·GPU에서 검증 통과. '+((gain)*100).toFixed(1)+'% 빠른 '+candidate.name+' 채택.',gain};
  }
  function deviceAllowed(variant,limits){
-  const threads=variant.id==='serial'?64:variant.lanes*variant.tileRows;
+  const scalar=variant.id==='serial'||variant.id==='packed_row';
+  const threads=scalar?64:variant.lanes*variant.tileRows;
   if(threads>limits.maxComputeInvocationsPerWorkgroup)return false;
-  if(variant.id!=='serial'&&(variant.lanes>limits.maxComputeWorkgroupSizeX||variant.tileRows>limits.maxComputeWorkgroupSizeY))return false;
-  if(variant.id==='serial'&&64>limits.maxComputeWorkgroupSizeX)return false;
+  if(!scalar&&(variant.lanes>limits.maxComputeWorkgroupSizeX||variant.tileRows>limits.maxComputeWorkgroupSizeY))return false;
+  if(scalar&&64>limits.maxComputeWorkgroupSizeX)return false;
   return true;
  }
  async function run({rows=256,cols=512,format=143,trials=7,onProgress=()=>{}}={}){
@@ -137,11 +140,11 @@ const AetherionAutotuneV2=(()=>{
       {binding:0,resource:{buffer:vectors}},{binding:1,resource:{buffer:packed}},
       {binding:2,resource:{buffer:output}},{binding:3,resource:{buffer:settings}}
      ]});
-     const dispatch=withReadback=>{
+     const dispatch=(withReadback,repeats=1)=>{
       const commands=device.createCommandEncoder();
       const pass=commands.beginComputePass();
       pass.setPipeline(pipeline);pass.setBindGroup(0,group);
-      pass.dispatchWorkgroups(v.id==='serial'?Math.ceil(rows/64):Math.ceil(rows/v.tileRows));
+      for(let iter=0;iter<repeats;iter++)pass.dispatchWorkgroups((v.id==='serial'||v.id==='packed_row')?Math.ceil(rows/64):Math.ceil(rows/v.tileRows));
       pass.end();
       if(withReadback)commands.copyBufferToBuffer(output,0,readback,0,rows*4);
       device.queue.submit([commands.finish()]);
@@ -156,12 +159,12 @@ const AetherionAutotuneV2=(()=>{
       results.push({...v,status:'invalid',ms:null,jitter:null,error:err,reason:'CPU 기준 수치 불일치 (허용 '+threshold.toExponential(2)+')'});
       continue;
      }
-     dispatch(false);
-     await device.queue.onSubmittedWorkDone(); // pipeline warm-up
+     dispatch(false,8);
+     await device.queue.onSubmittedWorkDone(); // batched warm-up
      const durations=[];
      for(let j=0;j<trials;j++){
-      const started=performance.now();dispatch(false);await device.queue.onSubmittedWorkDone();
-      durations.push(performance.now()-started);
+      const started=performance.now();dispatch(false,8);await device.queue.onSubmittedWorkDone();
+      durations.push((performance.now()-started)/8);
      }
      const med=median(durations),jit=deviation(durations);
      results.push({...v,status:'pass',ms:med,jitter:jit,error:err,trials:durations});
@@ -173,7 +176,7 @@ const AetherionAutotuneV2=(()=>{
    const selection=selectWinner(results);
    const gpu=[adapter.info?.vendor,adapter.info?.device,adapter.info?.architecture].filter(Boolean).join(' / ')||'GPU';
    return {
-    version:2,format,rows,cols,device:gpu,timing:'7회 GPU 완료 대기 포함 시간. 셰이더 단독 GPU 소요 시간이 아님.',
+    version:2,format,rows,cols,device:gpu,timing:'8회 연속 디스패치를 한 번 제출하고 GPU 완료 대기 후 8로 나눈 시간. 기기별 비교 전용이며 셰이더 단독 측정은 아님.',
     threshold,winner:selection.winner?.id||null,gain:selection.gain,reason:selection.reason,results
    };
   }finally{
