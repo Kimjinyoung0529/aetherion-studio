@@ -73,6 +73,24 @@ assert.equal(gguf.runtime.closed,true);
 const ggufFiles=await E.load({backend:'gguf',id:'files',files:[{name:'part.gguf',size:1000}]},opts,null,{importer});
 assert.equal(ggufFiles.runtime.files.length,1);
 await ggufFiles.close();
+// WebGPU must NOT be required for explicit n_gpu_layers=0 GGUF CPU fallback.
+class NoGpuWllama extends FakeWllama {
+ isSupportWebGPU(){return false}
+}
+const noGpuImporter=async(url)=>{
+ if(url.includes('wllama'))return {Wllama:NoGpuWllama};
+ throw Error('Unexpected import '+url);
+};
+const cpuSettings={...opts,n_gpu_layers:0};
+const ggufCPU=await E.load({backend:'gguf',url:'https://models.example/cpu.gguf'},cpuSettings,null,{importer:noGpuImporter});
+assert.equal(ggufCPU.runtime.opts.n_gpu_layers,0);
+assert.equal(ggufCPU.runtime.isSupportWebGPU(),false);
+await ggufCPU.close();
+await assert.rejects(
+ ()=>E.load({backend:'gguf',url:'https://models.example/must-have-gpu.gguf'},opts,null,{importer:noGpuImporter}),
+ /WebGPU/
+);
+
 const catalog=await E.catalog({importer});
 assert.equal(catalog[0].id,'Qwen3-0.6B-q4f16_1-MLC');
 const mlc=await E.load({backend:'mlc',id:'Qwen3-0.6B-q4f16_1-MLC'},opts,null,{importer});
@@ -87,4 +105,6 @@ const html=read('index.html'),app=read('app.js'),tuner=read('tuner.js');
 const ids=[...new Set([...app.matchAll(/\$\('([^']+)'\)/g)].map(x=>x[1]))];
 for(const id of ids)assert.ok(html.includes('id="'+id+'"'),'unmatched DOM id: '+id);
 assert.match(app,/benchmark\(/);assert.match(tuner,/parallelDownloads/);
+assert.match(app,/CPU-only \/ WebGPU 불필요|CPU-only/);
+assert.match(html,/GPU 레이어 = 0/);
 console.log('PASS AETHERION runtime tuning, source validation, benchmark comparability, GGUF+MLC mocks, UI linkage ('+ids.length+' controls)');
