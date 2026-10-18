@@ -93,15 +93,19 @@
  }
  async function connect(){
   if(locked)return;locked=true;updateButtons();
-  status('GPU / 모델 초기화 중…','loading');set('offload','요청 설정 / 실제 사용 미검증');
+  status('로컬 모델 초기화 중…','loading');set('offload','요청 설정 / 실제 사용 미검증');
   let next=null;
   try{
    const selection=getSelection();
-   if(!device){
+   const opts=profile();settingsSummary();
+   const needsGpu=selection.backend==='mlc'||opts.n_gpu_layers>0;
+   if(!needsGpu){
+    device={key:'cpu-only/'+(navigator.hardwareConcurrency||1),label:'CPU · WebAssembly',shaderF16:false,maxStorageBufferBindingSize:0};
+    set('gpu',device.label);set('deviceLimits','CPU-only · WebGPU 불필요');
+   }else if(!device||device.key.startsWith('cpu-only/')){
     device=await U.inspectGpu();set('gpu',device.label);
     set('deviceLimits',Math.round(device.maxStorageBufferBindingSize/2**20)+'MB binding · f16 '+(device.shaderF16?'yes':'no'));
    }
-   const opts=profile();settingsSummary();
    if(current){await current.close();current=null;messages=[];$('messages').textContent='';}
    const started=time();
    next=await U.load(selection,opts,event=>{
@@ -113,7 +117,8 @@
    set('loadedTime',((time()-started)/1000).toFixed(2)+' s');
    set('engineType',current.backend==='gguf'?'Wllama GGUF + AETHERION scheduler':'MLC WebGPU + AETHERION scheduler');
    set('modelName',current.modelKey);
-   set('offload',current.backend==='gguf'?'GPU '+opts.n_gpu_layers+'개 레이어 요청 · 실제 오프로딩 미검증':'WebLLM 컴파일 GPU 커널 · WebGPU');
+   set('offload',current.backend==='gguf'?
+    (opts.n_gpu_layers===0?'CPU 전용 모드 · GPU 0레이어':'GPU '+opts.n_gpu_layers+'개 레이어 요청 · 실제 오프로딩 미검증'):'WebLLM 컴파일 GPU 커널 · WebGPU');
    log('모델 준비: '+current.modelKey+' · 실행 엔진 '+current.backend);
    if(current.context)log('모델 정보: '+current.context.n_layer+' layers, actual context='+current.context.n_ctx);
    status('로컬 AI 준비됨','ready');
