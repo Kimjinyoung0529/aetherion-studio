@@ -28,6 +28,8 @@ h1 em{color:var(--orange);font-style:normal}
 .main{padding:50px 0 80px}
 .sectionTitle{font-size:29px;line-height:1.2;letter-spacing:-.055em;margin:12px 0 25px}
 .grids{display:grid;grid-template-columns:370px minmax(0,1fr);gap:17px;align-items:start}
+.benchGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.nativeFormGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .stack{display:grid;gap:16px;min-width:0}
 .panel{border:1px solid var(--line);background:var(--panel);border-radius:13px;overflow:hidden;box-shadow:0 9px 24px #14141406}
 .panelHead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:19px 20px;border-bottom:1px solid var(--line)}
@@ -73,8 +75,8 @@ textarea{min-height:80px;resize:vertical;line-height:1.8}
 .caution strong{color:#383b36}
 footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-height:1.8}footer .wrapper{display:flex;gap:15px;flex-wrap:wrap;justify-content:space-between}footer b{font-size:15px;color:white}
 [hidden]{display:none!important}
-@media(max-width:920px){.grids{grid-template-columns:1fr}.stack{min-width:0}}
-@media(max-width:560px){.wrapper{width:calc(100% - 28px)}.topbar .wrapper{height:61px}.brand{font-size:15px}.nav{gap:9px;font-size:10px}.hero{padding:49px 0}.lead{font-size:12px}.main{padding:30px 0 53px}.panelBody{padding:16px}.panelHead{padding:17px}.messages{height:315px;padding:15px}.chatComposer{padding:15px}.metric{padding:11px}.metric strong{font-size:12px}}
+@media(max-width:920px){.grids,.benchGrid{grid-template-columns:1fr}.stack{min-width:0}}
+@media(max-width:560px){.wrapper{width:calc(100% - 28px)}.topbar .wrapper{height:61px}.brand{font-size:15px}.nav{gap:9px;font-size:10px}.hero{padding:49px 0}.lead{font-size:12px}.main{padding:30px 0 53px}.panelBody{padding:16px}.panelHead{padding:17px}.messages{height:315px;padding:15px}.chatComposer{padding:15px}.metric{padding:11px}.metric strong{font-size:12px}.nativeFormGrid{grid-template-columns:1fr}}
 </style></head>
 <body>
 <header class="topbar"><div class="wrapper"><a class="brand" href="/">AETHERION <span>/ RUNTIME</span></a>
@@ -145,7 +147,7 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 </div>
 <section id="benchmark" style="margin-top:40px">
 <div class="kicker">02 / REAL PERFORMANCE</div><h2 class="sectionTitle">Measure before claiming victory.</h2>
-<div class="grids" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+<div class="grids benchGrid">
 <div class="panel"><div class="panelHead"><b>FAIR / DEVICE BENCHMARK</b><small>2 consecutive runs</small></div><div class="panelBody">
 <div class="field"><label for="benchmarkPrompt">기준 프롬프트</label><textarea id="benchmarkPrompt">브라우저에서 GPU 추론을 빠르게 만들려면 어떤 방법이 필요한지 간단히 설명해줘.</textarea></div>
 <div class="field"><label for="benchTokens">최대 출력 토큰</label><select id="benchTokens"><option value="32">32</option><option value="64" selected>64</option><option value="96">96</option></select></div>
@@ -172,7 +174,7 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <p class="help" style="font-size:12px;margin-bottom:20px">AETHERION이 직접 작성한 PTQ1_0/PQ2_0 압축 행렬 연산을 기존 1행 1스레드 방식과 32스레드 병렬 누산 방식으로 비교합니다. 같은 가중치·GPU·검증 코드를 사용합니다. 이 최적화 커널은 아직 일반 GGUF 전체 모델 실행기에 연결되지 않은 연구 기능입니다.</p>
 <div class="panel"><div class="panelHead"><b>PACKED MATVEC / BASELINE vs PARALLEL</b><small>Own native WebGPU kernels</small></div>
 <div class="panelBody">
-<div class="columns" style="grid-template-columns:repeat(3,1fr)">
+<div class="nativeFormGrid">
 <div class="field"><label for="nativeRows">행 수</label><select id="nativeRows"><option value="128">128</option><option value="256" selected>256</option><option value="512">512</option></select></div>
 <div class="field"><label for="nativeCols">열 수</label><select id="nativeCols"><option value="128">128</option><option value="512" selected>512</option><option value="1024">1024</option></select></div>
 <div class="field"><label for="nativeFormat">Prism 압축 포맷</label><select id="nativeFormat"><option value="143">PTQ1_0 · 1.75b</option><option value="142">PQ2_0 · 2.125b</option></select></div>
@@ -189,7 +191,7 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 </div></div>
 </section>
 
-<p class="caution"><strong>중요:</strong> AETHERION 자체 제작 부분은 GPU 프로필 선택기, 실행 스케줄러, 측정·비교 코드 및 별도 WGSL 실험 커널입니다. 범용 GGUF/MLC 모델의 전체 추론 연산은 각각 공개 Wllama/MLC 백엔드를 사용합니다. **모든 로컬 LLM을 하나의 자체 WebGPU 커널로 실행하는 제품은 아직 아니며, 기존 엔진보다 항상 빠르다는 보장도 없습니다.** Safari·iPhone에서는 런타임/양자화/메모리 제한에 따라 실패할 수 있습니다.</p>
+<p class="caution"><strong>중요:</strong> AETHERION 자체 제작 부분은 GPU 프로필 선택기, 실행 스케줄러, 측정·비교 코드 및 별도 WGSL 실험 커널입니다. 범용 GGUF/MLC 모델의 전체 추론 연산은 각각 공개 Wllama/MLC 백엔드를 사용합니다. <strong>모든 로컬 LLM을 하나의 자체 WebGPU 커널로 실행하는 제품은 아직 아니며, 기존 엔진보다 항상 빠르다는 보장도 없습니다.</strong> Safari·iPhone에서는 런타임/양자화/메모리 제한에 따라 실패할 수 있습니다.</p>
 </div></div>
 </main>
 <footer><div class="wrapper"><div><b>AETHERION / Universal Runtime</b><div>First-party scheduling &amp; performance lab · v1.0</div></div><div><a href="https://github.com/Kimjinyoung0529/aetherion-studio/tree/main/runtime">GitHub Source ↗</a> · <a href="/lab/bonsai/">Native WGSL Kernels ↗</a></div></div></footer>
