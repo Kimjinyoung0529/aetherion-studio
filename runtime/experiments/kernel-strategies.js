@@ -56,6 +56,45 @@ const AetherionKernelStrategies=(()=>{
    '}'
   ].join('\n');
  }
+ function packedRowShader(){
+  return base()+[
+   '@compute @workgroup_size(64)',
+   'fn main(@builtin(global_invocation_id) id:vec3<u32>){',
+   ' let row=id.x;if(row>=cfg.rows){return;}',
+   ' var total:f32=0.0;',
+   ' for(var block:u32=0u;block<cfg.blocksPerRow;block=block+1u){',
+   '  let baseOff=blockBase(row,block);',
+   '  let scale=blockScale(baseOff);',
+   '  var sum:f32=0.0;',
+   '  if(cfg.format==142u){',
+   '   for(var byteIndex:u32=0u;byteIndex<32u;byteIndex=byteIndex+1u){',
+   '    let bits=getByte(baseOff+2u+byteIndex);',
+   '    for(var digit:u32=0u;digit<4u;digit=digit+1u){',
+   '     let q=i32((bits>>(digit*2u))&3u)-1;',
+   '     sum+=f32(q)*x[block*128u+byteIndex*4u+digit];',
+   '    }',
+   '   }',
+   '  }else{',
+   '   for(var byteIndex:u32=0u;byteIndex<26u;byteIndex=byteIndex+1u){',
+   '    let bits=getByte(baseOff+byteIndex);',
+   '    var start:u32=0u;var stride:u32=0u;var count:u32=0u;',
+   '    if(byteIndex<16u){start=byteIndex;stride=16u;count=5u;}',
+   '    else if(byteIndex<24u){start=80u+(byteIndex-16u);stride=8u;count=5u;}',
+   '    else{start=120u+(byteIndex-24u);stride=2u;count=4u;}',
+   '    var power:u32=1u;',
+   '    for(var digit:u32=0u;digit<count;digit=digit+1u){',
+   '     let q=i32(((((bits*power)&255u)*3u)>>8u))-1;',
+   '     sum+=f32(q)*x[block*128u+start+digit*stride];',
+   '     power*=3u;',
+   '    }',
+   '   }',
+   '  }',
+   '  total+=sum*scale;',
+   ' }',
+   ' y[row]=total;',
+   '}'
+  ].join('\n');
+ }
  function splitShaders(){
   const hdr=base()+'@group(0) @binding(4) var<storage,read_write> partials:array<f32>;\n';
   const first=hdr+[
@@ -112,6 +151,7 @@ const AetherionKernelStrategies=(()=>{
   {id:'scalar',name:'A · 직렬 행 처리',family:'baseline',memoryMultiplier:1},
   {id:'lane32',name:'B · 32-lane 공유메모리',family:'cooperative',memoryMultiplier:1},
   {id:'packed_byte',name:'C · 압축바이트 직접 해독',family:'packed-access',memoryMultiplier:1},
+  {id:'packed_row',name:'F · 압축바이트 직렬 해독',family:'packed-scalar',memoryMultiplier:1},
   {id:'split_k',name:'D · Split-K 두 단계',family:'split-k',memoryMultiplier:1},
   {id:'predecode',name:'E · 일회성 해독 후 GEMV',family:'predecode',memoryMultiplier:0}
  ]);
@@ -123,10 +163,11 @@ const AetherionKernelStrategies=(()=>{
   if(id==='scalar')return {descriptor,stages:[{code:AetherionNativeBench.SERIAL,entry:'main',dispatch:Math.ceil(rows/64)}],bytesScratch:4,bytesDense:4};
   if(id==='lane32')return {descriptor,stages:[{code:AetherionNativeBench.PARALLEL,entry:'main',dispatch:Math.ceil(rows/4)}],bytesScratch:4,bytesDense:4};
   if(id==='packed_byte')return {descriptor,stages:[{code:packedWordShader(),entry:'main',dispatch:Math.ceil(rows/4)}],bytesScratch:4,bytesDense:4};
+  if(id==='packed_row')return {descriptor,stages:[{code:packedRowShader(),entry:'main',dispatch:Math.ceil(rows/64)}],bytesScratch:4,bytesDense:4};
   if(id==='split_k')return {descriptor,stages:splitShaders().map((p,i)=>({...p,dispatch:i===0?Math.ceil(rows*blocks/64):Math.ceil(rows/64)})),bytesScratch:rows*blocks*4,bytesDense:4};
   const stages=denseShaders();
   return {descriptor,preprocess:{...stages.unpack,dispatch:Math.ceil(rows*cols/128)},stages:[{...stages.matvec,dispatch:Math.ceil(rows/64)}],bytesScratch:4,bytesDense:rows*cols*4};
  }
- return Object.freeze({STRATEGIES,packedWordShader,splitShaders,denseShaders,makePlan});
+ return Object.freeze({STRATEGIES,packedWordShader,packedRowShader,splitShaders,denseShaders,makePlan});
 })();
 if(typeof globalThis!=='undefined')globalThis.AetherionKernelStrategies=AetherionKernelStrategies;
