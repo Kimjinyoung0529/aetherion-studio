@@ -20,7 +20,11 @@ jobs:
           node-version: '22'
       - name: Test quantized transformer weights and CPU generation
         run: node lab/generate/test_generator.mjs
+      - name: Verify Native Generator 0.4 Q8 checkpoint and Korean token generation
+        run: node lab/generate/v4/test_generator.mjs
       - name: Check inference and browser JavaScript
         run: |
           node --check lab/generate/engine.js
           node --check lab/generate/app.js
+          node --check lab/generate/v4/engine.js
+          node --check lab/generate/v4/app.js
