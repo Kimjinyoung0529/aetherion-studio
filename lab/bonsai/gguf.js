@@ -44,7 +44,10 @@ const GGUFInspector=(()=>{
      const elemType=await this.u32(),count=await this.u64();
      if(count>5e6)throw Error('Metadata array too large');
      if(elemType===8){
-      for(let i=0;i<count;i++)await this.str(0); // skip token strings without allocating
+      for(let i=0;i<count;i++){
+       await this.str(0); // skip strings without allocating token-vocabulary arrays
+       if(i%2048===0 && typeof requestAnimationFrame==='function')await new Promise(requestAnimationFrame);
+      }
      }else{
       const size=TYPE_SIZE[elemType];
       if(!size)throw Error('Unsupported GGUF metadata array type '+elemType);
