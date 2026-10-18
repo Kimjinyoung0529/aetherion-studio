@@ -100,7 +100,7 @@ const AetherionPackedSession=(()=>{
     device.queue.writeBuffer(activation,0,input);
     const cmd=device.createCommandEncoder(),pass=cmd.beginComputePass();
     pass.setPipeline(pipelineInfo.pipeline);pass.setBindGroup(0,pipelineInfo.bind);
-    pass.dispatchWorkgroups(variant.id==='serial'?Math.ceil(rows/64):Math.ceil(rows/variant.tileRows));
+    pass.dispatchWorkgroups((variant.id==='serial'||variant.id==='packed_row')?Math.ceil(rows/64):Math.ceil(rows/variant.tileRows));
     pass.end();
     cmd.copyBufferToBuffer(output,0,read,0,rows*4);
     device.queue.submit([cmd.finish()]);
