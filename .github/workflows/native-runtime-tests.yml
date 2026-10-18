@@ -20,9 +20,13 @@ jobs:
         run: node runtime/test_runtime.mjs
       - name: Verify first-party packed WGSL benchmark fixtures
         run: node runtime/test_native.mjs
+      - name: Test v2 multi-kernel autotune correctness gating
+        run: node runtime/test_autotune.mjs
       - name: Validate browser JavaScript syntax
         run: |
           node --check runtime/tuner.js
           node --check runtime/engine.js
           node --check runtime/app.js
           node --check runtime/native-kernel.js
+          node --check runtime/autotune-v2.js
+          node --check runtime/autotune-ui.js
