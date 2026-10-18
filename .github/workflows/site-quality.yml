@@ -5,6 +5,8 @@ on:
       - '**/*.html'
       - 'assets/**'
       - 'tools/site_audit.py'
+      - 'tools/site_browser_smoke.cjs'
+      - 'tools/webgpu_browser_probe.cjs'
       - '.github/workflows/site-quality.yml'
   workflow_dispatch:
 permissions:
@@ -25,6 +27,7 @@ jobs:
           node --check runtime/autotune-v2.js
           node --check runtime/autotune-ui.js
           node --check tools/site_browser_smoke.cjs
+          node --check tools/webgpu_browser_probe.cjs
   browser-layout:
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -54,6 +57,7 @@ jobs:
           trap 'kill "$SERVER" || true' EXIT
           sleep 2
           node tools/site_browser_smoke.cjs
+          node tools/webgpu_browser_probe.cjs
       - name: Keep visual regression screenshots
         if: always()
         uses: actions/upload-artifact@v4
