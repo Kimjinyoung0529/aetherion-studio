@@ -1,0 +1,27 @@
+name: AETHERION Native Bonsai Codec Tests
+on:
+  push:
+    paths:
+      - 'lab/bonsai/**'
+      - '.github/workflows/native-bonsai-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  codec:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Prism PTQ/PQ layouts and GGUF inspection
+        run: node lab/bonsai/test_codec.mjs
+      - name: Syntax check browser assets
+        run: |
+          node --check lab/bonsai/codec.js
+          node --check lab/bonsai/gguf.js
+          node --check lab/bonsai/engine.js
