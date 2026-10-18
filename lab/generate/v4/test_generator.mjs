@@ -39,7 +39,7 @@ assert.match(shader,/q8\(23392u\+tok,10u\)/);
 assert.match(shader,/tok\*32u\+col,0u/);
 assert.match(shader,/row\*64u\+col,8u/);
 assert.match(app,/engine\.verify\(\)/);
-assert.match(html,/generator\/v4\//);
+assert.match(html,/generate\/v4\//);
 const charIndex=new Map(model.vocab.map((char,index)=>[char,index]));
 function greedy(question,max=88){
  const ids=Array.from('Q: '+question+'\nA: ',ch=>charIndex.get(ch)??0);
