@@ -112,7 +112,7 @@ footer{background:#141716;color:#adb3aa;padding:30px 0;font-size:11px;line-heigh
 <div class="field"><label for="profile">GPU 실행 프로필</label><select id="profile"><option value="safe">안정 · 낮은 메모리 사용량</option><option value="balanced" selected>균형 · 일반 사용</option><option value="turbo">고속 · GPU 레이어·배치 확대</option></select>
 <p class="help" id="profileHint">WebGPU 지원 기기에서 프로필을 바꿔 성능을 비교하세요.</p></div>
 <div class="columns"><div class="field"><label for="context">문맥 길이</label><select id="context"><option value="512">512</option><option value="768" selected>768</option><option value="1024">1024</option><option value="1536">1536</option><option value="2048">2048</option></select></div>
-<div class="field"><label for="gpuOverride">GPU 레이어 직접 지정</label><input id="gpuOverride" type="number" min="0" max="99" placeholder="자동" inputmode="numeric"/></div></div>
+<div class="field"><label for="gpuOverride">GPU 레이어 직접 지정</label><input id="gpuOverride" type="number" min="0" max="99" placeholder="자동" inputmode="numeric"/></div><p class="help" style="grid-column:1/-1;margin-top:-4px">GPU가 없는 기기에서는 <strong>GPU 레이어 = 0</strong>으로 설정하면 지원되는 GGUF 모델을 CPU WebAssembly로 실행할 수 있습니다. MLC는 WebGPU가 필요합니다.</p></div>
 <p class="help" id="settingInfo" style="margin-bottom:16px"></p>
 <button type="button" class="mainButton" id="connect" style="width:100%">모델 로드 · GPU 초기화 ↗</button>
 <div class="actions"><button type="button" class="lightButton" id="disconnect" disabled>모델 해제</button><button type="button" class="lightButton" id="abort" disabled>현재 생성 중지</button></div>
