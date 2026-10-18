@@ -152,7 +152,7 @@ async function inspectSelectedGGUF(){
  const file=$('ggufFile').files?.[0];if(!file)return;
  modelFile=null;modelHeader=null;window.currentBonsaiAudit=null;
  $('tensorName').textContent='';$('runFile').disabled=true;
- $('signedFoldWidth').textContent='';$('signedFoldRun').disabled=true;
+ $('signedFoldWidth').textContent='';$('signedFoldRun').disabled=true;$('runFoldedPath').disabled=true;
  $('auditReport').textContent='검사 준비 중…';
  $('ggufInfo').textContent='GGUF 메타데이터를 스트리밍으로 검사 중입니다…';
  try{
@@ -168,6 +168,7 @@ async function inspectSelectedGGUF(){
    foldSelect.append(option);
   }
   $('signedFoldRun').disabled=!modelAudit.compatibleMetadata||!modelAudit.info.signWidths.length||modelAudit.info.blocks>1024;
+  $('runFoldedPath').disabled=!modelAudit.compatibleMetadata||!modelAudit.info.signWidths.length||modelAudit.info.blocks>1024;
   const selector=$('tensorName');
   header.tensors.forEach((tensor,index)=>{
    const option=document.createElement('option');
