@@ -24,6 +24,7 @@
   label('autoReason',report.reason);
   label('autoDevice',report.device);
   label('autoThreshold',report.threshold.toExponential(2));
+  $('autoSession').disabled=!report.winner;
   $('autoDownload').disabled=false;
  }
  action.addEventListener('click',async()=>{
@@ -31,6 +32,10 @@
   running=true;action.disabled=true;$('autoDownload').disabled=true;
   lastReport=null;
   $('autoResults').replaceChildren();
+  $('autoSession').disabled=true;
+  label('autoSessionResult','검증 전');
+  label('autoSessionMs','—');
+  label('autoSessionDetail','승자 커널을 선택한 뒤 GPU 세션을 실행하세요.');
   label('autoWinner','GPU 검사 준비 중…');
   label('autoSpeedup','—');
   label('autoReason','실제 수치 검증 후 7개 후보의 GPU 실행 시간을 비교합니다.');
@@ -47,6 +52,34 @@
    label('autoProgress','GPU 실행 오류. 미검증 후보는 채택하지 않습니다.');
   }finally{running=false;action.disabled=false;}
  });
+ $('autoSession').addEventListener('click',async()=>{
+  if(!lastReport?.winner)return;
+  const button=$('autoSession');
+  button.disabled=true;
+  let session=null;
+  label('autoSessionResult','GPU 가중치 상주 세션 준비 중…');
+  try{
+   const {rows,cols,format,winner}=lastReport;
+   const fixture=PrismBlocks.packFixture(rows,cols,format,0x32aff);
+   const x=PrismBlocks.randomActivation(cols,0x99ff);
+   session=await AetherionPackedSession.create({rows,cols,format,weights:fixture.bytes,preferredVariant:winner});
+   const first=await session.multiply(x);
+   const second=await session.multiply(x);
+   const difference=AetherionNativeBench.maxError(first.output,second.output);
+   if(difference>1e-5)throw Error('동일 입력의 GPU 결과 불일치: '+difference);
+   const verify=first.verification;
+   label('autoSessionResult','PASS · GPU 호출 '+session.info.calls+'회 · '+(first.fallback?'직렬 복귀':first.variant+' 채택'));
+   label('autoSessionMs',second.ms.toFixed(3)+'ms');
+   label('autoSessionDetail','상주 가중치 재사용. CPU 정확도 검증 '+verify.checkedRows+'/'+rows+'행 ('+(verify.allRows?'전체':'샘플')+') · 최대 오차 '+verify.maxError.toExponential(2)+'. GPU 읽기 완료 포함 시간이며 LLM 전체 토큰 속도가 아닙니다.');
+  }catch(e){
+   label('autoSessionResult','FAIL · 계산 결과 미채택');
+   label('autoSessionDetail',String(e?.message||e));
+  }finally{
+   session?.close();
+   button.disabled=!lastReport?.winner;
+  }
+ });
+
  $('autoDownload').addEventListener('click',()=>{
   if(!lastReport)return;
   const json=JSON.stringify({...lastReport,notice:'End-to-end LLM token throughput not measured. Kernel-only JS queue/fence timings.'},null,2);
