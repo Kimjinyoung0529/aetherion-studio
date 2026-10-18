@@ -23,6 +23,8 @@ This is a native, browser-only WebGPU codec and matvec experiment for **PrismML 
 - `index.html`: interactive research interface.
 - `test_codec.mjs`: standalone Node conformance tests, no external npm packages.
 - `hadamard.js`: independent direct WebGPU normalized FWHT and CPU reference, with GPU result comparison.
+- `ffn.js`: first-party WGSL RMSNorm + SwiGLU dense feed-forward + residual kernel with deterministic CPU reference.
+- `test_ffn.mjs`: checks FFN reference, zero-weight residual behavior, and shape guards (GPU output verification requires on-device browser).
 - `test_hadamard.mjs`: standalone normalized FWHT algebraic / inverse test.
 
 ## Critical limits
@@ -46,3 +48,7 @@ This is a native, browser-only WebGPU codec and matvec experiment for **PrismML 
 2. Integrate the correct Prism Bonsai 2 sign-flip/Hadamard transforms at the verified model graph locations (the generic FWHT proof of concept is implemented separately).
 3. Implement the Qwen3.5 hybrid model graph, tokenizer, state cache, KV cache, streaming autoregressive decode.
 4. Logit/token parity testing against a trusted reference across multiple prompts and browsers.
+
+## Latest FFN building block
+
+A handcrafted WebGPU shader now benchmarks **RMSNorm → Gate/Up projections → SiLU(gate)·up → Down projection → residual** on deterministic 32/64-wide test tensors. This is an independent Qwen3.5-style FFN primitive, not a validated Bonsai layer: correct model tensors, sign transforms, GDN recurrence, rotary embeddings, cache handling, tokenizer and real-model logit parity remain unimplemented.
