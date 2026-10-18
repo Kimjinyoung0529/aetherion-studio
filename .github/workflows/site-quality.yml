@@ -1,0 +1,26 @@
+name: AETHERION Whole Site Quality
+on:
+  push:
+    paths:
+      - '**/*.html'
+      - 'assets/**'
+      - 'tools/site_audit.py'
+      - '.github/workflows/site-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  html-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit Korean branding, navigation, HTML and local references
+        run: python3 tools/site_audit.py
+      - name: Validate shared JavaScript syntax
+        run: |
+          node --check assets/studio.js
+          node --check runtime/engine.js
+          node --check runtime/app.js
+          node --check runtime/autotune-v2.js
+          node --check runtime/autotune-ui.js
