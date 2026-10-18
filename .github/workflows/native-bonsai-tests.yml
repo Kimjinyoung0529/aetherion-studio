@@ -26,6 +26,8 @@ jobs:
         run: node lab/bonsai/test_signed_fold.mjs
       - name: Test Hadamard CPU reference and involution
         run: node lab/bonsai/test_hadamard.mjs
+      - name: Test RMSNorm SwiGLU dense FFN reference
+        run: node lab/bonsai/test_ffn.mjs
       - name: Syntax check browser assets
         run: |
           node --check lab/bonsai/codec.js
@@ -34,3 +36,4 @@ jobs:
           node --check lab/bonsai/hadamard.js
           node --check lab/bonsai/audit.js
           node --check lab/bonsai/signed_fold.js
+          node --check lab/bonsai/ffn.js
