@@ -25,7 +25,7 @@ const AetherionUniversal=(()=>{
   let succeeded=false;
   try{
    runtime.setCompat?.('default','safari');
-   if(runtime.isSupportWebGPU&&!runtime.isSupportWebGPU())throw Error('이 Wllama 실행 환경에는 WebGPU 지원이 없습니다.');
+   if(opts.n_gpu_layers>0 && runtime.isSupportWebGPU && !runtime.isSupportWebGPU())throw Error('GPU 오프로딩을 요청했지만 WebGPU가 없습니다. GPU 레이어를 0으로 지정하면 GGUF를 CPU로 실행할 수 있습니다.');
    const onProgress=p=>{
     const fraction=p?.total>0?p.loaded/p.total:(Number.isFinite(p?.progress)?p.progress:null);
     if(Number.isFinite(fraction))notify?.({kind:'download',fraction:Math.max(0,Math.min(1,fraction))});
