@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fffdf8">
+<title>오픈소스 | AETHERION AI</title>
+<meta name="description" content="AETHERION AI에서 떼어 내 공개하는 오픈소스 프로젝트 9개와 진행 상태.">
+<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="오픈소스 | AETHERION AI"><meta property="og:description" content="AETHERION AI에서 떼어 내 공개하는 오픈소스 프로젝트 9개와 진행 상태."><meta property="og:image" content="https://aetherion.o-r.kr/assets/img/og.jpg">
+<link rel="canonical" href="https://aetherion.o-r.kr/opensource/">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="alternate" type="application/rss+xml" title="AETHERION 소식" href="/feed.xml">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<link rel="stylesheet" href="/assets/site.css?v=7">
+<link rel="stylesheet" href="/assets/news.css?v=2">
+<style>
+.os-grid{list-style:none;padding:0;margin:28px 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.os-card{padding:20px;border-radius:var(--ae-radius,18px);border:1px solid var(--ae-border,rgba(0,0,0,.08));background:rgba(255,255,255,.55);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 8px 24px rgba(20,20,40,.06);display:flex;flex-direction:column;gap:6px}
+.os-card p{margin:0}.os-top{display:flex;justify-content:space-between;align-items:center}.os-no{font-variant-numeric:tabular-nums;color:var(--ae-muted,#777);font-size:.85rem}
+.os-name{font-size:1.1rem;margin:4px 0;word-break:break-all}.os-badge{font-size:.75rem;padding:3px 10px;border-radius:999px;font-weight:600}
+.os-pub{background:#d8f5e3;color:#0b6b35}.os-sk{background:#fff0cc;color:#7a5200}.os-plan{background:#ececf2;color:#555}.os-link{margin-top:auto;font-weight:600}
+</style>
+</head>
+<body class="s sub-page">
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="hdr ae-header"><div class="nav">
+<a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
+<nav class="links ae-header__links" aria-label="주요 메뉴"><a href="/models/">모델</a><a href="/news/">소식</a><a href="/platform/">API</a><a href="/pricing/">플랜</a><a href="/security/">보안</a><a href="/patch-notes/">패치 노트</a><a href="/status/">상태</a><a href="/opensource/">오픈소스</a><a href="/playground/" class="btn pri">써보기</a></nav>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">홈</a><a href="/models/">모델</a><a href="/news/">소식</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/security/">보안</a><a href="/press/">프레스 킷</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/opensource/">오픈소스</a><a href="/playground/">써보기</a></nav></details>
+</div></header>
+<main id="main" class="page"><div class="wrap">
+<h1>오픈소스</h1>
+<p class="lead">AETHERION AI를 만들면서 쓰는 도구들을 하나씩 떼어 내 공개하고 있어요. 지금은 <strong>9개 중 2개</strong>가 저장소를 열었고, 둘 다 아직 뼈대 단계예요. 나머지는 계획이에요.</p>
+<p class="muted small">상태: <b>공개</b> = 쓸 만한 첫 릴리스 · <b>뼈대</b> = 저장소와 최소 기능·테스트만 있음 · <b>계획</b> = 아직 저장소 없음. 별 수·사용자 수 같은 숫자는 적지 않아요.</p>
+<ul class="os-grid">
+<li class="os-card"><div class="os-top"><span class="os-no">01</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">honest-numbers</h2><p>모든 수치에 출처를 붙이는 정직한 벤치마크·수치 보고 키트</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/honest-numbers" rel="noopener">GitHub에서 보기 →</a></li>
+<li class="os-card"><div class="os-top"><span class="os-no">02</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">ko-agent-tools-mcp</h2><p>한국어 에이전트용 MCP 도구 서버 — 초성 추출, 숫자→한글 금액, 공휴일·영업일</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/ko-agent-tools-mcp" rel="noopener">GitHub에서 보기 →</a></li>
+<li class="os-card"><div class="os-top"><span class="os-no">03</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">ko-toolcall-bench</h2><p>한국어 도구 호출(tool calling) 벤치마크 — 출처가 분명한 소규모 평가셋, honest-numbers 연동</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">04</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">cpu-moe-server-kit</h2><p>GPU 없이 CPU만으로 MoE 모델을 서빙하는 llama.cpp 설정·모델 전환·워치독 키트</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">05</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">sandbox-runner</h2><p>네트워크 없는 Docker 컨테이너에서 에이전트 코드를 실행하는 샌드박스 래퍼</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">06</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">small-deep-research</h2><p>작은 모델로 돌리는 딥 리서치 엔진 — 검색·요약·인용을 단계별로</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">07</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">chainlog</h2><p>해시 사슬로 엮어 변조를 감지하는 로그 라이브러리</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">08</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">tunnel-watch</h2><p>Tailscale Funnel·예비 터널 상태를 감시하고 자동 복구하는 도구</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">09</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">ko-prompt-kit</h2><p>한국어 시스템 프롬프트 템플릿과 평가 예시 모음</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+</ul>
+<p class="muted small">순서와 이름은 바뀔 수 있어요. 새 저장소가 열리면 <a href="/patch-notes/">패치 노트</a>에 알려 드릴게요.</p>
+</div></main>
+<footer class="foot ae-footer"><div class="wrap">
+<div class="cols">
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델(<a href="/models/" style="display:inline">모드별 상세</a>): High <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · Medium <a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener" style="display:inline">OpenAI gpt-oss-20b</a> (Apache 2.0) · Low <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5 15.7B-A3B</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
+<div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/status/">서버 상태</a></div>
+<div><h4>소식</h4><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
+<div><h4>회사</h4><a href="/#company">소개</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/#careers">채용</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
+</div></div></footer>
+<script src="/assets/news.js?v=2" defer></script>
+</body>
+</html>
