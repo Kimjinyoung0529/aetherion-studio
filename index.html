@@ -2,76 +2,132 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07090f">
-<meta name="description" content="카카오 Kanana 1.5 15.7B-A3B 기반 한국어 AI. 웹검색과 도구를 쓰는 에이전트를 브라우저에서 바로 체험하세요.">
-<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR">
-<meta property="og:title" content="AETHERION AI | 한국어 에이전트 AI, Kanana로 움직이다"><meta property="og:description" content="카카오 Kanana 1.5 15.7B-A3B 기반 한국어 AI. 웹검색과 도구를 쓰는 에이전트를 브라우저에서 바로 체험하세요.">
-<title>AETHERION AI | 한국어 에이전트 AI, Kanana로 움직이다</title>
+<meta name="theme-color" content="#07080c">
+<title>AETHERION AI | 한국어 에이전트 AI</title>
+<meta name="description" content="AETHERION AI는 Google Gemma 4 26B-A4B 기반 서비스 모델로 한국어 에이전트를 만듭니다. 이미지 이해, 딥 리서치, 웹검색·뉴스·시세 도구, 실시간 코드 미리보기.">
+<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:url" content="https://hii.o-r.kr/">
+<meta property="og:title" content="AETHERION AI | 한국어 에이전트 AI"><meta property="og:description" content="Gemma 4 기반 한국어 에이전트: 이미지 이해, 딥 리서치, 실시간 도구.">
+<meta property="og:image" content="https://hii.o-r.kr/assets/img/og.jpg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://hii.o-r.kr/assets/img/og.jpg">
 <link rel="canonical" href="https://hii.o-r.kr/">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="preload" as="image" href="/assets/img/hero.webp">
 <link rel="stylesheet" href="/assets/brand.css?v=3">
-<link rel="stylesheet" href="/assets/kanana.css?v=1">
+<link rel="stylesheet" href="/assets/site.css?v=1">
 </head>
-<body class="k">
-<a class="ae-skip" href="#main">본문 바로가기</a>
-<header class="ae-header"><div class="k-nav">
-<a href="/" class="k-brand" aria-label="AETHERION AI 홈"><span class="k-logo" aria-hidden="true">A</span>AETHERION</a>
-<nav class="k-links" aria-label="주요 메뉴"><a href="/#features" class="k-hide">기능</a><a href="/#performance" class="k-hide">성능</a><a href="/#faq" class="k-hide">FAQ</a><a href="/runtime/" class="k-hide">로컬 실행기</a><a href="/playground/">플레이그라운드</a></nav>
+<body class="s">
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="hdr ae-header"><div class="nav">
+<a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
+<nav class="links ae-header__links" aria-label="주요 메뉴"><a href="#models">모델</a><a href="#research">연구</a><a href="#company">회사</a><a href="#careers">채용</a><a href="/playground/" class="btn pri">써보기</a></nav>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="#models">모델</a><a href="#research">연구</a><a href="#company">회사</a><a href="#careers">채용</a><a href="/chat/">브라우저 채팅</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">연구실</a></nav></details>
 </div></header>
 <main id="main">
-<section class="k-hero"><div class="k-wrap">
-<span class="k-pill">NEW · Kanana 1.5 15.7B-A3B 에이전트 미리보기</span>
-<h1>한국어로 생각하고,<br><span class="k-grad">스스로 찾아보는 AI</span></h1>
-<p>AETHERION은 카카오의 오픈 모델 Kanana 1.5 15.7B-A3B를 직접 운영하는 한국어 중심 AI예요. 모르는 건 웹에서 검색하고, 출처를 달아 답합니다.</p>
-<div class="k-cta"><a class="k-btn k-btn--primary" href="/playground/">플레이그라운드에서 써보기 →</a><a class="k-btn" href="#features">무엇이 다른가요</a></div>
-<div class="k-stats">
-<div class="k-stat"><b>15.7B</b><span>전체 파라미터 (MoE)</span></div>
-<div class="k-stat"><b>3B</b><span>토큰당 활성 파라미터</span></div>
-<div class="k-stat"><b>~10–15</b><span>초당 토큰 (CPU 8코어 실측)</span></div>
-<div class="k-stat"><b>2종</b><span>에이전트 도구: 웹검색 · 페이지 읽기</span></div>
-</div></div></section>
-
-<section class="k-sec" id="features"><div class="k-wrap">
-<h2>에이전트로 일하는 한국어 AI</h2><p class="k-lead">질문을 이해하고, 필요하면 도구를 골라 쓰고, 결과를 읽은 뒤 근거와 함께 답합니다.</p>
-<div class="k-grid">
-<div class="k-card"><div class="k-ico">🔎</div><h3>실시간 웹검색</h3><p>최신 뉴스나 사실 확인이 필요하면 스스로 검색하고, 답변에 [1], [2] 출처를 붙여요.</p></div>
-<div class="k-card"><div class="k-ico">🛠️</div><h3>도구 호출 에이전트</h3><p>검색 → 페이지 읽기 → 다시 검색처럼 여러 단계를 반복해 답을 완성해요. 과정은 화면에 그대로 보여요.</p></div>
-<div class="k-card"><div class="k-ico">🇰🇷</div><h3>한국어 우선</h3><p>한국어 데이터로 학습한 카카오 Kanana를 써서 자연스러운 존댓말과 한국 맥락을 이해해요.</p></div>
-<div class="k-card"><div class="k-ico">⚡</div><h3>MoE 효율</h3><p>15.7B 모델이지만 한 번에 3B만 계산해서 GPU 없이 CPU만으로도 대화 속도가 나와요.</p></div>
-<div class="k-card"><div class="k-ico">🔐</div><h3>접속 키 보호</h3><p>모델 서버는 접속 키가 있는 사람만 쓸 수 있어요. 키는 내 브라우저에만 저장돼요.</p></div>
-<div class="k-card"><div class="k-ico">🧪</div><h3>브라우저 실행도 그대로</h3><p>기존 WebGPU 브라우저 채팅과 로컬 실행기, 삼진 가중치 연구실은 계속 쓸 수 있어요.</p></div>
-</div></div></section>
-
-<section class="k-sec" id="how"><div class="k-wrap">
-<h2>이렇게 동작해요</h2><p class="k-lead">브라우저 → AETHERION 에이전트 서버 → Kanana 모델. 모든 단계가 스트리밍으로 보여요.</p>
-<div class="k-flow"><div><b>질문 이해</b><p class="k-note">Kanana가 검색이 필요한지 판단해요.</p></div><div><b>도구 실행</b><p class="k-note">서버가 웹검색이나 페이지 읽기를 대신 수행해요.</p></div><div><b>결과 읽기</b><p class="k-note">찾은 내용을 모델에게 다시 넘겨요.</p></div><div><b>출처와 함께 답변</b><p class="k-note">한국어 답변과 출처 링크를 보여줘요.</p></div></div>
+<section class="hero">
+<img class="hero-img" src="/assets/img/hero.webp" alt="" width="1024" height="1024">
+<div class="wrap">
+<span class="eyebrow">AETHERION · Gemma 4 기반 에이전트</span>
+<h1>보고, 찾고, 만들어 내는<br><span class="grad">한국어 AI</span></h1>
+<p class="lead">AETHERION은 Google의 오픈 모델 Gemma 4 26B-A4B를 직접 운영해 만든 한국어 에이전트예요. 이미지를 읽고, 웹을 뒤져 출처를 달고, 코드는 그 자리에서 실행해 보여줘요.</p>
+<div class="cta"><a class="btn pri" href="/playground/">플레이그라운드 열기 →</a><a class="btn" href="#models">모델 사양 보기</a></div>
+<div class="stats">
+<div class="stat"><b>26B</b><span>전체 파라미터 (MoE)</span></div>
+<div class="stat"><b>~4B</b><span>토큰당 활성 파라미터</span></div>
+<div class="stat"><b>6–9</b><span>초당 토큰 · CPU 8코어 실측</span></div>
+<div class="stat"><b>10종</b><span>에이전트 도구</span></div>
+</div>
 </div></section>
 
-<section class="k-sec" id="performance"><div class="k-wrap">
-<h2>성능과 사양</h2><p class="k-lead">GPU 없는 8코어 CPU 서버에서 직접 잰 값이에요.</p>
-<table class="k-table"><thead><tr><th>항목</th><th>값</th></tr></thead><tbody>
-<tr><td>모델</td><td>kakaocorp/kanana-1.5-15.7b-a3b-instruct</td></tr>
-<tr><td>양자화</td><td>GGUF IQ4_XS (약 8.7GB)</td></tr>
-<tr><td>구조</td><td>Mixture-of-Experts · 전체 15.7B / 활성 3B</td></tr>
-<tr><td>생성 속도</td><td>초당 약 10~15 토큰 (Xeon 8코어, llama.cpp)</td></tr>
-<tr><td>문맥 길이 (서비스 설정)</td><td>8,192 토큰</td></tr>
-<tr><td>동시 처리</td><td>1건씩 순서대로 (대기열 최대 6건)</td></tr>
-<tr><td>라이선스</td><td>Apache 2.0</td></tr>
+<section class="sec" id="models"><div class="wrap">
+<span class="label">Models</span>
+<h2>AETHERION 서비스 모델</h2>
+<p class="sub">직접 학습한 모델이 아니에요. Google Gemma 4 26B-A4B(Apache 2.0)를 양자화해 우리 서버에서 돌리고, 그 위에 에이전트·도구·리서치 기능을 얹었어요.</p>
+<div class="model">
+<div class="panel">
+<span class="tag">비전</span><span class="tag">생각하기</span><span class="tag">도구 호출</span><span class="tag">딥 리서치</span>
+<h3>AETHERION · Gemma 4 26B-A4B</h3>
+<p class="note" style="margin-top:4px">한 서버, GPU 없이 운영 중인 미리보기 버전</p>
+<table class="spec"><tbody>
+<tr><td>기반 모델</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">google/gemma-4-26B-A4B-it</a></td></tr>
+<tr><td>구조</td><td>Mixture-of-Experts · 전체 26B / 활성 약 4B</td></tr>
+<tr><td>양자화</td><td>GGUF UD-IQ3_S (11.3GB) + 비전 인코더 BF16</td></tr>
+<tr><td>생성 속도</td><td>초당 약 6–9 토큰 (Xeon 8코어, llama.cpp)</td></tr>
+<tr><td>메모리</td><td>약 12.2GB RAM</td></tr>
+<tr><td>문맥 길이</td><td>8,192 토큰 (서비스 설정)</td></tr>
+<tr><td>입력</td><td>텍스트 · 이미지 (최대 2장)</td></tr>
+<tr><td>라이선스</td><td>Apache 2.0 (Gemma 4)</td></tr>
 </tbody></table>
-<p class="k-note">개인 서버 한 대로 운영하는 미리보기라서, 사람이 몰리면 대기 시간이 생길 수 있어요.</p>
+</div>
+<div class="panel">
+<h3>에이전트 도구</h3>
+<p class="note">모델이 필요할 때 스스로 골라 쓰고, 과정은 화면에 그대로 보여줘요.</p>
+<div class="chips"><span>🔎 웹검색</span><span>📄 페이지 읽기</span><span>📰 뉴스</span><span>📈 주식·코인 시세</span><span>🌤️ 날씨</span><span>🧮 계산기</span><span>💱 환율·단위</span><span>📚 위키백과</span><span>🕒 날짜·시간</span><span>🔳 QR 코드</span></div>
+<h3 style="margin-top:30px">플레이그라운드 기능</h3>
+<div class="chips"><span>🖼️ 이미지 이해</span><span>💭 생각 과정 보기</span><span>🧭 딥 리서치</span><span>∑ KaTeX 수식</span><span>🧩 mermaid 다이어그램</span><span>▶ 코드 미리보기</span><span>🎙️ 음성 입력</span><span>🔊 읽어주기</span><span>/ 슬래시 명령</span><span>⬇ 마크다운 내보내기</span></div>
+</div>
+</div>
 </div></section>
 
-<section class="k-sec k-faq" id="faq"><div class="k-wrap">
+<section class="sec" id="features"><div class="wrap">
+<span class="label">Product</span>
+<h2>질문에서 결과물까지, 한 화면에서</h2>
+<p class="sub">생각하고, 도구를 쓰고, 근거를 붙이는 모든 단계가 스트리밍으로 보여요.</p>
+<div class="grid">
+<div class="feat"><img src="/assets/img/feat-search.webp" alt="" loading="lazy"><div><h3>출처 있는 검색</h3><p>최신 정보는 웹·뉴스에서 직접 찾아 [1], [2] 출처를 붙여 답해요.</p></div></div>
+<div class="feat"><img src="/assets/img/feat-vision.webp" alt="" loading="lazy"><div><h3>이미지 이해</h3><p>사진, 스크린샷, 표를 올리면 내용을 읽고 설명해요. 붙여넣기·드래그도 돼요.</p></div></div>
+<div class="feat"><img src="/assets/img/feat-research.webp" alt="" loading="lazy"><div><h3>딥 리서치</h3><p>검색어를 스스로 세우고 여러 페이지를 읽은 뒤 출처가 달린 보고서를 써요.</p></div></div>
+<div class="feat"><img src="/assets/img/feat-tools.webp" alt="" loading="lazy"><div><h3>바로 실행되는 코드</h3><p>만든 HTML·SVG·QR은 옆 창 샌드박스에서 즉시 미리보기로 열려요.</p></div></div>
+</div>
+</div></section>
+
+<section class="sec" id="research"><div class="wrap">
+<span class="label">Research</span>
+<h2>연구 노트</h2>
+<p class="sub">작은 팀이 실제로 만들어 보고 기록한 것들이에요. 외부 평가나 논문이 아니라 실험 기록이에요.</p>
+<div class="research">
+<a class="paper" href="/playground/"><time>2026.10</time><h3>CPU 한 대로 26B MoE 비전 에이전트 돌리기</h3><p>3비트 양자화 Gemma 4와 비전 인코더를 16GB RAM에 올리고, 도구 호출·생각하기를 스트리밍으로 묶은 기록.</p><span class="st">● 서비스 중</span></a>
+<a class="paper" href="/playground/"><time>2026.10</time><h3>딥 리서치 파이프라인</h3><p>질의 계획 → 다중 검색 → 본문 읽기 → 인용 보고서. 로컬 모델 하나로 끝까지 수행해요.</p><span class="st">● 실험 기능</span></a>
+<a class="paper" href="/lab/"><time>이전</time><h3>삼진 가중치 · WebGPU 실험실</h3><p>브라우저에서 작은 모델을 직접 돌려 보는 WebGPU 채팅과 로컬 실행기 실험.</p><span class="st">● 보관 중</span></a>
+</div>
+</div></section>
+
+<section class="sec" id="company"><div class="wrap company">
+<img src="/assets/img/lab.webp" alt="AETHERION 서버실을 표현한 일러스트" loading="lazy">
+<div>
+<span class="label">Company</span>
+<h2>AETHERION은</h2>
+<p class="sub" style="margin-bottom:10px">공개된 좋은 모델을 누구나 실제로 쓸 수 있는 한국어 도구로 만드는 독립 프로젝트예요. 투자나 고객사를 자랑하기보다, 직접 돌려 본 숫자만 적어요.</p>
+<div class="vals">
+<div><b>정직한 숫자</b><span>속도·메모리는 우리 서버에서 잰 값만 써요. 가짜 벤치마크는 없어요.</span></div>
+<div><b>오픈 모델 존중</b><span>기반 모델과 라이선스를 항상 밝혀요.</span></div>
+<div><b>내 데이터는 내 브라우저에</b><span>대화 기록은 브라우저에만 저장되고 서버는 따로 보관하지 않아요.</span></div>
+</div>
+</div>
+</div></section>
+
+<section class="sec" id="careers"><div class="wrap">
+<div class="careers">
+<div><span class="label">Careers · 함께하기</span><h2>지금은 채용하지 않아요</h2><p class="note" style="font-size:16px">대신 오픈소스 기여는 언제나 환영해요. 버그 제보나 아이디어는 GitHub로 보내 주세요.</p></div>
+<a class="btn pri" href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub에서 기여하기 →</a>
+</div>
+</div></section>
+
+<section class="sec faq" id="faq"><div class="wrap">
+<span class="label">FAQ</span>
 <h2>자주 묻는 질문</h2>
-<details><summary>누구나 쓸 수 있나요?</summary><p>지금은 접속 키가 있는 사람만 쓸 수 있는 비공개 미리보기예요. 플레이그라운드 왼쪽 설정에 키를 넣으면 돼요.</p></details>
-<details><summary>대화 내용은 어디에 저장되나요?</summary><p>대화는 내 브라우저에만 남아요. 서버는 답변을 만드는 동안만 내용을 다루고 따로 저장하지 않아요.</p></details>
-<details><summary>웹검색은 어떤 걸 쓰나요?</summary><p>서버가 DuckDuckGo 검색 결과를 가져와 모델에게 넘겨요. 답변 아래에 출처 링크가 붙어요.</p></details>
-<details><summary>서버가 꺼져 있으면요?</summary><p>플레이그라운드 상단에 상태가 표시돼요. 그동안은 <a href="/chat/">브라우저 WebGPU 채팅</a>으로 작은 모델을 내 기기에서 직접 돌릴 수 있어요.</p></details>
-<details><summary>왜 Kanana 15.7B-A3B인가요?</summary><p>한국어에 강한 오픈 모델이면서, MoE 구조라 GPU 없이도 실사용 속도가 나오기 때문이에요.</p></details>
+<details><summary>AETHERION 모델은 직접 학습한 건가요?</summary><p>아니요. Google의 오픈 모델 Gemma 4 26B-A4B(Apache 2.0)를 그대로 쓰고, 양자화·서버·에이전트 도구·리서치 기능을 저희가 만들었어요.</p></details>
+<details><summary>누구나 쓸 수 있나요?</summary><p>지금은 접속 키가 있는 사람만 쓰는 비공개 미리보기예요. 플레이그라운드 설정에 키를 넣으면 돼요.</p></details>
+<details><summary>대화 내용은 어디에 저장되나요?</summary><p>내 브라우저에만 남아요. 서버는 답을 만드는 동안만 내용을 다뤄요. 올린 이미지도 저장하지 않아요.</p></details>
+<details><summary>왜 이렇게 느릴 때가 있나요?</summary><p>GPU 없는 서버 한 대에서 한 번에 한 요청씩 처리해요. 초당 6–9 토큰 정도이고, 딥 리서치는 여러 페이지를 읽느라 1–3분 걸릴 수 있어요.</p></details>
+<details><summary>서버가 꺼져 있으면요?</summary><p><a href="/chat/">브라우저 WebGPU 채팅</a>으로 작은 모델을 내 기기에서 직접 돌릴 수 있어요.</p></details>
 </div></section>
 </main>
-<footer class="ae-footer"><div class="k-wrap k-foot">
-<div>© 2026 AETHERION AI · 모델: <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener">Kakao Kanana 1.5 15.7B-A3B</a> (Apache 2.0)</div>
-<nav aria-label="사이트 하단 메뉴"><a href="/playground/">플레이그라운드</a><a href="/chat/">브라우저 채팅(WebGPU)</a><a href="/agent/">에이전트 스튜디오</a><a href="/runtime/">로컬 실행기</a><a href="/lab/">연구실</a><a href="/legacy/home.html">이전 홈</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></nav>
-</div></footer>
+<footer class="foot ae-footer"><div class="wrap">
+<div class="cols">
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델: <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> 기반 (Apache 2.0). Gemma는 Google의 상표예요.</p></div>
+<div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/chat/">브라우저 채팅 (WebGPU)</a><a href="/agent/">에이전트 스튜디오</a><a href="/runtime/">로컬 실행기</a></div>
+<div><h4>연구</h4><a href="#research">연구 노트</a><a href="/lab/">연구실</a><a href="/legacy/home.html">이전 홈</a></div>
+<div><h4>회사</h4><a href="#company">소개</a><a href="#careers">함께하기</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
+</div></div></footer>
 </body>
 </html>
