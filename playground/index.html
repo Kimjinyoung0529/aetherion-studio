@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0b0d12">
-<meta name="description" content="AETHERION 에이전트(Google Gemma 4 26B-A4B 기반)와 대화하기. 대화 분기, 가상 컴퓨터, 이미지 생성(SDXL-Turbo), 모델 전환, 딥 리서치, 웹 도구와 실시간 코드 미리보기.">
+<meta name="description" content="AETHERION 에이전트(Google Gemma 4 26B-A4B 기반)와 대화하기. 대화 분기, 가상 컴퓨터, 이미지 생성(FLUX 3 Image Klein), 모델 전환, 딥 리서치, 웹 도구와 실시간 코드 미리보기.">
 <meta property="og:type" content="website"><meta property="og:locale" content="ko_KR">
 <meta property="og:title" content="플레이그라운드 | AETHERION AI"><meta property="og:description" content="Gemma 4 기반 AETHERION 에이전트: 이미지 이해, 딥 리서치, 실시간 코드 미리보기."><meta property="og:image" content="https://hii.o-r.kr/assets/img/og.jpg"><meta name="twitter:card" content="summary_large_image">
 <title>플레이그라운드 | AETHERION AI</title>
@@ -78,7 +78,7 @@
           <button type="button" class="card" data-q="/다이어그램 웹 요청이 서버에서 처리되는 흐름"><span class="ci">🧩</span><b>다이어그램</b><small>mermaid로 그리기</small></button>
           <button type="button" class="card" data-q="HTML 캔버스로 간단한 벽돌깨기 게임 만들어줘"><span class="ci">🎮</span><b>미니 게임</b><small>바로 플레이</small></button>
           <button type="button" class="card" data-q="/컴퓨터 파이썬으로 1부터 10000까지 소수 개수를 실제로 계산하고 걸린 시간도 알려줘"><span class="ci">🖥️</span><b>가상 컴퓨터</b><small>코드를 실제로 실행</small></button>
-          <button type="button" class="card" data-q="/이미지 햇살 가득한 숲속 오두막, 수채화 느낌"><span class="ci">🎨</span><b>이미지 생성</b><small>SDXL-Turbo · CPU</small></button>
+          <button type="button" class="card" data-q="/이미지 햇살 가득한 숲속 오두막, 수채화 느낌"><span class="ci">🎨</span><b>이미지 생성</b><small>FLUX 3 Klein · CPU</small></button>
         </div>
       </section>
     </div>
@@ -97,7 +97,7 @@
               <button type="button" role="menuitem" id="file-btn">📎 파일 · PDF 첨부</button><input type="file" id="file-in" accept=".pdf,.txt,.md,.csv,.tsv,.json,.js,.ts,.py,.html,.css,.java,.c,.cpp,.go,.rs,.sql,.xml,.yaml,.yml,application/pdf,text/*" hidden>
               <button type="button" role="menuitem" id="tpl-btn">🧩 템플릿</button>
               <div class="pop-h">만들기</div>
-              <button type="button" role="menuitem" id="gen-btn">🎨 이미지 생성 <small>SDXL-Turbo</small></button>
+              <button type="button" role="menuitem" id="gen-btn">🎨 이미지 생성 <small>FLUX 3 Klein</small></button>
               <button type="button" role="menuitem" id="vm-btn">🖥️ 가상 컴퓨터 열기</button>
               <div class="pop-h">에이전트가 쓸 수 있는 것</div>
               <label class="pop-chk"><input type="checkbox" id="tools" checked> 웹 도구 (검색·뉴스·날씨 등)</label>
@@ -186,9 +186,9 @@
 <dialog class="dlg" id="gen">
   <form method="dialog" class="dlg-in">
     <h2>🎨 이미지 생성</h2>
-    <p class="muted">모델: <b>SDXL-Turbo</b> (Stability AI, 오픈 가중치) · 서버 CPU에서 직접 그려요. 그리는 동안 언어 모델을 잠시 내려서 1장에 30~60초쯤 걸려요. 요청한 Krea 2 Turbo는 12B·26GB에 GPU용이라 이 서버(CPU·15GB)에서는 돌릴 수 없었어요.</p>
-    <label for="gen-p">무엇을 그릴까요? (영어가 더 정확해요)</label><textarea id="gen-p" rows="3" maxlength="600" placeholder="예: a cozy cabin in a sunny forest, watercolor"></textarea>
-    <div class="gen-opts"><label>품질 <select id="gen-steps"><option value="1">빠르게 (1단계)</option><option value="2" selected>보통 (2단계)</option><option value="4">좋게 (4단계)</option></select></label><label>크기 <select id="gen-size"><option value="384">384</option><option value="512" selected>512</option><option value="640">640</option></select></label></div>
+    <p class="muted">모델: <b>FLUX 3 Image Klein</b> (Black Forest Labs, 5.6B 오픈 가중치, Q4_K 양자화) · 서버 CPU에서 직접 그려요. 먼저 Gemma가 요청을 자세한 영어 장면 설명으로 바꾸고, 언어 모델을 잠시 내린 뒤 그려요. 512px 한 장에 약 2분 20초~2분 40초 걸려요(실측).</p>
+    <label for="gen-p">무엇을 그릴까요? (한국어로 써도 돼요)</label><textarea id="gen-p" rows="3" maxlength="600" placeholder="예: a cozy cabin in a sunny forest, watercolor"></textarea>
+    <div class="gen-opts"><label>품질 <select id="gen-steps"><option value="8">빠르게 (8단계)</option><option value="12">보통 (12단계)</option><option value="16" selected>기본 (16단계)</option></select></label><label>크기 <select id="gen-size"><option value="384">384</option><option value="512" selected>512</option></select></label></div>
     <div class="gen-prog" id="gen-prog" hidden><div class="bar"><i id="gen-bar"></i></div><span id="gen-txt"></span></div>
     <div class="dlg-acts"><span style="flex:1"></span><button value="cancel" class="btn">닫기</button><button type="button" class="btn primary" id="gen-go">그리기</button></div>
   </form>
@@ -213,6 +213,6 @@
 <script src="/assets/vendor/marked.min.js" defer></script>
 <script src="/assets/vendor/purify.min.js" defer></script>
 <script src="/assets/vendor/highlight.min.js" defer></script>
-<script src="/assets/playground.js?v=5" defer></script>
+<script src="/assets/playground.js?v=6" defer></script>
 </body>
 </html>

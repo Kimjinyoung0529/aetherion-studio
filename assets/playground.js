@@ -1,5 +1,5 @@
 // AETHERION Playground v5: agent chat with branching (edit/regenerate ‹ n/m ›, fork), Intelligence-UI touches (glow, follow-up chips,
-// writing tools on selection), endpoint failover, virtual computer (Docker sandbox), image generation (SDXL-Turbo), model switcher,
+// writing tools on selection), endpoint failover, virtual computer (Docker sandbox), image generation (FLUX 3 Image Klein), model switcher,
 // conversation search & pins, shortcuts, plus v4: live artifacts, files/PDF Q&A, Python (Pyodide), CSV charts, share links, memory, TTS, PWA.
 (() => {
   'use strict';
@@ -371,7 +371,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     ['/검색', '웹에서 검색해서 출처와 함께 알려줘: ', '웹검색'], ['/뉴스', '최신 뉴스를 찾아서 정리해줘: ', '뉴스'], ['/시세', '현재 시세를 알려줘: ', '주식·코인'],
     ['/코드', 'CSS와 JS를 포함한 단일 HTML 파일로 만들어줘: ', '미리보기 실행'], ['/번역', '다음 글을 자연스럽게 번역해줘 (한국어면 영어로, 그 외는 한국어로). 번역문만 써줘:\n', '한↔영'],
     ['/요약', '다음 URL이나 글을 읽고 핵심을 5줄로 요약해줘: ', 'URL·글 요약'], ['/수식', '수식은 LaTeX($...$, $$...$$)로 써서 설명해줘: ', 'KaTeX'],
-    ['/다이어그램', 'mermaid 코드 블록(```mermaid)으로 다이어그램을 그려줘: ', 'mermaid'], ['/qr', 'QR 코드를 만들어줘: ', 'QR 코드'], ['/리서치', '', '딥 리서치 모드'], ['/파이썬', '```python 코드 블록으로 작성해줘(브라우저에서 실행돼요): ', 'Python 실행'], ['/기억', '', '나에 대해 기억시키기'], ['/컴퓨터', '', '가상 컴퓨터에서 실제 실행'], ['/이미지', '', '이미지 생성 (SDXL-Turbo)'],
+    ['/다이어그램', 'mermaid 코드 블록(```mermaid)으로 다이어그램을 그려줘: ', 'mermaid'], ['/qr', 'QR 코드를 만들어줘: ', 'QR 코드'], ['/리서치', '', '딥 리서치 모드'], ['/파이썬', '```python 코드 블록으로 작성해줘(브라우저에서 실행돼요): ', 'Python 실행'], ['/기억', '', '나에 대해 기억시키기'], ['/컴퓨터', '', '가상 컴퓨터에서 실제 실행'], ['/이미지', '', '이미지 생성 (FLUX 3 Klein)'],
   ];
   const slashBox = $('slash');
   function hideSlash() { slashBox.hidden = true; }
@@ -769,7 +769,8 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     setProg(2, '요청 보내는 중…'); const t0 = performance.now();
     await sse('/api/image', { prompt, steps, size }, ev => {
       if (ev.type === 'progress') {
-        if (ev.stage === 'queued') setProg(3, `대기 중${ev.ahead ? ` (앞에 ${ev.ahead}개)` : ''}…`);
+        if (ev.stage === 'upsample') setProg(5, 'Gemma가 장면 설명을 쓰는 중…');
+        else if (ev.stage === 'queued') setProg(3, `대기 중${ev.ahead ? ` (앞에 ${ev.ahead}개)` : ''}…`);
         else if (ev.stage === 'unload') setProg(8, '언어 모델을 잠시 내려 메모리 확보 중…');
         else if (ev.stage === 'load') setProg(15, '그림 모델 불러오는 중…');
         else if (ev.stage === 'sampling') setProg(20 + 55 * (ev.step || 0) / (ev.steps || steps), `그리는 중 ${ev.step || 0}/${ev.steps || steps}단계…`);
@@ -777,7 +778,8 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
         else if (ev.stage === 'reload') setProg(95, '언어 모델 다시 올리는 중…');
       } else if (ev.type === 'done') {
         const t = ev.timings || {}; const sec = v => v != null ? (v / 1000).toFixed(1) + '초' : '-';
-        m.content = ''; m.meta = `SDXL-Turbo · ${size}px · ${steps}단계 · 그리기 ${sec(t.sample_ms)} · 변환 ${sec(t.decode_ms)} · 전체 ${sec(t.total_ms || (performance.now() - t0))}`;
+        m.content = ''; m.meta = `${ev.model || 'FLUX 3 Image Klein'} · ${size}px · ${steps}단계 · 그리기 ${sec(t.sample_ms)} · 변환 ${sec(t.decode_ms)} · 전체 ${sec(t.total_ms || (performance.now() - t0))}`;
+        if (ev.caption) m.imageCap = prompt + ' → ' + ev.caption.slice(0, 300);
         toJpeg(ev.image).then(u => { m.image = u; persist(); renderAll(); });
         setProg(100, '완료 · ' + m.meta);
       } else if (ev.type === 'error') { m.content = ''; m.error = '이미지 생성 실패: ' + ev.message; persist(); renderAll(); $('gen-txt').textContent = m.error; }
