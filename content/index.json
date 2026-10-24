@@ -1,7 +1,18 @@
 {
  "generated_from": "content/posts",
- "count": 8,
+ "count": 9,
  "posts": [
+  {
+   "slug": "2026-10-24-patch-v6-2",
+   "type": "patch",
+   "type_label": "패치 노트",
+   "title": "패치 노트 v6.2 — 이미지 모델을 FLUX 3 Image Klein으로 교체",
+   "date": "2026-10-24",
+   "version": "v6.2",
+   "summary": "이미지 생성 모델을 Black Forest Labs의 FLUX 3 Image Klein(5.6B, 오픈 가중치)으로 바꿨어요. 한국어로 요청해도 Gemma가 장면 설명으로 바꿔 줘요.",
+   "url": "/news/post/?p=2026-10-24-patch-v6-2",
+   "html": "<p>안녕하세요, AETHERION 팀이에요. 이번엔 그림 쪽을 크게 바꿨어요.</p>\n<h2>신규</h2>\n<ul>\n<li><strong>FLUX 3 Image Klein</strong>: Black Forest Labs가 2026년 10월 15일 공개한 5.6B 오픈 가중치 모델이에요. stable-diffusion.cpp에서 Q4_K GGUF(3.5GB)와 Qwen3-VL-4B 텍스트 인코더(Q4_K_M)로 서버 CPU에서 돌려요.</li>\n<li>서버 실측(512px, 16단계, CPU 8코어): 전체 약 141초(그리기 111초 + 변환 30초), 최대 메모리 약 5.9GB.</li>\n<li><strong>장면 설명 자동 작성</strong>: Klein은 짧은 문장보다 자세한 장면 설명에서 잘 그려요. 그래서 그리기 전에 Gemma가 요청을 영어 장면 설명으로 바꾸고, 결과 아래에 그 설명을 같이 보여줘요. 한국어로 써도 돼요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>품질 선택을 8·12·16단계로 바꿨어요(기본 16단계). 640px는 시간이 너무 길어 뺐어요.</li>\n<li>사이트 캐시 버전을 올려서 v6.1 모바일 수정이 바로 보이게 했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>이전 이미지 모델(SDXL-Turbo, SD-Turbo) 파일을 서버에서 지워 디스크 약 16GB를 확보했어요.</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>한 장에 2분 넘게 걸리고, 그동안 채팅은 기다려야 해요.</li>\n<li>이미지 편집(참고 이미지 넣기)은 모델은 지원하지만 아직 화면에 연결하지 않았어요.</li>\n</ul>\n<p>이미지 모델: Black Forest Labs FLUX 3 Image Klein (FLUX Kommunity License v1.0). 기반 언어 모델: Google Gemma 4 26B-A4B.</p>\n<p>— AETHERION 팀</p>"
+  },
   {
    "slug": "2026-10-24-patch-v6-1",
    "type": "patch",
