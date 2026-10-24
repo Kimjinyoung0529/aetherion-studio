@@ -22,7 +22,7 @@
 <header class="hdr ae-header"><div class="nav">
 <a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
 <nav class="links ae-header__links" aria-label="주요 메뉴"><a href="#products">제품</a><a href="#models">모델</a><a href="#roadmap">로드맵</a><a href="#research">연구</a><a href="#company">회사</a><a href="/platform/">API</a><a href="/pricing/">플랜</a><a href="/news/">소식</a><a href="/playground/" class="btn pri">써보기</a></nav>
-<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="#products">제품</a><a href="#models">모델</a><a href="#roadmap">로드맵</a><a href="#research">연구</a><a href="#company">회사</a><a href="#careers">채용</a><a href="/news/">소식</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/playground/">써보기</a></nav></details>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="#products">제품</a><a href="#models">모델</a><a href="/models/">모드별 사양</a><a href="#roadmap">로드맵</a><a href="#research">연구</a><a href="#company">회사</a><a href="#careers">채용</a><a href="/news/">소식</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/playground/">써보기</a></nav></details>
 </div></header>
 <main id="main">
 <section class="hero">
@@ -61,16 +61,17 @@
 <section class="sec" id="models"><div class="wrap">
 <span class="label">Models</span>
 <h2>모델과 플랫폼</h2>
-<p class="sub">직접 학습한 모델이 아니에요. 공개 가중치 모델을 4비트 안팎으로 양자화해 우리 서버(CPU 8코어, RAM 15GB, GPU 없음)에서 돌리고, 그 위에 에이전트·도구·리서치 기능을 얹었어요. 기본 모델은 Gemma 4 26B-A4B예요.</p>
+<p class="sub">직접 학습한 모델이 아니에요. 공개 가중치 모델을 4비트 안팎으로 양자화해 우리 서버(CPU 8코어, RAM 15GB, GPU 없음)에서 돌리고, 그 위에 에이전트·도구·리서치 기능을 얹었어요. 채팅에서는 High · Medium · Low 세 가지 모드로 고르고, 모드마다 다른 모델이 돌아가요. <a href="/models/">모드별 사양 보기</a></p>
 <div class="model">
 <div class="panel">
 <span class="tag">한국어</span><span class="tag">도구 호출</span><span class="tag">딥 리서치</span><span class="tag">모델 전환</span>
 <h3>AETHERION 모델 라인업</h3>
 <p class="note" style="margin-top:4px">생성 속도는 2026.10.24 같은 서버에서 llama.cpp로 직접 잰 값이에요 (짧은 한국어 답변 기준).</p>
 <table class="spec"><tbody>
-<tr><td>Kanana 1.5 15.7B-A3B</td><td><a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener">Kakao</a> · MoE(활성 약 3B) · IQ4_XS 4.25bit · 8.7GB · 초당 약 19 토큰 · 텍스트 전용 · Kanana License</td></tr>
-<tr><td>기본 · Gemma 4 26B-A4B</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google</a> · MoE(활성 약 4B) · UD-IQ3_S 3.44bit · 11.3GB · 초당 약 11 토큰 · 이미지 이해·생각 모드 · Apache 2.0. 4비트(약 17GB)는 RAM에 안 들어가서 3비트를 써요.</td></tr>
-<tr><td>Gemma 4 12B</td><td>Google · Dense · Q4_K_M · 7.1GB · 초당 약 5 토큰 · 이미지 이해 · Apache 2.0</td></tr>
+<tr><td>Low · Kanana 1.5 15.7B-A3B</td><td><a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener">Kakao</a> · MoE(활성 약 3B) · IQ4_XS 4.25bit · 8.7GB · 초당 약 19 토큰 · 텍스트 전용 · Kanana License</td></tr>
+<tr><td>High(기본) · Gemma 4 26B-A4B</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google</a> · MoE(활성 약 4B) · UD-IQ3_S 3.44bit · 11.3GB · 초당 약 11 토큰 · 이미지 이해·생각 모드 · Apache 2.0. 4비트(약 17GB)는 RAM에 안 들어가서 3비트를 써요.</td></tr>
+<tr><td>Medium · gpt-oss-20b</td><td><a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener">OpenAI</a> · MoE(전체 21B, 활성 약 3.6B) · MXFP4 · 12.1GB · 초당 약 9 토큰 · 텍스트 전용 · Apache 2.0</td></tr>
+<tr><td>Gemma 4 12B (API 전용)</td><td>Google · Dense · Q4_K_M · 7.1GB · 초당 약 5 토큰 · 이미지 이해 · Apache 2.0</td></tr>
 <tr><td>Kanana 2 3B</td><td>Kakao · Q4_K_M · 2.2GB · 가볍고 빠름 · Kanana License</td></tr>
 <tr><td>이미지</td><td>Black Forest Labs FLUX 3 Image Klein 5.6B (Q4_K) · stable-diffusion.cpp · 512px 약 2분20초 · FLUX Kommunity License</td></tr>
 <tr><td>문맥 길이</td><td>8,192 토큰 (서비스 설정)</td></tr>
@@ -160,7 +161,7 @@
 </main>
 <footer class="foot ae-footer"><div class="wrap">
 <div class="cols">
-<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델: 기본 <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · 선택 <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델(<a href="/models/" style="display:inline">모드별 상세</a>): High <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · Medium <a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener" style="display:inline">OpenAI gpt-oss-20b</a> (Apache 2.0) · Low <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5 15.7B-A3B</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
 <div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/status/">서버 상태</a><a href="/share/">공유된 대화</a></div>
 <div><h4>연구</h4><a href="#research">연구 노트</a><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
 <div><h4>회사</h4><a href="#company">소개</a><a href="#careers">함께하기</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>

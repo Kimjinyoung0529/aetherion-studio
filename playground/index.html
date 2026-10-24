@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="/assets/vendor/hljs-light.min.css" id="hl-light" disabled>
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
 <link rel="manifest" href="/manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="AETHERION"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="stylesheet" href="/assets/playground.css?v=7">
+<link rel="stylesheet" href="/assets/playground.css?v=8">
 </head>
 <body class="pg">
 <a class="skip" href="#q">입력창으로 바로가기</a>
@@ -39,7 +39,7 @@
   <main class="main" id="main">
     <header class="top">
       <button class="ic" id="side-open" type="button" aria-label="사이드바 열기" title="대화 목록"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
-      <button class="chip" id="model-chip" type="button" title="연결 상태"><span class="dot" id="dot"></span><span class="chip-name" id="chip-name">Gemma 4 26B-A4B · 3.4bit</span><span class="chip-sub" id="stxt">확인 중…</span></button>
+      <button class="chip" id="model-chip" type="button" title="연결 상태"><span class="dot" id="dot"></span><span class="chip-name" id="chip-name">AETHERION</span><span class="chip-sub" id="stxt">확인 중…</span></button>
       <div class="top-r">
         <button class="ic" id="art-toggle" type="button" aria-label="미리보기 패널" title="미리보기 패널" hidden><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M13 4v16"/></svg></button>
         <button class="ic" id="share" type="button" aria-label="공유 링크 만들기" title="공유 링크 만들기"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
@@ -78,7 +78,7 @@
           <button type="button" class="card" data-q="/다이어그램 웹 요청이 서버에서 처리되는 흐름"><span class="ci">🧩</span><b>다이어그램</b><small>mermaid로 그리기</small></button>
           <button type="button" class="card" data-q="HTML 캔버스로 간단한 벽돌깨기 게임 만들어줘"><span class="ci">🎮</span><b>미니 게임</b><small>바로 플레이</small></button>
           <button type="button" class="card" data-q="/컴퓨터 파이썬으로 1부터 10000까지 소수 개수를 실제로 계산하고 걸린 시간도 알려줘"><span class="ci">🖥️</span><b>가상 컴퓨터</b><small>코드를 실제로 실행</small></button>
-          <button type="button" class="card" data-q="/이미지 햇살 가득한 숲속 오두막, 수채화 느낌"><span class="ci">🎨</span><b>이미지 생성</b><small>FLUX 3 Klein · CPU</small></button>
+          <button type="button" class="card" data-q="/이미지 햇살 가득한 숲속 오두막, 수채화 느낌"><span class="ci">🎨</span><b>이미지 생성</b><small>서버 CPU에서 그려요</small></button>
         </div>
       </section>
     </div>
@@ -97,11 +97,21 @@
               <button type="button" role="menuitem" id="file-btn">📎 파일 · PDF 첨부</button><input type="file" id="file-in" accept=".pdf,.txt,.md,.csv,.tsv,.json,.js,.ts,.py,.html,.css,.java,.c,.cpp,.go,.rs,.sql,.xml,.yaml,.yml,application/pdf,text/*" hidden>
               <button type="button" role="menuitem" id="tpl-btn">🧩 템플릿</button>
               <div class="pop-h">만들기</div>
-              <button type="button" role="menuitem" id="gen-btn">🎨 이미지 생성 <small>FLUX 3 Klein</small></button>
+              <button type="button" role="menuitem" id="gen-btn">🎨 이미지 생성</button>
               <button type="button" role="menuitem" id="vm-btn">🖥️ 가상 컴퓨터 열기</button>
               <div class="pop-h">에이전트가 쓸 수 있는 것</div>
               <label class="pop-chk"><input type="checkbox" id="tools" checked> 웹 도구 (검색·뉴스·날씨 등)</label>
               <label class="pop-chk"><input type="checkbox" id="use-vm"> 가상 컴퓨터에서 코드 실행</label>
+            </div>
+          </div>
+          <div class="pop-wrap">
+            <button class="ic sm tier-btn" id="tier" type="button" title="추론 모드" aria-label="추론 모드 선택" aria-haspopup="menu" aria-expanded="false" data-tier="high"><svg viewBox="0 0 24 24"><path d="M4.5 16a8 8 0 1115 0"/><path class="needle" d="M12 16l4-5"/><circle cx="12" cy="16" r="1.3"/></svg><span class="tier-t" id="tier-t">High</span></button>
+            <div class="pop up tier-menu" id="tier-menu" role="menu" hidden>
+              <div class="pop-h">추론 모드</div>
+              <button type="button" role="menuitemradio" data-tier="high"><b>High</b><small>깊게 생각 · 이미지 이해</small></button>
+              <button type="button" role="menuitemradio" data-tier="medium"><b>Medium</b><small>균형</small></button>
+              <button type="button" role="menuitemradio" data-tier="low"><b>Low</b><small>빠르게</small></button>
+              <a class="pop-foot" href="/models/" target="_blank" rel="noopener">모드별 사양 보기 ↗</a>
             </div>
           </div>
           <span class="tool-badges" id="tool-badges"></span>
@@ -140,7 +150,7 @@
 <dialog class="dlg" id="settings">
   <form method="dialog" class="dlg-in">
     <h2>설정</h2>
-    <div class="stabs" role="tablist"><button type="button" role="tab" class="stab on" data-st="conn">연결</button><button type="button" role="tab" class="stab" data-st="model">모델</button><button type="button" role="tab" class="stab" data-st="me">개인화</button><button type="button" role="tab" class="stab" data-st="voice">읽어주기</button><button type="button" role="tab" class="stab" data-st="data">데이터</button></div>
+    <div class="stabs" role="tablist"><button type="button" role="tab" class="stab on" data-st="conn">연결</button><button type="button" role="tab" class="stab" data-st="model">모드</button><button type="button" role="tab" class="stab" data-st="me">개인화</button><button type="button" role="tab" class="stab" data-st="voice">읽어주기</button><button type="button" role="tab" class="stab" data-st="data">데이터</button></div>
     <section class="spane" data-sp="conn">
       <p class="muted">키와 주소는 이 브라우저(localStorage)에만 저장돼요. 주소를 비우면 기본 주소 목록(config/endpoint.json)을 쓰고, 응답이 없으면 예비 주소로 자동 전환해요.</p>
       <label for="ep">서버 주소 (비우면 자동)</label><input type="url" id="ep" placeholder="https://aetherion.tailbe77c4.ts.net" autocomplete="off">
@@ -149,7 +159,7 @@
       <ul class="ep-list" id="ep-list"></ul>
     </section>
     <section class="spane" data-sp="model" hidden>
-      <label>언어 모델 <small class="muted">(메모리 15GB 서버라 한 번에 하나만 올려요. 바꾸는 데 보통 몇 초, 처음 불러올 땐 더 걸려요)</small></label>
+      <label>추론 모드 <small class="muted">(서버 메모리가 15GB라 한 번에 한 모드만 켜져요. 바꾸는 데 보통 10~40초 걸려요)</small></label>
       <div class="model-list" id="model-list"><p class="muted">연결되면 목록이 보여요.</p></div>
       <label for="temp">창의성 (temperature) <b id="temp-v">0.6</b></label><input type="range" id="temp" min="0" max="1.5" step="0.1" value="0.6">
       <p class="muted">낮을수록 정확하고 일정하게, 높을수록 다양하게 답해요.</p>
@@ -186,7 +196,7 @@
 <dialog class="dlg" id="gen">
   <form method="dialog" class="dlg-in">
     <h2>🎨 이미지 생성</h2>
-    <p class="muted">모델: <b>FLUX 3 Image Klein</b> (Black Forest Labs, 5.6B 오픈 가중치, Q4_K 양자화) · 서버 CPU에서 직접 그려요. 먼저 Gemma가 요청을 자세한 영어 장면 설명으로 바꾸고, 언어 모델을 잠시 내린 뒤 그려요. 512px 한 장에 약 2분 20초~2분 40초 걸려요(실측).</p>
+    <p class="muted">서버 CPU에서 직접 그려서 512px 한 장에 2~3분 걸려요. 그리는 동안 채팅은 잠시 멈춰요. 사용하는 모델은 <a href="/models/" target="_blank" rel="noopener">모드별 사양</a>에 공개돼 있어요.</p>
     <label for="gen-p">무엇을 그릴까요? (한국어로 써도 돼요)</label><textarea id="gen-p" rows="3" maxlength="600" placeholder="예: a cozy cabin in a sunny forest, watercolor"></textarea>
     <div class="gen-opts"><label>품질 <select id="gen-steps"><option value="8">빠르게 (8단계)</option><option value="12">보통 (12단계)</option><option value="16" selected>기본 (16단계)</option></select></label><label>크기 <select id="gen-size"><option value="384">384</option><option value="512" selected>512</option></select></label></div>
     <div class="gen-prog" id="gen-prog" hidden><div class="bar"><i id="gen-bar"></i></div><span id="gen-txt"></span></div>
@@ -213,7 +223,7 @@
 <script src="/assets/vendor/marked.min.js" defer></script>
 <script src="/assets/vendor/purify.min.js" defer></script>
 <script src="/assets/vendor/highlight.min.js" defer></script>
-<script src="/assets/playground.js?v=8" defer></script>
+<script src="/assets/playground.js?v=9" defer></script>
 <script src="/assets/notice-banner.js?v=1" defer></script>
 </body>
 </html>
