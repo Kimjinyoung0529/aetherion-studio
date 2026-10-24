@@ -35,7 +35,7 @@ export function parse(file, raw) {
   const slug = file.replace(/\.md$/, '');
   return { slug, type: fm.type, type_label: TYPES[fm.type], title: fm.title, date: fm.date, version: fm.version || null, pinned: fm.pinned === 'true', summary: fm.summary, url: `/news/post/?p=${slug}`, html: md(m[2].trim()) };
 }
-const vnum = p => +(p.version || 'v0').replace(/\D/g, '') || 0;
+const vnum = p => { const n = (p.version || '').match(/\d+/g) || []; return n.slice(0, 3).reduce((a, x, i) => a + (+x) * [1e6, 1e3, 1][i], 0); };
 function build() {
   const posts = readdirSync(DIR).filter(f => f.endsWith('.md')).map(f => parse(f, readFileSync(join(DIR, f), 'utf8')))
     
