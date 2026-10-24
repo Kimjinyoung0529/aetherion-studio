@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const DIR = join(ROOT, 'content/posts'), SITE = 'https://hii.o-r.kr';
+const DIR = join(ROOT, 'content/posts'), SITE = 'https://aetherion.o-r.kr';
 const TYPES = { patch: '패치 노트', blog: '블로그', event: '이벤트', notice: '공지' };
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const inline = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')

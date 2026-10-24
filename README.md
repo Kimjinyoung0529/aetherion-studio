@@ -1,6 +1,6 @@
 # AETHERION AI
 
-한국어 에이전트 AI 사이트와 플레이그라운드예요. 사이트: https://hii.o-r.kr
+한국어 에이전트 AI 사이트와 플레이그라운드예요. 사이트: https://aetherion.o-r.kr
 
 ## 서비스 모델
 - **Google Gemma 4 26B-A4B** (Apache 2.0). 우리가 학습한 모델이 아니에요. 공개 가중치의 3비트 양자화(UD-IQ3_S) 버전과 비전 인코더(mmproj)를 그대로 써요. Gemma는 Google의 상표예요.
