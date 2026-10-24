@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fffdf8">
+<title>플랫폼 · API 문서 | AETHERION AI</title>
+<meta name="description" content="AETHERION 모델 서버가 실제로 제공하는 HTTP API.">
+<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="플랫폼 · API 문서 | AETHERION AI"><meta property="og:description" content="AETHERION 모델 서버가 실제로 제공하는 HTTP API."><meta property="og:image" content="https://hii.o-r.kr/assets/img/og.jpg">
+<link rel="canonical" href="https://hii.o-r.kr/platform/">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="alternate" type="application/rss+xml" title="AETHERION 소식" href="/feed.xml">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<link rel="stylesheet" href="/assets/site.css?v=6">
+<link rel="stylesheet" href="/assets/news.css?v=1">
+</head>
+<body class="s sub-page">
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="hdr ae-header"><div class="nav">
+<a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
+<nav class="links ae-header__links" aria-label="주요 메뉴"><a href="/#models">모델</a><a href="/news/">소식</a><a href="/platform/">API</a><a href="/pricing/">플랜</a><a href="/security/">보안</a><a href="/patch-notes/">패치 노트</a><a href="/status/">상태</a><a href="/playground/" class="btn pri">써보기</a></nav>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">홈</a><a href="/#models">모델</a><a href="/news/">소식</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/playground/">써보기</a></nav></details>
+</div></header>
+<main id="main" class="page"><div class="wrap">
+<h1>플랫폼 · API</h1>
+<p class="lead">플레이그라운드가 쓰는 것과 같은 HTTP API예요. 여기에는 서버에 실제로 있는 엔드포인트만 적었어요. 오픈 베타라 SDK, SLA, 사용량 과금은 아직 없어요.</p>
+<h2>기본</h2>
+<ul><li>주소: 서버 상태 페이지에 표시되는 엔드포인트 (Tailscale Funnel HTTPS)</li><li>인증: <code>Authorization: Bearer &lt;접속 키&gt;</code> 헤더 (<code>/health</code>는 제외). 키는 운영팀이 따로 전달해요.</li><li>속도 제한: <code>/api/chat</code>은 IP당 분당 8회예요. 넘으면 <code>429</code>가 와요.</li><li>요청 본문은 JSON, 채팅 응답은 Server-Sent Events(<code>text/event-stream</code>)예요.</li></ul>
+<h2>엔드포인트</h2>
+<table class="spec"><tbody>
+<tr><td><code>GET /health</code></td><td>서버와 모델 상태, 현재 모델, 라이선스, 도구 목록 (인증 불필요)</td></tr>
+<tr><td><code>POST /api/chat</code></td><td>에이전트 채팅. <code>{"messages":[...]}</code>를 보내면 <code>delta</code>와 <code>done</code>(tokens, tok_s) 이벤트가 스트리밍돼요. 이미지는 비전 모델(Gemma 4)에서만 돼요.</td></tr>
+<tr><td><code>POST /api/suggest</code></td><td>대화를 바탕으로 다음 질문 제안</td></tr>
+<tr><td><code>GET /api/models</code></td><td>사용 가능한 모델 목록과 현재 모델</td></tr>
+<tr><td><code>POST /api/models</code></td><td>모델 전환 <code>{"id":"gemma4"}</code> 또는 <code>kanana15</code>, <code>gemma12</code>, <code>kanana3</code>. 다시 불러오는 데 수십 초 걸려요.</td></tr>
+<tr><td><code>POST /api/image</code></td><td>FLUX 3 Image Klein으로 이미지 생성 (prompt, size 384/512, steps 8/12/16). 512px 기준 약 2~3분 걸리고, 그동안 채팅은 잠시 멈춰요.</td></tr>
+<tr><td><code>POST /api/computer</code></td><td>격리된 가상 컴퓨터(Docker): exec, write, read, list, reset, status</td></tr>
+<tr><td><code>POST /api/feedback</code></td><td>답변 평가 <code>{"rating":"up"|"down"}</code></td></tr>
+</tbody></table>
+<h2>예시</h2>
+<pre><code>curl -N "$AE_URL/api/chat" \
+  -H "Authorization: Bearer $AE_KEY" \
+  -d '{"messages":[{"role":"user","content":"안녕!"}]}'</code></pre>
+</div></main>
+<footer class="foot ae-footer"><div class="wrap">
+<div class="cols">
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델: 기본 <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · 선택 <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
+<div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/status/">서버 상태</a></div>
+<div><h4>소식</h4><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
+<div><h4>회사</h4><a href="/#company">소개</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/#careers">채용</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
+</div></div></footer>
+</body>
+</html>

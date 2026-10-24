@@ -1,7 +1,18 @@
 {
  "generated_from": "content/posts",
- "count": 10,
+ "count": 11,
  "posts": [
+  {
+   "slug": "2026-10-24-patch-v6-4",
+   "type": "patch",
+   "type_label": "패치 노트",
+   "title": "패치 노트 v6.4 — API 문서, 플랜, 보안, 프레스 킷",
+   "date": "2026-10-24",
+   "version": "v6.4",
+   "summary": "API 문서, 오픈 베타 플랜, 보안·신뢰, 프레스 킷 페이지를 열었어요. 기본 모델은 다시 Gemma 4 26B-A4B예요.",
+   "url": "/news/post/?p=2026-10-24-patch-v6-4",
+   "html": "<p>안녕하세요, AETHERION 팀이에요. 회사 소개를 더 투명하게 하려고 페이지 네 개를 열었어요. 모두 실제로 있는 기능과 조치만 적었어요.</p>\n<h2>신규</h2>\n<ul>\n<li><a href=\"/platform/\">플랫폼 · API 문서</a>: 서버에 실제로 있는 엔드포인트 8개와 인증, 속도 제한을 정리했어요.</li>\n<li><a href=\"/pricing/\">플랜</a>: 지금은 오픈 베타라 모두 무료예요.</li>\n<li><a href=\"/security/\">보안 · 신뢰</a>: HTTPS, 접속 키, 가상 컴퓨터 격리 설정, 데이터 저장 방식을 적었어요.</li>\n<li><a href=\"/press/\">프레스 킷</a>: 로고, 한 줄 소개, 표기 원칙을 담았어요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>헤더와 푸터 메뉴에 새 페이지를 연결했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>기본 모델을 다시 Google Gemma 4 26B-A4B로 돌렸어요. 이미지 이해와 생각 모드를 기본으로 쓸 수 있어요. Kanana 1.5(4bit, 대화가 더 빠름)는 모델 선택에서 계속 고를 수 있어요.</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>외부 보안 인증은 아직 받지 않았어요.</li>\n<li>가동률 보장(SLA)은 없어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
+  },
   {
    "slug": "2026-10-24-patch-v6-3",
    "type": "patch",
