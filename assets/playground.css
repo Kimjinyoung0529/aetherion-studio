@@ -347,3 +347,14 @@ body.glow .main::after{content:"";position:fixed;inset:0;pointer-events:none;box
   .art-ver{max-width:110px}
 }
 .art-body iframe{position:absolute;inset:0;height:100%}
+
+/* v6.6 writing tools + selection bar */
+.wt-wrap{position:relative;display:inline-flex}
+.wt-menu{position:absolute;bottom:calc(100% + 6px);left:0;z-index:40;display:flex;flex-direction:column;min-width:170px;padding:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.wt-menu[hidden]{display:none}
+.wt-menu b{font-size:11px;color:var(--faint);padding:6px 10px 2px;font-weight:700}
+.wt-menu button{width:auto!important;height:auto!important;text-align:left;padding:8px 10px;border-radius:9px;font-size:13.5px;color:var(--text);background:none;border:0;cursor:pointer;white-space:nowrap}
+.wt-menu button:hover{background:var(--card2)}
+.wt-menu{bottom:auto;top:calc(100% + 6px)}
+.wt-menu button{text-align:left!important;justify-content:flex-start!important;display:block!important}
+@media (max-width:860px){.chip-name{max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}}

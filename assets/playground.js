@@ -148,7 +148,7 @@
       if (m.doc) { const f = document.createElement('div'); f.className = 'doc-chip'; f.textContent = '📎 ' + m.doc.name + ' · ' + m.doc.text.length.toLocaleString() + '자'; d.prepend(f); }
       if (m.thumbs?.length) { const g = document.createElement('div'); g.className = 'thumbs'; m.thumbs.forEach(u => { const im = new Image(); im.src = u; im.alt = '첨부 이미지'; g.appendChild(im); }); d.prepend(g); }
     } else {
-      d.innerHTML = `<div class="av" aria-hidden="true"><img src="/assets/brand/logo-128.png" alt=""></div><div class="bot-col"><details class="think" hidden><summary>💭 <span class="tl">생각 과정</span></summary><div class="think-body"></div></details><div class="steps"></div><div class="status"></div><div class="md"></div><div class="srcs"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="regen" title="다시 생성 (새 분기)" aria-label="다시 생성">${ICON.redo}</button><button type="button" data-act="fork" title="여기까지 새 대화로 분기" aria-label="새 대화로 분기">${ICON.fork}</button><button type="button" data-act="speak" title="소리내어 읽기" aria-label="소리내어 읽기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button><button type="button" data-act="up" title="좋아요" aria-label="좋은 답변">👍</button><button type="button" data-act="down" title="별로예요" aria-label="아쉬운 답변">👎</button>${bnav(m)}<span class="meta"></span></div><div class="sugg"></div></div>`;
+      d.innerHTML = `<div class="av" aria-hidden="true"><img src="/assets/brand/logo-128.png" alt=""></div><div class="bot-col"><details class="think" hidden><summary>💭 <span class="tl">생각 과정</span></summary><div class="think-body"></div></details><div class="steps"></div><div class="status"></div><div class="md"></div><div class="srcs"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="regen" title="다시 생성 (새 분기)" aria-label="다시 생성">${ICON.redo}</button><button type="button" data-act="fork" title="여기까지 새 대화로 분기" aria-label="새 대화로 분기">${ICON.fork}</button><span class="wt-wrap"><button type="button" data-act="wt" title="글쓰기 도구 · 실험실" aria-label="글쓰기 도구" aria-haspopup="menu">✨</button><span class="wt-menu" role="menu" hidden><b>글쓰기 도구</b><button type="button" role="menuitem" data-act="wt:short">더 짧게</button><button type="button" role="menuitem" data-act="wt:long">더 자세히</button><button type="button" role="menuitem" data-act="wt:easy">쉽게 풀어서</button><button type="button" role="menuitem" data-act="wt:formal">격식체로</button><button type="button" role="menuitem" data-act="wt:en">영어로</button><b>실험실 🧪</b><button type="button" role="menuitem" data-act="wt:verify">스스로 검증하기</button><button type="button" role="menuitem" data-act="wt:map">대화 지도 그리기</button></span></span><button type="button" data-act="speak" title="소리내어 읽기" aria-label="소리내어 읽기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button><button type="button" data-act="up" title="좋아요" aria-label="좋은 답변">👍</button><button type="button" data-act="down" title="별로예요" aria-label="아쉬운 답변">👎</button>${bnav(m)}<span class="meta"></span></div><div class="sugg"></div></div>`;
       fillBot(d, m, false);
     }
     return d;
@@ -304,6 +304,8 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (act === 'chart') return openArt(b.closest('.cb').querySelector('code').textContent, 'csv');
     if (!m) return;
     if (act === 'up' || act === 'down') return feedback(m, i, act, b);
+    if (act === 'wt') { const mn = b.nextElementSibling; document.querySelectorAll('.wt-menu').forEach(x => x !== mn && (x.hidden = true)); mn.hidden = !mn.hidden; return; }
+    if (act.startsWith('wt:')) { b.closest('.wt-menu').hidden = true; if (busy) return toast('답변이 끝난 뒤에 써 주세요'); return ask(wtPrompt(act.slice(3), m.content, i)); }
     if (act === 'copy') return copy(m.content, b);
     if (act === 'speak') return speak(m.content, b);
     if (act === 'sugg') return ask(b.textContent);
@@ -541,6 +543,14 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   document.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => ask(b.dataset.q)));
   function setBusy(v) { busy = v; $('form').classList.toggle('busy', v); document.body.classList.toggle('glow', v); $('send').setAttribute('aria-label', v ? '중지' : '전송'); grow(); }
 
+  // ---------- writing tools · 실험실 (v6.6) ----------
+  const WT = { short: '아래 답변을 핵심만 남겨 절반 이하 길이로 다시 써줘.', long: '아래 답변을 예시와 근거를 더해 더 자세히 다시 써줘.', easy: '아래 답변을 중학생도 이해하게 쉬운 말로 다시 써줘.', formal: '아래 답변을 격식 있는 존댓말 문서체로 다시 써줘.', en: 'Translate the answer below into natural English. Output only the translation.',
+    verify: '아래 답변을 스스로 검증해줘. 사실 주장을 하나씩 나열하고 각각 [확실/불확실/틀릴 수 있음]으로 표시한 뒤 이유를 한 줄씩 써줘. 필요하면 웹 검색으로 확인해. 마지막에 고친 답변을 짧게 써줘.' };
+  function wtPrompt(k, text, i) {
+    if (k === 'map') { const hist = cur.msgs.slice(0, i + 1).map(x => (x.role === 'user' ? 'Q: ' : 'A: ') + String(x.content).slice(0, 400)).join('\n'); return '지금까지의 대화를 주제별로 묶어 ```mermaid mindmap 코드 블록 하나로 그려줘. 노드는 짧은 한국어 명사구로.\n\n' + hist.slice(-6000); }
+    return WT[k] + '\n\n---\n' + String(text).slice(0, 6000);
+  }
+  document.addEventListener('click', e => { if (!e.target.closest('.wt-wrap')) document.querySelectorAll('.wt-menu').forEach(x => x.hidden = true); });
   function ask(raw) {
     if (busy) return;
     const { text, mode, remember: rem, image } = expandSlash(raw);
