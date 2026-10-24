@@ -1,13 +1,8 @@
 name: AETHERION Whole Site Quality
 on:
   push:
-    paths:
-      - '**/*.html'
-      - 'assets/**'
-      - 'tools/site_audit.py'
-      - 'tools/site_browser_smoke.cjs'
-      - 'tools/webgpu_browser_probe.cjs'
-      - '.github/workflows/site-quality.yml'
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,13 +16,13 @@ jobs:
         run: python3 tools/site_audit.py
       - name: Validate shared JavaScript syntax
         run: |
-          node --check assets/studio.js
-          node --check runtime/engine.js
-          node --check runtime/app.js
-          node --check runtime/autotune-v2.js
-          node --check runtime/autotune-ui.js
+          node --check assets/playground.js
+          node --check assets/news.js
+          node --check sw.js
           node --check tools/site_browser_smoke.cjs
-          node --check tools/webgpu_browser_probe.cjs
+          node --check tools/build_content.mjs
+      - name: Generated news content is up to date
+        run: node tools/build_content.mjs --check
   browser-layout:
     runs-on: ubuntu-latest
     timeout-minutes: 12
@@ -48,7 +43,7 @@ jobs:
           echo "BROWSER_EXECUTABLE=$BROWSER_EXECUTABLE" >> "$GITHUB_ENV"
           echo "PW_CORE_DIR=$RUNNER_TEMP/aetherion-browser/node_modules/playwright-core" >> "$GITHUB_ENV"
           npm install --prefix "$RUNNER_TEMP/aetherion-browser" --no-save --ignore-scripts playwright-core@1.56.1
-      - name: Smoke test ten HTML pages on mobile and desktop
+      - name: Smoke test all pages on mobile and desktop
         shell: bash
         run: |
           set -euo pipefail
@@ -57,7 +52,6 @@ jobs:
           trap 'kill "$SERVER" || true' EXIT
           sleep 2
           node tools/site_browser_smoke.cjs
-          node tools/webgpu_browser_probe.cjs
       - name: Keep visual regression screenshots
         if: always()
         uses: actions/upload-artifact@v4
