@@ -11,7 +11,7 @@
 <link rel="manifest" href="/manifest.webmanifest"><link rel="alternate" type="application/rss+xml" title="AETHERION 소식" href="/feed.xml">
 <link rel="stylesheet" href="/assets/brand.css?v=3">
 <link rel="stylesheet" href="/assets/site.css?v=7">
-<link rel="stylesheet" href="/assets/news.css?v=1">
+<link rel="stylesheet" href="/assets/news.css?v=2">
 </head>
 <body class="s sub-page">
 <a class="skip" href="#main">본문 바로가기</a>
@@ -22,10 +22,15 @@
 </div></header>
 <main id="main" class="page"><div class="wrap">
 <h1>서버 상태</h1>
-<p class="lead">모델 서버의 지금 상태예요. 30초마다 새로고침해요.</p>
+<p class="lead">모델 서버의 지금 상태예요. 연결은 <strong>기본(Tailscale Funnel)</strong>과 <strong>예비(runlocal 터널)</strong> 두 경로를 쓰고, 30초마다 새로고침해요.</p>
 <div class="status-card" id="st-card"><div class="st-big"><span class="dot" id="st-dot"></span><b id="st-main">확인 중…</b></div><p class="muted" id="st-sub"></p></div>
+<section class="st-paths" aria-labelledby="st-paths-h">
+<h2 id="st-paths-h" class="st-paths-title">연결 경로</h2>
+<p class="muted small st-paths-note">기본 경로가 응답하지 않으면 플레이그라운드가 예비 경로로 자동 전환해요. 주소는 <code>config/endpoint.json</code>에서 읽어요(하드코딩하지 않아요).</p>
+<ul class="st-path-list" id="st-paths"><li class="muted">경로 확인 중…</li></ul>
+</section>
 <dl class="st-grid" id="st-grid"></dl>
-<p class="muted small">서버 주소: <code id="st-ep">-</code> · 마지막 확인: <span id="st-time">-</span></p>
+<p class="muted small">사용 중 주소: <code id="st-ep">-</code> · 마지막 확인: <span id="st-time">-</span></p>
 <p class="muted small">모델: 기본 Google Gemma 4 26B-A4B (Apache 2.0) · 선택 Kanana 1.5 / Gemma 4 12B · llama.cpp · CPU 8코어. 꺼지면 감시 스크립트가 자동으로 다시 켜요.</p>
 </div></main>
 <footer class="foot ae-footer"><div class="wrap">
@@ -35,6 +40,6 @@
 <div><h4>소식</h4><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
 <div><h4>회사</h4><a href="/#company">소개</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/#careers">채용</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
 </div></div></footer>
-<script src="/assets/news.js?v=1" defer></script>
+<script src="/assets/news.js?v=2" defer></script>
 </body>
 </html>
