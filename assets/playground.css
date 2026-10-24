@@ -334,3 +334,16 @@ body.glow .main::after{content:"";position:fixed;inset:0;pointer-events:none;box
 /* v5: wide dialogs (VM, image) — size the dialog itself so content isn't clipped */
 .dlg:has(.dlg-in.wide){width:min(760px,94vw);max-width:94vw}
 .dlg-in.wide{width:auto;box-sizing:border-box;min-width:0}
+
+/* v6.5 mobile artifact panel */
+.tab{white-space:nowrap}.tabs{flex:none}
+@media (max-width:860px){
+  .art{height:100dvh;max-width:100vw}
+  .art-top{height:auto;min-height:52px;flex-wrap:wrap;row-gap:4px;padding:8px 10px calc(8px) max(10px,env(safe-area-inset-left))}
+  .art-title{flex:1 1 120px}
+  .art-acts{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-left:auto}
+  .art-acts::-webkit-scrollbar{display:none}
+  .art-acts .ic{flex:none}
+  .art-ver{max-width:110px}
+}
+.art-body iframe{position:absolute;inset:0;height:100%}
