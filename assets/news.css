@@ -38,3 +38,5 @@ time,.post-meta{color:var(--dim);font-size:13px}
 .ns-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .ns-item{display:block;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);text-decoration:none}
 .ns-item b{display:block;margin:6px 0 4px;font-size:16px;line-height:1.35}.ns-item time{display:block}
+
+.tag.notice{background:rgba(255,120,90,.16);color:#ff8a6a}.tag.pin{background:rgba(255,200,80,.18);color:#e0a400;margin-right:6px}.pcard.pinned{border:1px solid rgba(255,140,90,.55)}
