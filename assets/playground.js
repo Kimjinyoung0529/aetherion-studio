@@ -658,16 +658,26 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   const epList = () => { const man = $('ep').value.trim().replace(/\/+$/, ''); return man ? [man] : [...new Set([activeEp, ...eps.map(e => e.url), defaultEp].filter(Boolean))]; };
   const epLabel = u => eps.find(e => e.url === u)?.label || (u ? new URL(u).host : '');
   function useEp(u) { if ($('ep').value.trim()) return; activeEp = u; localStorage.setItem(LS.aep, u); renderEps(); }
+  // v7.3 circuit breaker: an endpoint that fails is skipped for an exponentially growing cool-down (15s -> 4min)
+  const CB = {};
+  const cbOpen = u => CB[u] && Date.now() < CB[u].until;
+  const cbFail = u => { const n = (CB[u]?.n || 0) + 1; CB[u] = { n, until: Date.now() + Math.min(15000 * 2 ** (n - 1), 240000) }; };
+  const cbOk = u => { delete CB[u]; };
+  const orderEps = list => { const a = list.filter(u => !cbOpen(u)); return a.length ? a : list; };
   async function fetchFailover(path, opts) {
-    const list = epList(); let lastErr;
+    const list = orderEps(epList()); let lastErr;
     for (const [k, ep] of list.entries()) {
-      try { const r = await fetch(ep + path, opts); if (k) { useEp(ep); toast('예비 주소로 전환했어요: ' + epLabel(ep), 2600); } return r; }
-      catch (e) { lastErr = e; if (e.name === 'AbortError' || opts.signal?.aborted) throw e; }
+      try {
+        const r = await fetch(ep + path, opts);
+        // v7.3: tunnel/edge errors (5xx, or 404 from a relay that forgot the tunnel) count as endpoint failure -> try next
+        if ((r.status >= 500 || r.status === 404) && k < list.length - 1) { cbFail(ep); lastErr = new Error('HTTP ' + r.status); continue; }
+        cbOk(ep); if (ep !== list[0] || k) { useEp(ep); if (k) toast('예비 주소로 전환했어요: ' + epLabel(ep), 2600); } return r;
+      } catch (e) { lastErr = e; if (e.name === 'AbortError' || opts.signal?.aborted) throw e; cbFail(ep); }
     }
     throw lastErr || new Error('Failed to fetch');
   }
-  async function probe(ep) { const t = performance.now(); const j = await (await fetch(ep + '/health', { signal: AbortSignal.timeout(7000), cache: 'no-store' })).json(); return { j, ms: Math.round(performance.now() - t) }; }
-  const health = {};
+  async function probe(ep) { const t = performance.now(); const r = await fetch(ep + '/health', { signal: AbortSignal.timeout(7000), cache: 'no-store' }); if (!r.ok) throw new Error('HTTP ' + r.status); const j = await r.json(); if (!j || j.ok !== true) throw new Error('bad health'); return { j, ms: Math.round(performance.now() - t) }; }
+  const health = {}; let offN = 0, offT = 0;
   function renderEps() {
     const el = $('ep-list'); if (!el) return;
     el.innerHTML = epList().map(u => `<li class="${u === endpoint() ? 'on' : ''}"><span class="dot ${health[u]?.ok ? 'ok' : health[u] ? 'bad' : 'wait'}"></span><b>${esc(epLabel(u))}</b><small>${health[u]?.ok ? health[u].ms + 'ms' : health[u] ? '응답 없음' : '확인 전'}</small>${u === endpoint() ? '<em>사용 중</em>' : ''}</li>`).join('');
@@ -677,9 +687,9 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (!list.length) return setStatus('bad', '서버 주소가 없어요');
     if (!navigator.onLine) return setStatus('bad', '인터넷 연결이 끊겼어요');
     setStatus('wait', '연결 확인 중…');
-    for (const ep of list) {
+    for (const ep of orderEps(list)) {
       try {
-        const { j, ms } = await probe(ep); health[ep] = { ok: true, ms }; lastHealth = j; useEp(ep);
+        const { j, ms } = await probe(ep); health[ep] = { ok: true, ms }; cbOk(ep); offN = 0; lastHealth = j; useEp(ep);
         applyHealth(j);
         const where = list.length > 1 || eps.length > 1 ? ' · ' + epLabel(ep).replace(/\s*\(.*\)/, '') : '';
         const ph = j.engine?.phase;
@@ -688,9 +698,11 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
         else if (!j.llm) setStatus('bad', '모델 서버 꺼짐 · 자동 재시작 중' + where);
         else setStatus('ok', (j.busy ? '응답 중' + (j.queue ? ` · 대기 ${j.queue}` : '') : '온라인') + where);
         renderEps(); return;
-      } catch { health[ep] = { ok: false }; }
+      } catch { health[ep] = { ok: false }; cbFail(ep); }
     }
-    renderEps(); setStatus('bad', '오프라인 (모든 서버 주소가 응답 없음)');
+    renderEps(); setStatus('bad', '오프라인 (모든 서버 주소가 응답 없음) · 자동 재시도 중');
+    // v7.3: offline -> retry with exponential backoff + jitter (5s,10s,20s… max 60s) instead of waiting a full minute
+    clearTimeout(offT); offN++; offT = setTimeout(() => { if (!busy) check(); }, Math.min(5000 * 2 ** (offN - 1), 60000) + Math.random() * 1500);
   }
   function applyHealth(j) { const t = TIER_OF[j.model_id]; if (t) setTierUI(t); }
   // ---- reasoning tiers (High / Medium / Low). Chat UI never shows model names; /models/ lists them. ----
