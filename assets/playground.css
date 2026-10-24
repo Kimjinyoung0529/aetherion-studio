@@ -358,3 +358,21 @@ body.glow .main::after{content:"";position:fixed;inset:0;pointer-events:none;box
 .wt-menu{bottom:auto;top:calc(100% + 6px)}
 .wt-menu button{text-align:left!important;justify-content:flex-start!important;display:block!important}
 @media (max-width:860px){.chip-name{max-width:42vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:middle}}
+
+/* v7 reasoning-tier gauge (High / Medium / Low) */
+.tier-btn{width:auto!important;padding:0 10px 0 7px!important;gap:5px;display:inline-flex;align-items:center;border-radius:999px}
+.tier-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.tier-btn .needle{transform-origin:12px 16px;transition:transform .35s cubic-bezier(.3,1.4,.5,1)}
+.tier-btn[data-tier=low] .needle{transform:rotate(-95deg)}
+.tier-btn[data-tier=medium] .needle{transform:rotate(-40deg)}
+.tier-btn[data-tier=high] .needle{transform:rotate(0)}
+.tier-t{font-size:12.5px;font-weight:600}
+.tier-btn.switching{opacity:.75}.tier-btn.switching .needle{animation:tierSpin 1s ease-in-out infinite alternate}
+@keyframes tierSpin{from{transform:rotate(-95deg)}to{transform:rotate(0)}}
+.tier-menu button{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.tier-menu button small{opacity:.65;font-size:12px}
+.tier-menu button[aria-checked=true]::after{content:"✓";position:absolute;right:14px;top:50%;transform:translateY(-50%)}
+.tier-menu button{position:relative}
+.pop-foot{display:block;padding:8px 12px 4px;font-size:12px;opacity:.7;text-decoration:none;color:inherit}
+body.tier-switching .composer{box-shadow:0 0 0 2px rgba(120,140,255,.35)}
+@media (prefers-reduced-motion:reduce){.tier-btn .needle{transition:none}.tier-btn.switching .needle{animation:none}}

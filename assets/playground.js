@@ -402,6 +402,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   let pending = [];
   function shrink(file, max) { return new Promise((ok, no) => { const img = new Image(); img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(img.src); ok(c.toDataURL('image/jpeg', .85)); }; img.onerror = no; img.src = URL.createObjectURL(file); }); }
   async function addFiles(files) {
+    if (curTier && curTier !== 'high' && [...files].some(f => /^image\//.test(f.type))) { if (confirm('이미지는 High 모드에서만 이해할 수 있어요. High 모드로 바꿀까요?')) { if (!(await switchTier('high'))) return; } else return; }
     const docs = [...files].filter(f => !/^image\//.test(f.type)); if (docs.length) addDoc(docs[0]);
     for (const f of [...files].filter(f => /^image\//.test(f.type)).slice(0, 2 - pending.length)) { try { pending.push({ full: await shrink(f, 1024), thumb: await shrink(f, 160) }); } catch { toast('이미지를 읽지 못했어요'); } }
     drawPending();
@@ -691,7 +692,25 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     }
     renderEps(); setStatus('bad', '오프라인 (모든 서버 주소가 응답 없음)');
   }
-  function applyHealth(j) { if (j.model) $('chip-name').textContent = j.model.replace(/^Google\s+/, ''); }
+  function applyHealth(j) { const t = TIER_OF[j.model_id]; if (t) setTierUI(t); }
+  // ---- reasoning tiers (High / Medium / Low). Chat UI never shows model names; /models/ lists them. ----
+  const TIERS = { high: { id: 'gemma4', label: 'High · 깊게 생각', short: 'High', vision: true }, medium: { id: 'gptoss', label: 'Medium · 균형', short: 'Medium' }, low: { id: 'kanana15', label: 'Low · 빠르게', short: 'Low' } };
+  const TIER_OF = { gemma4: 'high', gptoss: 'medium', kanana15: 'low' };
+  let curTier = null, tierBusy = false;
+  function setTierUI(t) { curTier = t; const b = $('tier'); b.dataset.tier = t; $('tier-t').textContent = TIERS[t].short; b.title = '추론 모드: ' + TIERS[t].label; $('chip-name').textContent = TIERS[t].label; document.querySelectorAll('#tier-menu [data-tier]').forEach(x => x.setAttribute('aria-checked', String(x.dataset.tier === t))); }
+  async function switchTier(t) {
+    if (!TIERS[t] || t === curTier) return true; if (busy || tierBusy) { toast('답변이 끝난 뒤에 바꿀 수 있어요'); return false; }
+    tierBusy = true; $('tier').classList.add('switching'); document.body.classList.add('tier-switching'); let ok = false;
+    toast(`모드 전환 중… ${TIERS[t].label}`, 60000);
+    await sse('/api/models', { id: TIERS[t].id }, ev => {
+      if (ev.type === 'progress') toast('모드 전환 중… ' + ({ queued: '대기 중', unload: '이전 모드 정리', load: TIERS[t].short + ' 불러오는 중' }[ev.stage] || ''), 60000);
+      if (ev.type === 'done') { ok = true; toast(`${TIERS[t].label} 모드로 바꿨어요 (${((ev.ms || 0) / 1000).toFixed(1)}초)`, 3000); }
+      if (ev.type === 'error') toast('모드 전환 실패: ' + ev.message, 4000);
+    });
+    tierBusy = false; $('tier').classList.remove('switching'); document.body.classList.remove('tier-switching');
+    if (ok) setTierUI(t); check(); return ok;
+  }
+  $('tier-menu').addEventListener('click', e => { const b = e.target.closest('[data-tier]'); if (b) switchTier(b.dataset.tier); });
   // offline banner
   function netBanner() { const b = $('net-banner'); if (navigator.onLine) { if (!b.hidden) { b.hidden = true; check(); } } else { b.textContent = '📡 인터넷 연결이 끊겼어요. 다시 연결되면 자동으로 이어서 확인해요.'; b.hidden = false; setStatus('bad', '인터넷 연결이 끊겼어요'); } }
   addEventListener('online', netBanner); addEventListener('offline', netBanner); netBanner();
@@ -704,7 +723,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   }
   function closePops() { document.querySelectorAll('.pop').forEach(p => p.hidden = true); document.querySelectorAll('[aria-haspopup=menu]').forEach(b => b.setAttribute('aria-expanded', 'false')); }
   document.addEventListener('click', e => { if (!e.target.closest('.pop')) closePops(); });
-  bindPop('plus', 'plus-menu'); bindPop('more', 'more-menu');
+  bindPop('plus', 'plus-menu'); bindPop('more', 'more-menu'); bindPop('tier', 'tier-menu');
   $('settings-open2').onclick = () => openSettings();
   $('model-chip').onclick = () => { openSettings(); stab('model'); };
   function updatePin() { $('pin-cur-t').textContent = cur?.pinned ? '고정 해제' : '고정하기'; $('pin-cur').disabled = !cur?.msgs.length; }
@@ -740,21 +759,10 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (!ep || !key) { box.innerHTML = '<p class="muted">접속 키를 넣고 연결하면 목록이 보여요.</p>'; return; }
     try {
       const j = await (await fetch(ep + '/api/models', { headers: authH(), signal: AbortSignal.timeout(8000) })).json();
-      box.innerHTML = j.models.map(md_ => `<button type="button" class="mopt${md_.id === j.current ? ' on' : ''}" data-mid="${esc(md_.id)}"${j.phase !== 'ready' ? ' disabled' : ''}><b>${esc(md_.label || md_.name)}</b><small>${esc(md_.note || '')}${md_.vision ? ' · 이미지 이해' : ''}</small><small class="lic">${esc(md_.license || '')}</small>${md_.id === j.current ? '<em>사용 중</em>' : ''}</button>`).join('')
-        + (j.image ? `<p class="muted">이미지 생성: ${esc(j.image.label || j.image.name || '')}</p>` : '');
+      const cur_ = TIER_OF[j.current]; box.innerHTML = Object.entries(TIERS).map(([t, v]) => `<button type="button" class="mopt${t === cur_ ? ' on' : ''}" data-tier="${t}"${j.phase !== 'ready' ? ' disabled' : ''}><b>${esc(v.label)}</b><small>${v.vision ? '이미지 이해 · 생각 모드' : '텍스트 전용'}</small>${t === cur_ ? '<em>사용 중</em>' : ''}</button>`).join('') + '<p class="muted">모드별 모델과 양자화는 <a href="/models/" target="_blank" rel="noopener">모드별 사양</a>에 공개돼 있어요.</p>';
     } catch { box.innerHTML = '<p class="muted">모델 목록을 못 불러왔어요 (키나 연결을 확인해 주세요).</p>'; }
   }
-  $('model-list').addEventListener('click', async e => {
-    const b = e.target.closest('.mopt'); if (!b || b.classList.contains('on') || busy) return;
-    if (!confirm('모델을 바꿀까요? 바꾸는 동안(보통 몇 초) 채팅이 잠시 멈춰요.')) return;
-    $('model-list').querySelectorAll('.mopt').forEach(x => x.disabled = true);
-    await sse('/api/models', { id: b.dataset.mid }, ev => {
-      if (ev.type === 'progress') toast('모델 전환: ' + ({ queued: '대기 중', unload: '기존 모델 내리는 중', load: '새 모델 불러오는 중' }[ev.stage] || ev.stage), 60000);
-      if (ev.type === 'done') toast(`모델을 바꿨어요 (${((ev.ms || 0) / 1000).toFixed(1)}초)`, 3000);
-      if (ev.type === 'error') toast('모델 전환 실패: ' + ev.message, 4000);
-    });
-    loadModels(); check();
-  });
+  $('model-list').addEventListener('click', async e => { const b = e.target.closest('.mopt'); if (!b || b.classList.contains('on')) return; $('model-list').querySelectorAll('.mopt').forEach(x => x.disabled = true); await switchTier(b.dataset.tier); loadModels(); });
   // generic SSE POST reader for /api/models and /api/image
   async function sse(path, body, on, signal) {
     try {
@@ -786,7 +794,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     setProg(2, '요청 보내는 중…'); const t0 = performance.now();
     await sse('/api/image', { prompt, steps, size }, ev => {
       if (ev.type === 'progress') {
-        if (ev.stage === 'upsample') setProg(5, 'Gemma가 장면 설명을 쓰는 중…');
+        if (ev.stage === 'upsample') setProg(5, '장면 설명을 쓰는 중…');
         else if (ev.stage === 'queued') setProg(3, `대기 중${ev.ahead ? ` (앞에 ${ev.ahead}개)` : ''}…`);
         else if (ev.stage === 'unload') setProg(8, '언어 모델을 잠시 내려 메모리 확보 중…');
         else if (ev.stage === 'load') setProg(15, '그림 모델 불러오는 중…');
@@ -795,7 +803,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
         else if (ev.stage === 'reload') setProg(95, '언어 모델 다시 올리는 중…');
       } else if (ev.type === 'done') {
         const t = ev.timings || {}; const sec = v => v != null ? (v / 1000).toFixed(1) + '초' : '-';
-        m.content = ''; m.meta = `${ev.model || 'FLUX 3 Image Klein'} · ${size}px · ${steps}단계 · 그리기 ${sec(t.sample_ms)} · 변환 ${sec(t.decode_ms)} · 전체 ${sec(t.total_ms || (performance.now() - t0))}`;
+        m.content = ''; m.meta = `이미지 생성 · ${size}px · ${steps}단계 · 그리기 ${sec(t.sample_ms)} · 변환 ${sec(t.decode_ms)} · 전체 ${sec(t.total_ms || (performance.now() - t0))}`;
         if (ev.caption) m.imageCap = prompt + ' → ' + ev.caption.slice(0, 300);
         toJpeg(ev.image).then(u => { m.image = u; persist(); renderAll(); });
         setProg(100, '완료 · ' + m.meta);

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fffdf8">
+<title>모델 · 모드별 사양 | AETHERION AI</title>
+<meta name="description" content="AETHERION 채팅의 High · Medium · Low 모드가 실제로 쓰는 모델과 양자화, 측정 속도.">
+<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="모델 · 모드별 사양 | AETHERION AI"><meta property="og:description" content="AETHERION 채팅의 High · Medium · Low 모드가 실제로 쓰는 모델과 양자화, 측정 속도."><meta property="og:image" content="https://hii.o-r.kr/assets/img/og.jpg">
+<link rel="canonical" href="https://hii.o-r.kr/models/">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="alternate" type="application/rss+xml" title="AETHERION 소식" href="/feed.xml">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<link rel="stylesheet" href="/assets/site.css?v=6">
+<link rel="stylesheet" href="/assets/news.css?v=1">
+</head>
+<body class="s sub-page">
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="hdr ae-header"><div class="nav">
+<a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
+<nav class="links ae-header__links" aria-label="주요 메뉴"><a href="/models/">모델</a><a href="/news/">소식</a><a href="/platform/">API</a><a href="/pricing/">플랜</a><a href="/security/">보안</a><a href="/patch-notes/">패치 노트</a><a href="/status/">상태</a><a href="/playground/" class="btn pri">써보기</a></nav>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">홈</a><a href="/models/">모델</a><a href="/news/">소식</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/security/">보안</a><a href="/press/">프레스 킷</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/playground/">써보기</a></nav></details>
+</div></header>
+<main id="main" class="page"><div class="wrap">
+<h1>모델 · 모드별 사양</h1>
+<p class="lead">채팅 화면에서는 모델 이름 대신 <b>High · Medium · Low</b> 모드만 보여요. 모드마다 실제로 어떤 모델이 도는지는 여기에 그대로 적어 둬요. AETHERION은 이 모델들을 직접 학습하지 않았고, 공개 가중치를 양자화해서 우리 서버에서 돌려요.</p>
+<table class="spec"><thead><tr><th>모드</th><th>모델</th><th>양자화 · 크기</th><th>측정 속도*</th><th>특징</th><th>라이선스</th></tr></thead><tbody>
+<tr><td><b>High · 깊게 생각</b> (기본)</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google Gemma 4 26B-A4B</a> · MoE, 활성 약 4B</td><td>UD-IQ3_S (3.44bit) · 11.3GB</td><td>초당 약 11 토큰</td><td>이미지 이해, 생각 모드</td><td>Apache 2.0</td></tr>
+<tr><td><b>Medium · 균형</b></td><td><a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener">OpenAI gpt-oss-20b</a> · MoE, 전체 21B · 활성 약 3.6B</td><td>MXFP4 (<a href="https://huggingface.co/ggml-org/gpt-oss-20b-GGUF" rel="noopener">ggml-org GGUF</a>) · 12.1GB</td><td>초당 약 9 토큰 (추론 토큰 포함)</td><td>텍스트 전용, 내부 추론</td><td>Apache 2.0</td></tr>
+<tr><td><b>Low · 빠르게</b></td><td><a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener">Kakao Kanana 1.5 15.7B-A3B Instruct</a> · MoE, 활성 약 3B</td><td>IQ4_XS (4.25bit) · 8.7GB</td><td>초당 약 19 토큰</td><td>텍스트 전용, 한국어 특화</td><td>Kanana License</td></tr>
+</tbody></table>
+<p class="muted">* 2026-10-24, 같은 서버(인텔 Xeon 8코어, RAM 15GB, GPU 없음)에서 llama.cpp b11712로 짧은 한국어 답변을 생성하며 직접 잰 값이에요. 질문 길이와 도구 사용에 따라 달라져요. gpt-oss-20b는 메모리를 최대 약 10.7GB 썼어요.</p>
+<h2>모드를 바꾸면</h2><ul><li>RAM이 15GB라 한 번에 한 모델만 올려요. 모드를 바꾸면 이전 모델을 내리고 새 모델을 불러와서 보통 10~40초 걸려요.</li><li>이미지 첨부는 High 모드에서만 돼요. 다른 모드에서 이미지를 올리면 High로 바꾸자고 안내해요.</li><li>문맥 길이는 모든 모드에서 8,192 토큰이에요.</li></ul>
+<h2>이미지 생성</h2><p>Black Forest Labs FLUX 3 Image Klein 5.6B (Q4_K GGUF) + Qwen3-VL-4B 텍스트 인코더, stable-diffusion.cpp, CPU. 512px 한 장에 약 2분 20초. FLUX Kommunity License. 그리는 동안 채팅 모델을 잠시 내려요.</p>
+<h2>API로 직접 고르기</h2><p><code>POST /api/models</code>에 <code>{"id":"gemma4"}</code>(High), <code>{"id":"gptoss"}</code>(Medium), <code>{"id":"kanana15"}</code>(Low)를 보내요. 자세한 건 <a href="/platform/">API 문서</a>를 봐 주세요.</p>
+</div></main>
+<footer class="foot ae-footer"><div class="wrap">
+<div class="cols">
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델(<a href="/models/" style="display:inline">모드별 상세</a>): High <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · Medium <a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener" style="display:inline">OpenAI gpt-oss-20b</a> (Apache 2.0) · Low <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5 15.7B-A3B</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
+<div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/status/">서버 상태</a></div>
+<div><h4>소식</h4><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
+<div><h4>회사</h4><a href="/#company">소개</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/#careers">채용</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
+</div></div></footer>
+</body>
+</html>
