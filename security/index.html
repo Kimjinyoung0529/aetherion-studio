@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fffdf8">
+<title>보안 · 신뢰 | AETHERION AI</title>
+<meta name="description" content="AETHERION이 실제로 적용한 보안 조치.">
+<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR"><meta property="og:title" content="보안 · 신뢰 | AETHERION AI"><meta property="og:description" content="AETHERION이 실제로 적용한 보안 조치."><meta property="og:image" content="https://hii.o-r.kr/assets/img/og.jpg">
+<link rel="canonical" href="https://hii.o-r.kr/security/">
+<link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest"><link rel="alternate" type="application/rss+xml" title="AETHERION 소식" href="/feed.xml">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<link rel="stylesheet" href="/assets/site.css?v=6">
+<link rel="stylesheet" href="/assets/news.css?v=1">
+</head>
+<body class="s sub-page">
+<a class="skip" href="#main">본문 바로가기</a>
+<header class="hdr ae-header"><div class="nav">
+<a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
+<nav class="links ae-header__links" aria-label="주요 메뉴"><a href="/#models">모델</a><a href="/news/">소식</a><a href="/platform/">API</a><a href="/pricing/">플랜</a><a href="/security/">보안</a><a href="/patch-notes/">패치 노트</a><a href="/status/">상태</a><a href="/playground/" class="btn pri">써보기</a></nav>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="/">홈</a><a href="/#models">모델</a><a href="/news/">소식</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/playground/">써보기</a></nav></details>
+</div></header>
+<main id="main" class="page"><div class="wrap">
+<h1>보안 · 신뢰</h1>
+<p class="lead">실제로 적용한 조치만 적었어요. 외부 인증(SOC 2, ISO 등)은 받지 않았어요.</p>
+<h2>전송과 접근</h2><ul><li>모든 API 트래픽은 HTTPS(Tailscale Funnel)로 오가요.</li><li>API는 접속 키가 있어야 쓸 수 있어요. 키를 채팅이나 공개 저장소에 올리지 않아요.</li><li>채팅은 IP당 분당 8회로 제한하고, 요청 크기에도 상한을 둬요.</li></ul>
+<h2>가상 컴퓨터 격리</h2><ul><li>세션마다 별도의 Docker 컨테이너를 써요. 비루트 사용자(10001)로 돌리고, 모든 권한(capabilities)을 빼고 no-new-privileges를 걸어요.</li><li>루트 파일시스템은 읽기 전용이고, 작업 공간은 tmpfs(384MB)예요.</li><li>메모리 768MB, CPU 1.5, 프로세스 256개로 제한하고, 명령에는 시간 제한이 있어요. 기본은 네트워크 없음이에요.</li><li>쓰지 않는 세션은 일정 시간이 지나면 자동으로 지워요.</li></ul>
+<h2>데이터</h2><ul><li>대화 기록은 브라우저(localStorage)에만 저장돼요.</li><li>서버는 요청 수 같은 통계만 메모리에 두고, 답변 평가는 질문·답변 일부(최대 300/600자)와 함께 서버 파일에 남겨요.</li><li>모델은 모두 우리 서버에서 돌아가고, 대화를 외부 AI API로 보내지 않아요. 단, 웹 검색이나 날씨 같은 도구를 쓰면 검색어가 해당 서비스로 가요.</li></ul>
+<p class="muted">보안 문제를 찾으셨다면 <a href="https://github.com/Kimjinyoung0529/aetherion-studio/issues" rel="noopener">GitHub 이슈</a>로 알려 주세요.</p>
+</div></main>
+<footer class="foot ae-footer"><div class="wrap">
+<div class="cols">
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델: 기본 <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · 선택 <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
+<div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/status/">서버 상태</a></div>
+<div><h4>소식</h4><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
+<div><h4>회사</h4><a href="/#company">소개</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/#careers">채용</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
+</div></div></footer>
+</body>
+</html>
