@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """AETHERION entire-site HTML integrity and responsive brand contract.
-Static checks only; browser WebGPU and CSS visual parity need real rendering tests.
+Static checks only; visual layout is covered by tools/site_browser_smoke.cjs.
 """
 from __future__ import annotations
 from html.parser import HTMLParser
@@ -14,11 +14,11 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 IGNORE_DIRS = {".git", "node_modules", "vendor", "_site"}
 CORE_PAGES = [
-    "index.html", "chat/index.html", "agent/index.html",
-    "runtime/index.html", "runtime/experiments/index.html", "lab/index.html", "lab/ternary/index.html",
-    "lab/bonsai/index.html", "lab/generate/index.html",
-    "lab/generate/v4/index.html", "legacy/index.html"
+    "index.html", "news/index.html", "news/post/index.html", "patch-notes/index.html",
+    "status/index.html", "share/index.html"
 ]
+# App pages: full-screen UI without the marketing header/footer; only references and basics are checked.
+APP_PAGES = ["playground/index.html"]
 
 class Page(HTMLParser):
     def __init__(self):
@@ -116,8 +116,6 @@ def main():
             errors.append(f"{filename}: missing unified ae-header/ae-footer")
         if not any("/assets/brand.css" in x for x in dom.styles):
             errors.append(f"{filename}: missing brand stylesheet")
-        if filename != "index.html" and not any("/assets/interior.css" in x for x in dom.styles):
-            errors.append(f"{filename}: missing interior stylesheet")
         duplicates = [id for id,c in collections.Counter(dom.ids).items() if c > 1]
         if duplicates:
             errors.append(f"{filename}: duplicated element ids {duplicates}")
@@ -125,12 +123,28 @@ def main():
             errors.append(f"{filename}: navigation needs accessible label")
         if not any(x == "#main" for x in dom.links):
             errors.append(f"{filename}: accessible skip-to-main missing")
-        if not any(x.startswith("/runtime/") for x in dom.links):
-            errors.append(f"{filename}: universal runtime link missing")
+        if not any(x.startswith("/playground/") for x in dom.links):
+            errors.append(f"{filename}: universal playground link missing")
         if dom.elements["h1"] < 1:
             errors.append(f"{filename}: missing first-level heading")
         if dom.inline_buttons:
             errors.append(f"{filename}: inline onclick javascript is not permitted")
+    for filename in APP_PAGES:
+        path = ROOT / filename
+        if not path.is_file():
+            errors.append(f"{filename}: missing HTML page"); continue
+        raw = path.read_text("utf-8"); dom = Page(); dom.feed(raw); dom.close(); pages[filename] = dom
+        if dom.html_lang != "ko" or not dom.viewport or dom.main_ids != ["main"]:
+            errors.append(f"{filename}: needs html[lang=ko], viewport and one <main id=main>")
+        duplicates = [id for id,c in collections.Counter(dom.ids).items() if c > 1]
+        if duplicates:
+            errors.append(f"{filename}: duplicated element ids {duplicates}")
+    for legacy in ("chat", "agent", "lab", "runtime", "legacy"):
+        if (ROOT / legacy).exists():
+            errors.append(f"/{legacy}/ was retired in v4 and must not come back without updating the audit")
+    for filename in pages:
+        if re.search(r'href="/(chat|agent|lab|runtime|legacy)/', (ROOT / filename).read_text("utf-8")):
+            errors.append(f"{filename}: links to a retired page")
     # All locally referenced files and internal links, incl intra-document targets.
     links_checked=0
     for filename,dom in pages.items():
@@ -155,7 +169,7 @@ def main():
         for issue in errors[:150]:
             print(" -",issue)
         return 1
-    print(f"PASS {len(pages)} Korean branded pages; {links_checked} static links/scripts/styles verified, unique DOM IDs, accessible menus and hash targets")
+    print(f"PASS {len(pages)} Korean pages; {links_checked} static links/scripts/styles verified, unique DOM IDs, accessible menus and hash targets")
     return 0
 
 if __name__ == "__main__":

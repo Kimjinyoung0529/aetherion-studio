@@ -11,12 +11,11 @@ if(!pwPath)throw Error('PW_CORE_DIR env is required');
 const {chromium}=require(pwPath);
 const host='http://127.0.0.1:8765';
 const cases=[
- ['/', '홈페이지'],['/chat/','AI 채팅'],['/agent/','에이전트'],
- ['/runtime/','로컬 실행기'],['/runtime/experiments/','커널 실험'],['/lab/','Native Lab'],
- ['/lab/ternary/','Ternary'],['/lab/bonsai/','Bonsai'],
- ['/lab/generate/','Generator 0.3'],['/lab/generate/v4/','Generator 0.4'],
- ['/legacy/','Legacy']
+ ['/', '홈페이지'],['/news/','소식'],['/news/post/?p=2026-10-24-patch-v4','소식 글'],
+ ['/patch-notes/','패치 노트'],['/status/','서버 상태'],['/share/','공유된 대화'],['/playground/','플레이그라운드']
 ];
+const shotDir=process.env.SHOT_DIR||'browser-smoke-screenshots';
+const shotPrefix=process.env.SHOT_PREFIX||'';
 (async()=>{
  const browser=await chromium.launch({
   headless:true,executablePath:process.env.BROWSER_EXECUTABLE,
@@ -24,7 +23,7 @@ const cases=[
  });
  const failures=[];
  try{
-  fs.mkdirSync('browser-smoke-screenshots',{recursive:true});
+  fs.mkdirSync(shotDir,{recursive:true});
   for(const width of [390,1280]){
    const context=await browser.newContext({viewport:{width,height:820},locale:'ko-KR',deviceScaleFactor:1});
    for(const [route,label] of cases){
@@ -49,7 +48,6 @@ const cases=[
        lang:document.documentElement.lang,
        main:document.querySelectorAll('main#main').length,
        header:!!document.querySelector('.ae-header'),footer:!!document.querySelector('.ae-footer'),
-       brandStyles:getComputedStyle(document.querySelector('.ae-header')).backgroundColor,
        horizontalOverflow:Math.max(0,document.documentElement.scrollWidth-innerWidth),
        tooWide,sidebar:!!document.querySelector('.ae-drawer'),
        firstHeading:document.querySelector('h1')?.textContent?.trim().slice(0,55)
@@ -57,38 +55,62 @@ const cases=[
      });
      assert.equal(result.lang,'ko');
      assert.equal(result.main,1);
-     assert.ok(result.header&&result.footer&&result.sidebar);
-     assert.ok(result.firstHeading?.length>1);
+     const app=route==='/playground/';
+     if(!app)assert.ok(result.header&&result.footer&&result.sidebar,'missing ae-header/ae-footer/ae-drawer');
+     if(!app)assert.ok(result.firstHeading?.length>1,'missing h1');
      if(result.horizontalOverflow>5){
       failures.push(width+'px '+route+' horizontal overflow '+result.horizontalOverflow+'px suspects '+JSON.stringify(result.tooWide));
      }
-     if(width===390){
+     if(app){
+      for(const id of ['q','send','share','file-btn','file-in','tpl-btn','tpl','art-ver','custom','mem-list','voice','rate','autoread','tts-test'])
+       assert.equal(await page.locator('#'+id).count(),1,'playground #'+id+' missing');
+      assert.equal(await page.locator('a[href="/chat/"]').count(),0,'WebGPU link must be gone');
+      await page.locator('#tpl-btn').click();
+      assert.ok(await page.locator('#tpl .tpl').count()>=12,'template gallery empty');
+      await page.locator('#tpl .tpl').first().click();
+      assert.ok((await page.locator('#q').inputValue()).length>5,'template did not fill the input');
+      const parts=await page.evaluate(()=>window.__aeTTS.chunks('첫 문장이에요. 두 번째 문장이에요! ```js\nx\n``` 끝.'));
+      assert.ok(parts.length>=3&&!parts.join(' ').includes('```'),'TTS chunking');
+     }else if(width===390){
       const menu=page.locator('.ae-menu summary');
       assert.equal(await menu.isVisible(),true);
       await menu.click();
-      assert.equal(await page.locator('.ae-drawer a[href="/runtime/"]').isVisible(),true,'Mobile menu missing Runtime');
+      assert.equal(await page.locator('.ae-drawer a[href="/news/"]').isVisible(),true,'Mobile menu missing 소식');
       await menu.click();
      }else{
       assert.equal(await page.locator('.ae-header__links').isVisible(),true);
      }
-     if(route==='/runtime/experiments/'){
-      assert.equal(await page.locator('#run').count(),1,'Independent six-way GPU button missing');
-      assert.equal(await page.locator('#results').count(),1,'Independent GPU result table missing');
+     if(route==='/news/'){
+      await page.waitForSelector('#post-list .pcard',{timeout:8000});
+      assert.ok(await page.locator('#post-list .pcard').count()>=6,'news list');
+      await page.locator('.ntab[data-type="event"]').click();
+      assert.equal(await page.locator('#post-list .pcard').count(),1,'event tab filter');
      }
-     if(route==='/runtime/'){
-      assert.equal(await page.locator('#autoRun').count(),1,'GPU v2 button missing');
-      assert.equal(await page.locator('#autoResults').count(),1,'GPU score table missing');
-      assert.equal(await page.locator('#backend').count(),1,'Model picker missing');
+     if(route==='/patch-notes/'){
+      await page.waitForSelector('#post-list .patch',{timeout:8000});
+      assert.ok(await page.locator('#post-list .patch').count()>=4,'patch notes');
      }
-     if(route==='/chat/'||route==='/agent/'){
-      assert.equal(await page.locator('#navLaunch').count(),1,'Original CTA must remain wired');
+     if(route.startsWith('/news/post/')){
+      await page.waitForFunction(()=>document.querySelector('#post-body h2'),null,{timeout:8000});
+      assert.match(await page.locator('#post-title').textContent(),/v4/);
      }
      if(route==='/'){
-      await page.screenshot({path:'browser-smoke-screenshots/home-'+width+'.png',fullPage:true});
+      await page.waitForSelector('#ns-list .ns-item time',{timeout:8000});
      }
-     if(route==='/runtime/'){
-      await page.screenshot({path:'browser-smoke-screenshots/runtime-'+width+'.png',fullPage:true});
+     if(route==='/share/'){
+      const enc=await page.evaluate(async()=>{
+       const data={t:'공유 테스트',m:[{r:'u',c:'안녕?'},{r:'a',c:'반가워요 <b>x</b>',s:[]}]};
+       const bytes=new Uint8Array(await new Response(new Blob([new TextEncoder().encode(JSON.stringify(data))]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer());
+       let bin='';for(const b of bytes)bin+=String.fromCharCode(b);
+       return 'z'+btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+      });
+      await page.goto(host+'/share/#'+enc);await page.reload();
+      await page.waitForSelector('.smsg',{timeout:8000});
+      assert.equal(await page.locator('.smsg').count(),2,'share decode');
+      assert.equal(await page.locator('.smsg b:not(.who)').count(),0,'share must escape HTML');
      }
+     const name=route==='/'?'home':route.split('?')[0].replace(/^\/|\/$/g,'').replace(/\//g,'-');
+     await page.screenshot({path:path.join(shotDir,shotPrefix+name+'-'+width+'.png'),fullPage:!app});
      for(const error of resourceErrors)failures.push(width+'px '+route+' local asset '+error);
      for(const error of errors)failures.push(width+'px '+route+' browser JS '+error.slice(0,220));
      console.log('PASS',width+'px',label,'overflow',result.horizontalOverflow+'px');
@@ -102,5 +124,5 @@ const cases=[
  if(failures.length){
   console.error('\nSITE BROWSER SMOKE FAILED '+failures.length+' checks:\n'+failures.join('\n'));
   process.exitCode=1;
- }else console.log('PASS 11 pages × 2 viewports, Chromium DOM and mobile menu interactions, no script errors or local 404s');
+ }else console.log('PASS '+cases.length+' pages × 2 viewports, Chromium DOM and mobile menu interactions, no script errors or local 404s');
 })().catch(e=>{console.error(e);process.exitCode=1});

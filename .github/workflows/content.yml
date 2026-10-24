@@ -1,0 +1,29 @@
+name: News content build
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/posts/**'
+      - 'tools/build_content.mjs'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build content/index.json and feed.xml
+        run: node tools/build_content.mjs
+      - name: Commit regenerated files if they changed
+        run: |
+          if git diff --quiet -- content/index.json feed.xml; then echo "up to date"; exit 0; fi
+          git config user.name "aetherion-content-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/index.json feed.xml
+          git commit -m "chore(content): rebuild news index and feed"
+          git push

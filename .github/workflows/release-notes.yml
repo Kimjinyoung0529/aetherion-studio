@@ -1,0 +1,32 @@
+name: Release PR needs patch notes
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+permissions:
+  contents: read
+jobs:
+  patch-note:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Release PRs must add a patch post
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          HEAD_REF: ${{ github.head_ref }}
+          LABELS: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          # A PR is a "release" when it is labeled release, its branch starts with feat/ or release/, or its title starts with vN.
+          if ! { [[ ",$LABELS," == *",release,"* ]] || [[ "$HEAD_REF" =~ ^(feat|release)/ ]] || [[ "$TITLE" =~ ^v[0-9]+ ]]; }; then
+            echo "Not a release PR; skipping."; exit 0
+          fi
+          added=$(git diff --name-only --diff-filter=A "$BASE"...HEAD -- 'content/posts/*.md' || true)
+          for f in $added; do
+            if grep -qE '^type:[[:space:]]*patch[[:space:]]*$' "$f"; then echo "Found new patch post: $f"; exit 0; fi
+          done
+          echo "::error::Release PR must add a new content/posts/*.md with 'type: patch' (sections 신규/개선/수정/알려진 문제, signed AETHERION 팀)."
+          exit 1
