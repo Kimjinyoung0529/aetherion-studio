@@ -29,7 +29,7 @@
 </div></header>
 <main id="main" class="page"><div class="wrap">
 <h1>오픈소스</h1>
-<p class="lead">AETHERION AI를 만들면서 쓰는 도구들을 하나씩 떼어 내 공개하고 있어요. 지금은 <strong>9개 중 6개</strong>가 저장소를 열었고, 여섯 다 아직 뼈대 단계예요. 나머지는 계획이에요.</p>
+<p class="lead">AETHERION AI를 만들면서 쓰는 도구들을 하나씩 떼어 내 공개하고 있어요. 지금은 <strong>9개 중 9개</strong>가 저장소를 열었고, 아홉 다 아직 뼈대 단계예요.</p>
 <p class="muted small">상태: <b>공개</b> = 쓸 만한 첫 릴리스 · <b>뼈대</b> = 저장소와 최소 기능·테스트만 있음 · <b>계획</b> = 아직 저장소 없음. 별 수·사용자 수 같은 숫자는 적지 않아요.</p>
 <ul class="os-grid">
 <li class="os-card"><div class="os-top"><span class="os-no">01</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">honest-numbers</h2><p>모든 수치에 출처를 붙이는 정직한 벤치마크·수치 보고 키트</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/honest-numbers" rel="noopener">GitHub에서 보기 →</a></li>
@@ -38,9 +38,9 @@
 <li class="os-card"><div class="os-top"><span class="os-no">04</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">cpu-moe-server-kit</h2><p>GPU 없이 CPU만으로 MoE GGUF 모델(gpt-oss-20b, Qwen3-30B-A3B 등)을 llama.cpp로 서빙 — 하드웨어 점검, 추천 플래그, 모델 프리셋, 모델 전환 래퍼, 내 컴퓨터 tok/s 측정</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/cpu-moe-server-kit" rel="noopener">GitHub에서 보기 →</a></li>
 <li class="os-card"><div class="os-top"><span class="os-no">05</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">sandbox-runner</h2><p>에이전트 셸 명령을 네트워크 없는 Docker 컨테이너에서 실행 — 메모리 768m·CPU 1.5·PID 256·60초 타임아웃, tmpfs 작업 폴더, 유휴 정리·세션 상한</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/sandbox-runner" rel="noopener">GitHub에서 보기 →</a></li>
 <li class="os-card"><div class="os-top"><span class="os-no">06</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">small-deep-research</h2><p>작은 로컬 모델로 돌리는 딥 리서치 엔진 — 계획→검색→가져오기→메모→번호 붙은 출처 보고서, OpenAI 호환 LLM·검색 백엔드 교체, 검색·페이지·토큰 예산 한도, 한국어 우선 프롬프트</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/small-deep-research" rel="noopener">GitHub에서 보기 →</a></li>
-<li class="os-card"><div class="os-top"><span class="os-no">07</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">chainlog</h2><p>해시 사슬로 엮어 변조를 감지하는 로그 라이브러리</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
-<li class="os-card"><div class="os-top"><span class="os-no">08</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">tunnel-watch</h2><p>Tailscale Funnel·예비 터널 상태를 감시하고 자동 복구하는 도구</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
-<li class="os-card"><div class="os-top"><span class="os-no">09</span><span class="os-badge os-plan">계획</span></div><h2 class="os-name">ko-prompt-kit</h2><p>한국어 시스템 프롬프트 템플릿과 평가 예시 모음</p><p class="muted small">라이선스: Apache-2.0 (예정)</p><span class="muted small">저장소 아직 없음</span></li>
+<li class="os-card"><div class="os-top"><span class="os-no">07</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">chainlog</h2><p>해시 사슬로 엮어 변조를 감지하는 로그 라이브러리 — 줄마다 앞 항목의 SHA-256을 넣은 JSONL, 수정·삭제·순서 바꿈을 줄 번호로 감지, 표준 라이브러리만 사용</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/chainlog" rel="noopener">GitHub에서 보기 →</a></li>
+<li class="os-card"><div class="os-top"><span class="os-no">08</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">tunnel-watch</h2><p>Tailscale Funnel·예비 터널 상태를 감시하고 자동 복구하는 도구 — 여러 검사기, 하나라도 200이면 정상(다수결 아님), 검사기 전부 오류면 재시작 안 함, 연속 실패 시 재시작 hook, 비밀값 저장 없음</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/tunnel-watch" rel="noopener">GitHub에서 보기 →</a></li>
+<li class="os-card"><div class="os-top"><span class="os-no">09</span><span class="os-badge os-sk">뼈대</span></div><h2 class="os-name">ko-prompt-kit</h2><p>한국어 시스템 프롬프트 템플릿과 평가 예시 모음 — 해요체·합니다체·도구 판단 템플릿 3개, 좋은/나쁜 답 예시, 정규식 기반 규칙 검사</p><p class="muted small">라이선스: Apache-2.0</p><a class="os-link" href="https://github.com/Kimjinyoung0529/ko-prompt-kit" rel="noopener">GitHub에서 보기 →</a></li>
 </ul>
 <p class="muted small">순서와 이름은 바뀔 수 있어요. 새 저장소가 열리면 <a href="/patch-notes/">패치 노트</a>에 알려 드릴게요.</p>
 </div></main>
