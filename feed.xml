@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel>
 <title>AETHERION 소식</title><link>https://hii.o-r.kr/news/</link><description>AETHERION 패치 노트, 블로그, 이벤트</description><language>ko</language>
+<item><title>[공지] 10월 24일 플레이그라운드 접속 장애 안내 및 사과</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-notice-outage</link><guid isPermaLink="false">aetherion-2026-10-24-notice-outage</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>2026년 10월 24일 늦어도 20:16부터 20:22(KST)까지 플레이그라운드가 응답하지 않는 접속 장애가 있었어요. 원인과 조치, 재발 방지 대책을 알려 드려요.</description></item>
 <item><title>[패치 노트] 패치 노트 v6.7 — 연결 안정성</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-7</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-7</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>서버 연결이 끊기던 문제를 고치고, 1분마다 연결을 점검해 자동으로 복구하는 감시 장치를 넣었어요.</description></item>
 <item><title>[패치 노트] 패치 노트 v6.6 — 글쓰기 도구와 실험실</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-6</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-6</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>답변마다 ✨ 버튼으로 글쓰기 도구를 쓸 수 있고, 실험실 기능 두 가지(스스로 검증하기, 대화 지도)를 넣었어요.</description></item>
 <item><title>[패치 노트] 패치 노트 v6.5 — 모바일 미리보기 패널 수정</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-5</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-5</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>아이폰에서 미리보기 패널의 탭이 세로로 찌그러지고, 캔버스 애니메이션이 점 하나로만 보이던 문제를 고쳤어요.</description></item>
