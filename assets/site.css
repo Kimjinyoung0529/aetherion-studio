@@ -124,3 +124,72 @@ html,body{overflow-x:clip}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.hdr,.s .ae-header{background:rgba(255,253,248,.96)!important}.panel,.stat,.feat,.paper,.s .ae-drawer,.btn{background:#fff!important}}
 @media (prefers-reduced-transparency:reduce){.hdr,.s .ae-header,.panel,.stat,.feat,.paper,.s .ae-drawer,.btn{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:#fff!important}.hdr,.s .ae-header{background:#fffdf8!important}}
 @media (prefers-reduced-motion:reduce){.feat,.paper,.btn{transition:none!important}.paper:hover,.feat:hover{transform:none}}
+/* ===== v0.01 — design refresh (bright · enterprise · Liquid Glass) =====
+ * New 0.0X design era. Inspiration drawn from the layout clarity, generous
+ * whitespace and calm typography of leading AI company sites — no copied code,
+ * assets, logos or brand names. All imagery stays self-generated.
+ */
+:root{
+  --ae01-page:#fcfbf7;--ae01-ink:#171a22;--ae01-dim:#596075;
+  --ae01-line:#ece4d6;--ae01-accent:#ff6a3d;--ae01-accent-2:#ff4f6d;
+  --ae01-ring:rgba(255,106,61,.18);--ae01-shadow:28px 60px -40px rgba(60,40,20,.35);
+  --ae01-space:clamp(76px,9vw,128px);
+}
+body.s{
+  background:
+    radial-gradient(1100px 620px at 88% -8%,#ffe9cf 0,transparent 58%),
+    radial-gradient(900px 560px at -8% 4%,#e6f1ff 0,transparent 55%),
+    radial-gradient(760px 520px at 50% 118%,#f6ecff 0,transparent 60%),
+    var(--ae01-page);
+  color:var(--ae01-ink);
+  letter-spacing:-.01em;
+}
+/* rhythm: calmer, more enterprise section spacing */
+.sec{padding:var(--ae01-space) 0;border-top:1px solid rgba(236,228,214,.7)}
+.sec h2{letter-spacing:-.035em;line-height:1.1}
+.sec .sub{color:var(--ae01-dim);line-height:1.7;font-size:clamp(16px,1.4vw,19px)}
+.label{color:var(--ae01-accent);letter-spacing:.18em}
+/* nav polish */
+.links a:not(.btn){font-weight:600;letter-spacing:-.01em;border-radius:999px;padding:7px 12px;transition:background .18s,color .18s}
+.links a:not(.btn):hover{background:rgba(23,26,34,.06);color:var(--ae01-ink)}
+.brand{letter-spacing:.14em}
+/* hero: cleaner, more breathing room, softer mesh */
+.hero{padding:clamp(84px,10vw,132px) 0 clamp(72px,8vw,104px)}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;
+  background:rgba(255,255,255,.7);border:1px solid rgba(255,180,140,.5);
+  color:#c44a1f;letter-spacing:.1em;font-size:12px;
+  -webkit-backdrop-filter:saturate(160%) blur(10px);backdrop-filter:saturate(160%) blur(10px);
+  box-shadow:0 6px 18px rgba(255,106,61,.12)}
+.hero h1{letter-spacing:-.04em;line-height:1.06}
+.hero p.lead{color:var(--ae01-dim);line-height:1.6}
+.hero-img{filter:saturate(1.05)}
+/* stats: glass tiles, airier */
+.stats{border:0;background:transparent;gap:14px;grid-template-columns:repeat(4,1fr);margin-top:clamp(48px,6vw,74px)}
+.stat{border-radius:18px;border:1px solid rgba(255,255,255,.7);
+  background:rgba(255,255,255,.62)!important;
+  -webkit-backdrop-filter:saturate(170%) blur(16px);backdrop-filter:saturate(170%) blur(16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 14px 34px -24px rgba(60,40,20,.45);
+  padding:22px 22px}
+.stat b{font-size:clamp(26px,2.4vw,32px);letter-spacing:-.03em;background:linear-gradient(120deg,#ff6a3d,#ff4f6d);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.stat span{color:var(--ae01-dim)}
+/* cards: softer, deeper, enterprise */
+.prod,.feat,.paper,.lab,.road>div{border-radius:22px;border:1px solid rgba(236,228,214,.9)}
+.prod:hover,.feat:hover,.paper:hover{transform:translateY(-4px);box-shadow:var(--ae01-shadow)!important;border-color:rgba(255,201,173,.9)}
+.prod .ico{box-shadow:inset 0 1px 0 rgba(255,255,255,.7)}
+.prod h3,.feat h3,.paper h3{letter-spacing:-.02em}
+/* buttons: crisper primary */
+.btn.pri{background:linear-gradient(135deg,#ff7a45,#ff4f6d)!important;border:0;box-shadow:0 14px 30px -12px rgba(255,80,80,.55)}
+.btn.pri:hover{transform:translateY(-2px);box-shadow:0 18px 38px -12px rgba(255,80,80,.6)}
+.btn{border-radius:999px;font-weight:650}
+/* status pills a touch rounder */
+.st.live,.st.beta,.st.plan{border-radius:999px;font-weight:700}
+/* careers / final call band refinement */
+.careers{border-radius:28px;box-shadow:var(--ae01-shadow)}
+.foot{border-top:1px solid rgba(236,228,214,.8)}
+@media(max-width:960px){.stats{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+  .stats{grid-template-columns:1fr 1fr;gap:10px}
+  .stat{padding:16px 16px}
+  .hero{padding:52px 0 40px}
+  .sec{padding:56px 0}
+}
