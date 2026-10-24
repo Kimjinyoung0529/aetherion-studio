@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"><channel>
 <title>AETHERION 소식</title><link>https://hii.o-r.kr/news/</link><description>AETHERION 패치 노트, 블로그, 이벤트</description><language>ko</language>
+<item><title>[패치 노트] 패치 노트 v6.7 — 연결 안정성</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-7</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-7</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>서버 연결이 끊기던 문제를 고치고, 1분마다 연결을 점검해 자동으로 복구하는 감시 장치를 넣었어요.</description></item>
 <item><title>[패치 노트] 패치 노트 v6.6 — 글쓰기 도구와 실험실</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-6</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-6</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>답변마다 ✨ 버튼으로 글쓰기 도구를 쓸 수 있고, 실험실 기능 두 가지(스스로 검증하기, 대화 지도)를 넣었어요.</description></item>
 <item><title>[패치 노트] 패치 노트 v6.5 — 모바일 미리보기 패널 수정</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-5</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-5</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>아이폰에서 미리보기 패널의 탭이 세로로 찌그러지고, 캔버스 애니메이션이 점 하나로만 보이던 문제를 고쳤어요.</description></item>
 <item><title>[패치 노트] 패치 노트 v6.4 — API 문서, 플랜, 보안, 프레스 킷</title><link>https://hii.o-r.kr/news/post/?p=2026-10-24-patch-v6-4</link><guid isPermaLink="false">aetherion-2026-10-24-patch-v6-4</guid><pubDate>Sat, 24 Oct 2026 00:00:00 GMT</pubDate><description>API 문서, 오픈 베타 플랜, 보안·신뢰, 프레스 킷 페이지를 열었어요. 기본 모델은 다시 Gemma 4 26B-A4B예요.</description></item>
