@@ -193,3 +193,22 @@ body.s{
   .hero{padding:52px 0 40px}
   .sec{padding:56px 0}
 }
+/* v0.02: hero overlap fix, glass card polish, mobile rhythm */
+@media(min-width:961px){
+  .hero-img{right:-14%;width:min(680px,56vw);opacity:.85;
+    mask-image:radial-gradient(circle,#000 38%,transparent 68%);-webkit-mask-image:radial-gradient(circle,#000 38%,transparent 68%)}
+  .hero h1,.hero p.lead{max-width:min(640px,58%)}
+  .hero .wrap::before{content:"";position:absolute;inset:-40px auto -40px -60px;width:70%;z-index:-1;pointer-events:none;
+    background:radial-gradient(60% 60% at 30% 50%,rgba(255,255,255,.75),transparent 75%)}
+}
+.prod,.feat,.paper,.lab{background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(255,255,255,.66));
+  -webkit-backdrop-filter:saturate(160%) blur(12px);backdrop-filter:saturate(160%) blur(12px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 10px 28px -22px rgba(60,40,20,.4)}
+.sec h2{letter-spacing:-.03em;line-height:1.15;word-break:keep-all}
+@media(max-width:640px){
+  .wrap{padding-left:20px;padding-right:20px}
+  .hero .cta{display:flex;flex-wrap:wrap;gap:10px}
+  .hero .cta .btn{flex:1 1 auto;text-align:center}
+  .sec h2{font-size:clamp(26px,7.4vw,32px)}
+  .prod,.feat,.paper,.lab{padding:20px}
+}
