@@ -1,7 +1,19 @@
 {
  "generated_from": "content/posts",
- "count": 30,
+ "count": 31,
  "posts": [
+  {
+   "slug": "2026-10-25-patch-v0-09",
+   "type": "patch",
+   "type_label": "패치 노트",
+   "title": "패치 노트 v0.09 — 소형 모델 딥 리서치 엔진 small-deep-research 공개",
+   "date": "2026-10-25",
+   "version": "v0.09",
+   "pinned": true,
+   "summary": "여섯 번째 오픈소스 저장소 small-deep-research를 뼈대 단계로 공개하고, 오픈소스 페이지 카드를 연결했어요.",
+   "url": "/news/post/?p=2026-10-25-patch-v0-09",
+   "html": "<p>안녕하세요, AETHERION 팀이에요.</p>\n<h2>신규</h2>\n<ul>\n<li><strong>small-deep-research</strong>: 작은 로컬 모델로 돌리는 딥 리서치 엔진의 최소 뼈대 <a href=\"https://github.com/Kimjinyoung0529/small-deep-research\" rel=\"noopener\">저장소</a>를 열었어요(Apache-2.0). 계획 → 검색 → 페이지 가져오기 → 메모 추출 → 번호 붙은 출처가 달린 마크다운 보고서 순서로 돌아요. OpenAI 호환 LLM(llama.cpp 등)과 검색 백엔드(SearXNG, DuckDuckGo HTML)를 바꿔 끼울 수 있고, 검색 횟수·페이지 수·추정 토큰에 예산 한도를 둘 수 있어요. 프롬프트는 한국어 우선이에요. 가짜 LLM·검색으로 도는 테스트가 CI에서 돌아요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>오픈소스 페이지의 6번 카드를 &quot;계획&quot;에서 &quot;뼈대&quot;로 바꾸고 저장소 링크를 달았어요. 이제 9개 중 6개가 저장소를 열었어요. 홈 푸터에도 링크를 추가했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>없음</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>보고서 품질은 아직 재지 않았어요. 쓰는 모델과 검색 백엔드에 크게 좌우돼요.</li>\n<li>인용 번호가 실제로 그 문장을 뒷받침하는지는 아직 검증하지 않아요. 토큰 수도 글자 수 기반 추정치예요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
+  },
   {
    "slug": "2026-10-25-patch-v0-08",
    "type": "patch",
@@ -9,7 +21,7 @@
    "title": "패치 노트 v0.08 — CPU 전용 MoE 서버 키트 cpu-moe-server-kit 공개",
    "date": "2026-10-25",
    "version": "v0.08",
-   "pinned": true,
+   "pinned": false,
    "summary": "다섯 번째 오픈소스 저장소 cpu-moe-server-kit를 뼈대 단계로 공개하고, 오픈소스 페이지 카드를 연결했어요.",
    "url": "/news/post/?p=2026-10-25-patch-v0-08",
    "html": "<p>안녕하세요, AETHERION 팀이에요.</p>\n<h2>신규</h2>\n<ul>\n<li><strong>cpu-moe-server-kit</strong>: GPU 없이 CPU만으로 MoE GGUF 모델(gpt-oss-20b, Qwen3-30B-A3B 등)을 llama.cpp <code>llama-server</code>로 돌리기 위한 <a href=\"https://github.com/Kimjinyoung0529/cpu-moe-server-kit\" rel=\"noopener\">저장소</a>를 열었어요(Apache-2.0). 하드웨어 점검(코어, RAM, AVX2/AVX-512), 추천 플래그(threads, ctx, batch, mlock/mmap), 모델 프리셋, 모델 전환 래퍼(/health, /models, /switch), 내 컴퓨터에서 tok/s를 재는 벤치 스크립트가 들어 있어요. 단위 테스트가 CI에서 돌아요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>오픈소스 페이지의 4번 카드를 &quot;계획&quot;에서 &quot;뼈대&quot;로 바꾸고 저장소 링크를 달았어요. 이제 9개 중 5개가 저장소를 열었어요. 홈 푸터에도 링크를 추가했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>없음</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>저장소에는 성능 수치를 싣지 않았어요. 하드웨어마다 결과가 크게 달라서, 각자 컴퓨터에서 벤치 스크립트로 재 보셔야 해요.</li>\n<li>플래그 추천은 단순한 규칙이라 모든 컴퓨터에서 최적이라는 보장은 없어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
