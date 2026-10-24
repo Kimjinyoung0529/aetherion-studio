@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090f">
+<meta name="description" content="Kanana 1.5 15.7B-A3B 에이전트와 대화하기. 웹검색과 도구 사용 과정을 실시간으로 보여줍니다.">
+<meta property="og:type" content="website"><meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="플레이그라운드 | AETHERION AI"><meta property="og:description" content="Kanana 1.5 15.7B-A3B 에이전트와 대화하기. 웹검색과 도구 사용 과정을 실시간으로 보여줍니다.">
+<title>플레이그라운드 | AETHERION AI</title>
+<link rel="canonical" href="https://hii.o-r.kr/">
+<link rel="stylesheet" href="/assets/brand.css?v=3">
+<link rel="stylesheet" href="/assets/interior.css?v=1">
+<link rel="stylesheet" href="/assets/kanana.css?v=1">
+</head>
+<body class="k k-pg">
+<a class="ae-skip" href="#main">본문 바로가기</a>
+<header class="ae-header"><div class="k-nav">
+<a href="/" class="k-brand" aria-label="AETHERION AI 홈"><span class="k-logo" aria-hidden="true">A</span>AETHERION</a>
+<nav class="k-links" aria-label="주요 메뉴"><a href="/#features" class="k-hide">기능</a><a href="/#performance" class="k-hide">성능</a><a href="/#faq" class="k-hide">FAQ</a><a href="/runtime/" class="k-hide">로컬 실행기</a><a href="/playground/" aria-current="page">플레이그라운드</a></nav>
+</div></header>
+<main id="main" class="k-play">
+<aside class="k-side" id="side" aria-label="연결 설정">
+<h1>플레이그라운드</h1><div class="k-meta">Kanana 1.5 15.7B-A3B · 에이전트</div>
+<div class="k-status"><span class="k-dot" id="dot"></span><span id="stxt">서버 확인 중…</span></div>
+<label for="ep">서버 주소</label><input type="url" id="ep" placeholder="https://….runlocal.eu" autocomplete="off">
+<label for="key">접속 키</label><input type="password" id="key" placeholder="접속 키 입력" autocomplete="off">
+<label><input type="checkbox" id="tools" checked> 웹검색·도구 사용</label>
+<p style="display:flex;gap:8px;margin-top:14px"><button class="k-btn" id="save" type="button">저장 · 연결 확인</button><button class="k-btn" id="clear" type="button">새 대화</button></p>
+<p class="k-meta">키는 이 브라우저(localStorage)에만 저장돼요. 서버 주소를 비우면 기본 주소(config/endpoint.json)를 써요.</p>
+<p class="k-meta">서버가 꺼져 있으면 <a href="/chat/">브라우저 WebGPU 채팅</a>을 써보세요.</p>
+</aside>
+<section class="k-chat" aria-label="대화">
+<div class="k-msgs" id="msgs" aria-live="polite">
+<div class="k-empty" id="empty"><h2>무엇이든 물어보세요</h2><p>필요하면 웹을 검색해서 출처와 함께 답해요.</p>
+<div class="k-sugg"><button class="k-btn" type="button" data-q="오늘 한국 IT 뉴스 중 중요한 거 검색해서 알려줘">📰 오늘 IT 뉴스</button><button class="k-btn" type="button" data-q="크래프톤 Raon-1 mini가 뭔지 찾아서 정리해줘">🔎 Raon-1 mini 정리</button><button class="k-btn" type="button" data-q="파이썬으로 피보나치 수열 함수 짜줘">💻 코드 작성</button></div></div>
+</div>
+<form class="k-input" id="form"><button class="k-btn" type="button" id="menu" aria-label="설정 열기">⚙️</button><textarea id="q" rows="1" placeholder="메시지를 입력하세요 (Enter 전송, Shift+Enter 줄바꿈)" aria-label="메시지"></textarea><button class="k-btn k-btn--primary" id="send" type="submit">전송</button></form>
+</section>
+</main>
+<footer class="ae-footer" hidden><a href="/runtime/">로컬 실행기</a></footer>
+<script src="/assets/playground.js?v=1" defer></script>
+</body>
+</html>
