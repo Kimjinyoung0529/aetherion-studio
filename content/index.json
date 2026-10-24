@@ -1,6 +1,6 @@
 {
  "generated_from": "content/posts",
- "count": 24,
+ "count": 25,
  "posts": [
   {
    "slug": "2026-10-24-notice-outage-2",
@@ -193,6 +193,18 @@
    "summary": "서비스 모델을 Google Gemma 4 26B-A4B로 바꾸고 이미지 이해, 딥 리서치, 생각하기, 수식, 음성을 넣었어요.",
    "url": "/news/post/?p=2026-10-24-patch-v3",
    "html": "<h2>신규</h2>\n<ul>\n<li>서비스 모델을 Google Gemma 4 26B-A4B(Apache 2.0)로 바꿨어요. 3비트 양자화 버전을 llama.cpp로 CPU에서 돌려요.</li>\n<li>이미지 첨부와 이미지 이해.</li>\n<li>딥 리서치 모드: 여러 번 검색하고 본문을 읽은 뒤 출처를 단 보고서를 써요.</li>\n<li>생각하기 모드, 수식(KaTeX), 다이어그램(mermaid).</li>\n<li>음성 입력과 읽어주기, 슬래시 명령어, 마크다운 내보내기.</li>\n<li>회사 소개형 홈페이지와 새 브랜드 에셋.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>뉴스·시세·QR 도구를 추가했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>도구 결과가 길 때 대화가 잘리던 문제.</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>메모리 16GB 서버라서 가끔 모델이 메모리 부족으로 꺼졌어요. v4에서 자동 재시작을 넣었어요.</li>\n<li>아이폰에서 읽어주기가 중간에 끊기는 경우가 있었어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
+  },
+  {
+   "slug": "2026-10-24-patch-v0-03",
+   "type": "patch",
+   "type_label": "패치 노트",
+   "title": "패치 노트 v0.03 — 상태 페이지에서 Funnel·예비 경로 구분",
+   "date": "2026-10-24",
+   "version": "v0.03",
+   "pinned": false,
+   "summary": "서버 상태 페이지가 기본(Tailscale Funnel)과 예비(runlocal) 경로를 각각 점검해 보여 주도록 바꿨어요. 주소는 config/endpoint.json에서 읽어요.",
+   "url": "/news/post/?p=2026-10-24-patch-v0-03",
+   "html": "<p>안녕하세요, AETHERION 팀이에요. 상태 페이지가 &quot;서버가 살아 있는지&quot;만 알려 주고, 어느 연결 경로인지 구분이 잘 안 돼서 이번에 정리했어요.</p>\n<h2>신규</h2>\n<ul>\n<li><strong>연결 경로 목록</strong>: 상태 페이지에 기본(Funnel)과 예비(runlocal)를 각각 표시해요. 응답 시간·정상/오류·사용 중 표시가 같이 나와요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li><strong>경로별 안내 문구</strong>: 기본만 살아 있을 때, 예비만 살아 있을 때, 둘 다 끊겼을 때 문구를 다르게 보여 줘요.</li>\n<li><strong>설정 파일에서 주소 읽기</strong>: 경로 주소는 <code>config/endpoint.json</code>을 그대로 쓰므로, 예비 터널 주소가 바뀌어도 상태 페이지가 따라가요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>상태 페이지가 기본 주소 하나만 보고 &quot;연결 불가&quot;로 보이던 경우를 줄였어요. 예비 경로가 살아 있으면 그 상태로 안내해요.</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>이 컴퓨터(박스)에서는 Funnel DNS가 특수 주소로 해석돼 자기 자신을 점검하지 못할 수 있어요. 바깥에서 열면 정상으로 보여요.</li>\n<li>예비(runlocal) 주소는 무료 중계라 자주 바뀔 수 있어요. 바뀌면 자동 갱신되지만 반영까지 1~3분 걸릴 수 있어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
   },
   {
    "slug": "2026-10-24-patch-v2",
