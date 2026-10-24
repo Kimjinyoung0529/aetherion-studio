@@ -1,7 +1,18 @@
 {
  "generated_from": "content/posts",
- "count": 9,
+ "count": 10,
  "posts": [
+  {
+   "slug": "2026-10-24-patch-v6-3",
+   "type": "patch",
+   "type_label": "패치 노트",
+   "title": "패치 노트 v6.3 — 기본 모델을 4비트 Kanana 1.5로",
+   "date": "2026-10-24",
+   "version": "v6.3",
+   "summary": "실측해 보니 4비트 Kanana 1.5가 한국어 품질은 비슷하고 대화 속도는 가장 빨라서 기본 모델로 바꿨어요.",
+   "url": "/news/post/?p=2026-10-24-patch-v6-3",
+   "html": "<p>안녕하세요, AETHERION 팀이에요. 4비트 로컬 모델을 원하신다는 의견을 받고, 우리 서버(CPU 8코어 · RAM 15GB · GPU 없음)에 들어가는 후보를 직접 재 봤어요. 모두 같은 서버와 같은 llama.cpp(b11712)로 2026년 10월 24일에 측정했어요.</p>\n<p>| 모델 | 양자화 | 파일 | llama-bench tg64 | 실제 대화 속도 |</p>\n<p>|---|---|---|---|---|</p>\n<p>| Kakao Kanana 1.5 15.7B-A3B | IQ4_XS (4.25bit) | 8.7GB | 8.6 tok/s | 19.3 tok/s |</p>\n<p>| Google Gemma 4 26B-A4B | UD-IQ3_S (3.44bit) | 11.3GB | 12.4 tok/s | 11.4 tok/s |</p>\n<p>| Google Gemma 4 12B | Q4_K_M | 7.1GB | 5.7 tok/s | 5.1 tok/s |</p>\n<p>같은 한국어 질문(KTX 안내 세 문장, 속담 풀이 한 문장)에 세 모델 모두 자연스러운 한국어로 맞게 답했고, 형식을 가장 잘 지킨 건 Kanana 1.5였어요. 한 번씩 돌린 간단한 측정이라 공식 벤치마크는 아니에요.</p>\n<h2>신규</h2>\n<ul>\n<li>기본 모델을 Kakao Kanana 1.5 15.7B-A3B (IQ4_XS, 4bit)로 바꿨어요.</li>\n<li>Google Gemma 4 12B (Q4_K_M, 4bit)를 모델 선택에 추가했어요. 이미지를 이해하지만 느려요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>모델 이름 옆에 양자화 비트 수를 표시해요.</li>\n<li>홈의 모델 소개를 실측 숫자가 들어간 라인업 표로 바꿨어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>Kanana 답변 끝에 <code>&lt;|eot_id|&gt;</code> 토큰이 보이던 문제를 고쳤어요.</li>\n<li>이미지를 이해하지 못하는 모델에 사진을 보내면, 이제 Gemma 4로 바꾸라고 안내해요.</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>Gemma 4 26B-A4B는 4비트면 약 17GB라 RAM에 안 들어가요. 그래서 3비트로 계속 제공해요.</li>\n<li>gpt-oss-20b(MXFP4, 12.1GB)는 메모리가 빠듯해서 넣지 않았어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
+  },
   {
    "slug": "2026-10-24-patch-v6-2",
    "type": "patch",

@@ -53,7 +53,7 @@
         const j = await r.json();
         if (j.llm) set('ok', '정상 운영 중', '모델이 응답할 준비가 됐어요.');
         else set('wait', '모델 서버 꺼짐 · 자동 재시작 중', '보통 1~2분 안에 다시 켜져요.');
-        const rows = [['모델', j.model || 'Gemma 4 26B-A4B'], ['모델 상태', j.model_status || (j.llm ? 'ok' : 'down')], ['가동 시간', j.uptime_s != null ? fmtUp(j.uptime_s) : '-'], ['최근 속도', j.tok_s_recent ? j.tok_s_recent + ' tok/s' : '-'], ['대기 중 요청', j.queue ?? '-'], ['처리한 요청', j.requests ?? '-'], ['오류', j.errors ?? '-'], ['버전', j.version ? 'v' + j.version : '-']];
+        const rows = [['모델', j.model || 'Kanana 1.5 15.7B-A3B'], ['모델 상태', j.model_status || (j.llm ? 'ok' : 'down')], ['가동 시간', j.uptime_s != null ? fmtUp(j.uptime_s) : '-'], ['최근 속도', j.tok_s_recent ? j.tok_s_recent + ' tok/s' : '-'], ['대기 중 요청', j.queue ?? '-'], ['처리한 요청', j.requests ?? '-'], ['오류', j.errors ?? '-'], ['버전', j.version ? 'v' + j.version : '-']];
         $('st-grid').innerHTML = rows.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('');
       } catch (e) { set('bad', '서버에 연결할 수 없어요', '서버가 꺼져 있거나 주소가 바뀌었을 수 있어요. (' + (e.name === 'AbortError' ? '시간 초과' : e.message) + ')'); $('st-grid').innerHTML = ''; }
       $('st-time').textContent = new Date().toLocaleTimeString('ko-KR');

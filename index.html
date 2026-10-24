@@ -53,7 +53,7 @@
 <div class="prod"><div class="ico c2">🖥️</div><h3>가상 컴퓨터</h3><p>에이전트 전용 리눅스 컨테이너에서 파이썬·노드 코드를 실제로 실행해요. 메모리 768MB, 네트워크 기본 차단.</p><span class="st beta">미리보기</span></div>
 <div class="prod"><div class="ico c3">🎨</div><h3>이미지 생성</h3><p>Black Forest Labs의 FLUX 3 Image Klein(오픈 가중치, Q4_K)을 CPU에서 돌려요. 512px 한 장에 약 2분 반, 진행률을 실시간으로 보여줘요.</p><span class="st beta">미리보기</span></div>
 <div class="prod"><div class="ico c4">🧭</div><h3>딥 리서치</h3><p>검색 계획부터 여러 페이지 읽기, 인용 보고서까지 로컬 모델 하나로 끝까지 해요.</p><span class="st beta">실험 기능</span></div>
-<div class="prod"><div class="ico c5">🔀</div><h3>모델 전환</h3><p>Gemma 4 26B, Kanana 1.5 15.7B, Kanana 2 3B 중 하나를 골라 써요. 메모리를 지키려고 한 번에 하나만 올려요.</p><span class="st live">서비스 중</span></div>
+<div class="prod"><div class="ico c5">🔀</div><h3>모델 전환</h3><p>Kanana 1.5 15.7B(4bit·기본), Gemma 4 26B, Gemma 4 12B, Kanana 2 3B 중 하나를 골라 써요. 메모리를 지키려고 한 번에 하나만 올려요.</p><span class="st live">서비스 중</span></div>
 <div class="prod"><div class="ico c6">▶️</div><h3>코드 미리보기 · 파일</h3><p>만든 HTML은 옆 창에서 바로 실행하고, PDF·CSV는 읽어서 답하고 차트로 그려요.</p><span class="st live">서비스 중</span></div>
 </div>
 </div></section>
@@ -61,22 +61,19 @@
 <section class="sec" id="models"><div class="wrap">
 <span class="label">Models</span>
 <h2>모델과 플랫폼</h2>
-<p class="sub">직접 학습한 모델이 아니에요. Google Gemma 4 26B-A4B(Apache 2.0)를 양자화해 우리 서버에서 돌리고, 그 위에 에이전트·도구·리서치 기능을 얹었어요.</p>
+<p class="sub">직접 학습한 모델이 아니에요. 공개 가중치 모델을 4비트 안팎으로 양자화해 우리 서버(CPU 8코어, RAM 15GB, GPU 없음)에서 돌리고, 그 위에 에이전트·도구·리서치 기능을 얹었어요. 기본 모델은 4비트 Kanana 1.5예요.</p>
 <div class="model">
 <div class="panel">
-<span class="tag">비전</span><span class="tag">생각하기</span><span class="tag">도구 호출</span><span class="tag">딥 리서치</span>
-<h3>AETHERION · Gemma 4 26B-A4B</h3>
-<p class="note" style="margin-top:4px">한 서버, GPU 없이 운영 중인 미리보기 버전</p>
+<span class="tag">한국어</span><span class="tag">도구 호출</span><span class="tag">딥 리서치</span><span class="tag">모델 전환</span>
+<h3>AETHERION 모델 라인업</h3>
+<p class="note" style="margin-top:4px">생성 속도는 2026.10.24 같은 서버에서 llama.cpp로 직접 잰 값이에요 (짧은 한국어 답변 기준).</p>
 <table class="spec"><tbody>
-<tr><td>기반 모델</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">google/gemma-4-26B-A4B-it</a></td></tr>
-<tr><td>구조</td><td>Mixture-of-Experts · 전체 26B / 활성 약 4B</td></tr>
-<tr><td>양자화</td><td>GGUF UD-IQ3_S (11.3GB) + 비전 인코더 BF16</td></tr>
-<tr><td>생성 속도</td><td>초당 약 10 토큰 (Xeon 8코어, llama.cpp, 2026.10 실측)</td></tr>
-<tr><td>메모리</td><td>약 12.2GB RAM</td></tr>
+<tr><td>기본 · Kanana 1.5 15.7B-A3B</td><td><a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener">Kakao</a> · MoE(활성 약 3B) · IQ4_XS 4.25bit · 8.7GB · 초당 약 19 토큰 · 텍스트 전용 · Kanana License</td></tr>
+<tr><td>Gemma 4 26B-A4B</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google</a> · MoE(활성 약 4B) · UD-IQ3_S 3.44bit · 11.3GB · 초당 약 11 토큰 · 이미지 이해·생각 모드 · Apache 2.0. 4비트(약 17GB)는 RAM에 안 들어가서 3비트를 써요.</td></tr>
+<tr><td>Gemma 4 12B</td><td>Google · Dense · Q4_K_M · 7.1GB · 초당 약 5 토큰 · 이미지 이해 · Apache 2.0</td></tr>
+<tr><td>Kanana 2 3B</td><td>Kakao · Q4_K_M · 2.2GB · 가볍고 빠름 · Kanana License</td></tr>
+<tr><td>이미지</td><td>Black Forest Labs FLUX 3 Image Klein 5.6B (Q4_K) · stable-diffusion.cpp · 512px 약 2분20초 · FLUX Kommunity License</td></tr>
 <tr><td>문맥 길이</td><td>8,192 토큰 (서비스 설정)</td></tr>
-<tr><td>입력</td><td>텍스트 · 이미지 (최대 2장)</td></tr>
-<tr><td>라이선스</td><td>Apache 2.0 (Gemma 4)</td></tr>
-<tr><td>함께 쓰는 모델</td><td>Kakao Kanana 1.5 15.7B A3B · Kanana 2 3B (각 라이선스 표시) · 이미지: Black Forest Labs FLUX 3 Image Klein 5.6B (Q4_K)</td></tr>
 </tbody></table>
 </div>
 <div class="panel">
@@ -154,7 +151,7 @@
 <section class="sec faq" id="faq"><div class="wrap">
 <span class="label">FAQ</span>
 <h2>자주 묻는 질문</h2>
-<details><summary>AETHERION 모델은 직접 학습한 건가요?</summary><p>아니요. Google의 오픈 모델 Gemma 4 26B-A4B(Apache 2.0)를 그대로 쓰고, 양자화·서버·에이전트 도구·리서치 기능을 저희가 만들었어요.</p></details>
+<details><summary>AETHERION 모델은 직접 학습한 건가요?</summary><p>아니요. 기본은 Kakao의 오픈 모델 Kanana 1.5 15.7B-A3B(4bit), 선택으로 Google Gemma 4(Apache 2.0)를 그대로 쓰고, 양자화·서버·에이전트 도구·리서치 기능을 저희가 만들었어요.</p></details>
 <details><summary>누구나 쓸 수 있나요?</summary><p>지금은 접속 키가 있는 사람만 쓰는 비공개 미리보기예요. 플레이그라운드 설정에 키를 넣으면 돼요.</p></details>
 <details><summary>대화 내용은 어디에 저장되나요?</summary><p>내 브라우저에만 남아요. 서버는 답을 만드는 동안만 내용을 다뤄요. 올린 이미지도 저장하지 않아요.</p></details>
 <details><summary>왜 이렇게 느릴 때가 있나요?</summary><p>GPU 없는 서버 한 대에서 한 번에 한 요청씩 처리해요. 초당 10 토큰 안팎이고, 딥 리서치는 여러 페이지를 읽느라 1–3분 걸릴 수 있어요.</p></details>
@@ -163,7 +160,7 @@
 </main>
 <footer class="foot ae-footer"><div class="wrap">
 <div class="cols">
-<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델: <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> 기반 (Apache 2.0). Gemma는 Google의 상표예요.</p></div>
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델: 기본 <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5 15.7B-A3B</a> (4bit, Kanana License) · 선택 <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4</a> (Apache 2.0). Gemma는 Google의 상표예요.</p></div>
 <div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/status/">서버 상태</a><a href="/share/">공유된 대화</a></div>
 <div><h4>연구</h4><a href="#research">연구 노트</a><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
 <div><h4>회사</h4><a href="#company">소개</a><a href="#careers">함께하기</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
