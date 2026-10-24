@@ -1,7 +1,19 @@
 {
  "generated_from": "content/posts",
- "count": 29,
+ "count": 30,
  "posts": [
+  {
+   "slug": "2026-10-25-patch-v0-08",
+   "type": "patch",
+   "type_label": "패치 노트",
+   "title": "패치 노트 v0.08 — CPU 전용 MoE 서버 키트 cpu-moe-server-kit 공개",
+   "date": "2026-10-25",
+   "version": "v0.08",
+   "pinned": true,
+   "summary": "다섯 번째 오픈소스 저장소 cpu-moe-server-kit를 뼈대 단계로 공개하고, 오픈소스 페이지 카드를 연결했어요.",
+   "url": "/news/post/?p=2026-10-25-patch-v0-08",
+   "html": "<p>안녕하세요, AETHERION 팀이에요.</p>\n<h2>신규</h2>\n<ul>\n<li><strong>cpu-moe-server-kit</strong>: GPU 없이 CPU만으로 MoE GGUF 모델(gpt-oss-20b, Qwen3-30B-A3B 등)을 llama.cpp <code>llama-server</code>로 돌리기 위한 <a href=\"https://github.com/Kimjinyoung0529/cpu-moe-server-kit\" rel=\"noopener\">저장소</a>를 열었어요(Apache-2.0). 하드웨어 점검(코어, RAM, AVX2/AVX-512), 추천 플래그(threads, ctx, batch, mlock/mmap), 모델 프리셋, 모델 전환 래퍼(/health, /models, /switch), 내 컴퓨터에서 tok/s를 재는 벤치 스크립트가 들어 있어요. 단위 테스트가 CI에서 돌아요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>오픈소스 페이지의 4번 카드를 &quot;계획&quot;에서 &quot;뼈대&quot;로 바꾸고 저장소 링크를 달았어요. 이제 9개 중 5개가 저장소를 열었어요. 홈 푸터에도 링크를 추가했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>없음</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>저장소에는 성능 수치를 싣지 않았어요. 하드웨어마다 결과가 크게 달라서, 각자 컴퓨터에서 벤치 스크립트로 재 보셔야 해요.</li>\n<li>플래그 추천은 단순한 규칙이라 모든 컴퓨터에서 최적이라는 보장은 없어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
+  },
   {
    "slug": "2026-10-25-patch-v0-07",
    "type": "patch",
@@ -9,7 +21,7 @@
    "title": "패치 노트 v0.07 — 에이전트 샌드박스 sandbox-runner 공개",
    "date": "2026-10-25",
    "version": "v0.07",
-   "pinned": true,
+   "pinned": false,
    "summary": "네 번째 오픈소스 저장소 sandbox-runner를 뼈대 단계로 공개하고, 오픈소스 페이지 카드를 연결했어요.",
    "url": "/news/post/?p=2026-10-25-patch-v0-07",
    "html": "<p>안녕하세요, AETHERION 팀이에요.</p>\n<h2>신규</h2>\n<ul>\n<li><strong>sandbox-runner</strong>: 에이전트가 내린 셸 명령을 Docker 컨테이너 안에서 실행하는 Python 라이브러리·CLI <a href=\"https://github.com/Kimjinyoung0529/sandbox-runner\" rel=\"noopener\">저장소</a>를 열었어요(Apache-2.0). AETHERION 백엔드 샌드박스와 같은 기본 제한(메모리 768m, CPU 1.5, PID 256, 명령 타임아웃 60초)에 네트워크 차단, tmpfs 작업 폴더, 읽기 전용 루트, 유휴 세션 정리, 최대 세션 수 제한이 들어 있어요. 단위 테스트와 Docker 통합 테스트가 CI에서 돌아요.</li>\n</ul>\n<h2>개선</h2>\n<ul>\n<li>오픈소스 페이지의 sandbox-runner 카드를 &quot;계획&quot;에서 &quot;뼈대&quot;로 바꾸고 저장소 링크를 달았어요. 홈 푸터에도 링크를 추가했어요.</li>\n</ul>\n<h2>수정</h2>\n<ul>\n<li>없음</li>\n</ul>\n<h2>알려진 문제</h2>\n<ul>\n<li>컨테이너는 완벽한 보안 경계가 아니에요. 정말 믿을 수 없는 코드라면 gVisor나 microVM 같은 더 강한 격리를 함께 써야 해요. 보안 감사도 아직 받지 않았어요.</li>\n<li>성능 수치는 아직 재지 않았어요.</li>\n</ul>\n<p>— AETHERION 팀</p>"
