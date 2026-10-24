@@ -187,9 +187,16 @@
 
   // ---------- artifact panel ----------
   const isMobile = () => matchMedia('(max-width:860px)').matches;
+  // iOS Safari: srcdoc iframes can report innerWidth/innerHeight 0 when scripts first run, so canvas demos end up 0px. Patch the sizes and re-fire resize.
+  const FIT = `<script>(function(){var d=document.documentElement;function W(){return d.clientWidth||(window.frameElement&&window.frameElement.clientWidth)||screen.width}function H(){return d.clientHeight||(window.frameElement&&window.frameElement.clientHeight)||screen.height}
+try{if(!window.innerWidth||!window.innerHeight){Object.defineProperty(window,'innerWidth',{configurable:true,get:W});Object.defineProperty(window,'innerHeight',{configurable:true,get:H})}}catch(e){}
+function fix(){document.querySelectorAll('canvas').forEach(function(c){if(c.width<=2||c.height<=2){var r=c.getBoundingClientRect();c.width=Math.round(r.width>2?r.width:W());c.height=Math.round(r.height>2?r.height:H())}});window.dispatchEvent(new Event('resize'))}
+addEventListener('load',function(){requestAnimationFrame(fix);setTimeout(fix,150);setTimeout(fix,600)})})();<\/script><style>html,body{min-height:100%}</style>`;
+  function injectFit(doc) { return /<head[^>]*>/i.test(doc) ? doc.replace(/<head[^>]*>/i, m => m + FIT) : FIT + doc; }
   function wrapDoc(code, lang) {
     if (lang === 'svg' || /^\s*<svg/i.test(code)) return `<!doctype html><meta charset="utf-8"><body style="margin:0;display:grid;place-items:center;min-height:100vh;background:#fff">${code}</body>`;
-    return /<html|<!doctype/i.test(code) ? code : `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>${code}</body></html>`;
+    const doc = /<html|<!doctype/i.test(code) ? code : `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>${code}</body></html>`;
+    return injectFit(doc);
   }
   let arts = []; // version history for this conversation
   function artName(code, lang) { return (code.match(/<title>([^<]{1,60})<\/title>/i)?.[1] || ({ svg: 'SVG 그림', python: 'Python 실행', csv: 'CSV 차트' }[lang] || 'HTML 페이지')).trim(); }
