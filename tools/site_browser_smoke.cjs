@@ -101,7 +101,7 @@ const shotPrefix=process.env.SHOT_PREFIX||'';
      }
      if(route.startsWith('/news/post/')){
       await page.waitForFunction(()=>document.querySelector('#post-body h2'),null,{timeout:8000});
-      assert.match(await page.locator('#post-title').textContent(),/v5/);
+      assert.match(await page.locator('#post-title').textContent(),/v0\.00\.5/);
      }
      if(route==='/'){
       await page.waitForSelector('#ns-list .ns-item time',{timeout:8000});

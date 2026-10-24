@@ -32,6 +32,6 @@ summary: 실제 사고가 아닌 가상 시나리오로 진행한 보안 사고 
 - 모든 API 응답에 nosniff, X-Frame-Options DENY, CSP, Referrer-Policy, Permissions-Policy 헤더를 붙였어요.
 - /health 에 자동 감시의 마지막 점검 결과와 경과 시간을 함께 보여 줘요.
 
-이 내용은 [패치 노트 v7.3](/news/post/?p=2026-10-24-patch-v7-3)에 반영했어요. 다시 한번, 이 글의 공격 상황은 **전부 가상**이에요.
+이 내용은 [패치 노트 v0.00.16](/news/post/?p=2026-10-24-patch-v7-3)에 반영했어요. 다시 한번, 이 글의 공격 상황은 **전부 가상**이에요.
 
 — AETHERION 팀
