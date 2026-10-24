@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 IGNORE_DIRS = {".git", "node_modules", "vendor", "_site"}
 CORE_PAGES = [
     "index.html", "news/index.html", "news/post/index.html", "patch-notes/index.html",
-    "status/index.html", "share/index.html", "models/index.html"
+    "status/index.html", "opensource/index.html", "share/index.html", "models/index.html"
 ]
 # App pages: full-screen UI without the marketing header/footer; only references and basics are checked.
 APP_PAGES = ["playground/index.html"]

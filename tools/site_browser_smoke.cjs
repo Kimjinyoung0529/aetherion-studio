@@ -12,7 +12,7 @@ const {chromium}=require(pwPath);
 const host='http://127.0.0.1:8765';
 const cases=[
  ['/', '홈페이지'],['/news/','소식'],['/news/post/?p=2026-10-24-patch-v5','소식 글'],
- ['/patch-notes/','패치 노트'],['/status/','서버 상태'],['/share/','공유된 대화'],['/models/','모델 · 모드별 사양'],['/playground/','플레이그라운드']
+ ['/patch-notes/','패치 노트'],['/status/','서버 상태'],['/opensource/','오픈소스'],['/share/','공유된 대화'],['/models/','모델 · 모드별 사양'],['/playground/','플레이그라운드']
 ];
 const shotDir=process.env.SHOT_DIR||'browser-smoke-screenshots';
 const shotPrefix=process.env.SHOT_PREFIX||'';
