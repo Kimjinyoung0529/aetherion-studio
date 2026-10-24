@@ -1,1 +1,8 @@
-{ "endpoint": "https://mild-yapok.runlocal.eu", "note": "서버를 재시작하면 주소가 바뀔 수 있어요. 플레이그라운드 설정에서 직접 바꿀 수도 있어요." }
+{
+  "endpoint": "https://aetherion.tailbe77c4.ts.net",
+  "endpoints": [
+    { "url": "https://aetherion.tailbe77c4.ts.net", "label": "Tailscale Funnel (기본)" },
+    { "url": "https://reef-squid.runlocal.eu", "label": "runlocal 터널 (예비)" }
+  ],
+  "note": "기본 주소는 Tailscale Funnel 고정 주소예요. 응답이 없으면 플레이그라운드가 예비 주소로 자동 전환해요. 설정에서 직접 바꿀 수도 있어요."
+}

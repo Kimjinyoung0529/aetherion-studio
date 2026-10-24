@@ -1,9 +1,10 @@
-// AETHERION Playground v4: Gemma 4 agent + live artifacts (versioned), files/PDF Q&A, Python (Pyodide), CSV charts, share links,
-// custom instructions & memory, templates, feedback, sentence-chunked TTS, PWA.
+// AETHERION Playground v5: agent chat with branching (edit/regenerate ‹ n/m ›, fork), Intelligence-UI touches (glow, follow-up chips,
+// writing tools on selection), endpoint failover, virtual computer (Docker sandbox), image generation (SDXL-Turbo), model switcher,
+// conversation search & pins, shortcuts, plus v4: live artifacts, files/PDF Q&A, Python (Pyodide), CSV charts, share links, memory, TTS, PWA.
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const LS = { ep: 'ae.endpoint', key: 'ae.key', hist: 'ae.history', convs: 'ae.convs', cur: 'ae.current', theme: 'ae.theme', tools: 'ae.tools', custom: 'ae.custom', mem: 'ae.memory', voice: 'ae.voice', auto: 'ae.autoread', rate: 'ae.rate' };
+  const LS = { ep: 'ae.endpoint', key: 'ae.key', hist: 'ae.history', convs: 'ae.convs', cur: 'ae.current', theme: 'ae.theme', tools: 'ae.tools', custom: 'ae.custom', mem: 'ae.memory', voice: 'ae.voice', auto: 'ae.autoread', rate: 'ae.rate', temp: 'ae.temp', vm: 'ae.vmsid', usevm: 'ae.usevm', sugg: 'ae.sugg', aep: 'ae.activeEp' };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const host = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
   const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '#';
@@ -16,14 +17,16 @@
     play: '<svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg>',
     chev: '<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
     win: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>',
+    fork: '<svg viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 7v10M18 10c0 4-6 3-12 7"/></svg>',
   };
   const TOOLS = {
     web_search: ['🔎', '웹검색'], fetch_url: ['📄', '페이지 읽기'], weather: ['🌤️', '날씨'], calculator: ['🧮', '계산기'],
     datetime: ['🕒', '날짜·시간'], wikipedia: ['📚', '위키백과'], convert: ['💱', '변환'], news: ['📰', '뉴스'], price: ['📈', '시세'], qr: ['🔳', 'QR 코드'],
+    computer_exec: ['🖥️', '가상 컴퓨터 실행'], computer_write_file: ['💾', '파일 저장'], computer_read_file: ['📂', '파일 읽기'],
   };
 
   // ---------- state ----------
-  let convs = [], cur = null, busy = false, ctrl = null, defaultEp = '', art = null;
+  let convs = [], cur = null, busy = false, ctrl = null, defaultEp = '', art = null, eps = [], activeEp = localStorage.getItem('ae.activeEp') || '', lastHealth = null;
   try { convs = JSON.parse(localStorage.getItem(LS.convs) || '[]'); } catch { convs = []; }
   try { // migrate v1 single history
     const old = JSON.parse(localStorage.getItem(LS.hist) || 'null');
@@ -41,7 +44,9 @@
   const conv = () => cur || (cur = { id: uid(), title: '새 대화', ts: Date.now(), msgs: [] }, convs.unshift(cur), cur);
 
   // ---------- UI helpers ----------
-  const endpoint = () => ($('ep').value.trim() || defaultEp).replace(/\/+$/, '');
+  const endpoint = () => ($('ep').value.trim() || activeEp || defaultEp).replace(/\/+$/, '');
+  const keyVal = () => $('key').value.trim();
+  const authH = () => ({ 'Content-Type': 'application/json', Authorization: 'Bearer ' + keyVal() });
   function setStatus(cls, txt) { for (const [d, s] of [['dot', 'stxt'], ['dot2', 'stxt2']]) { $(d).className = 'dot ' + cls; $(s).textContent = txt; } }
   function toast(t, ms) { const e = $('toast'); e.textContent = t; e.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('show'), ms || 1800); }
   async function copy(text, btn) {
@@ -63,12 +68,14 @@
     return t.replace(/\$\$([\s\S]+?)\$\$/g, (_, x) => put(x, true)).replace(/\\\[([\s\S]+?)\\\]/g, (_, x) => put(x, true))
       .replace(/\\\(([\s\S]+?)\\\)/g, (_, x) => put(x, false)).replace(/(^|[^\\$\w])\$([^\s$][^$\n]*?)\$(?!\d)/g, (_, a, x) => a + put(x, false));
   }
+  // mermaid chokes on raw < > inside edge labels (A -->|x < 5| B); use its entity codes instead
+  const fixMermaid = src => src.replace(/\|([^|\n]*)\|/g, (m, l) => '|' + l.replace(/</g, '#lt;').replace(/>/g, '#gt;') + '|');
   async function renderDiagrams(root) {
     const blocks = root.querySelectorAll('.cb[data-lang=mermaid]:not([data-done])'); if (!blocks.length) return;
     try { await loadJs('/assets/vendor/mermaid.min.js'); mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', htmlLabels: false, flowchart: { htmlLabels: false }, theme: document.documentElement.dataset.theme === 'light' ? 'default' : 'dark' }); } catch { return; }
     for (const cb of blocks) {
       cb.dataset.done = 1;
-      try { const { svg } = await mermaid.render('mm' + uid(), cb.querySelector('code').textContent); const d = document.createElement('div'); d.className = 'diagram'; d.innerHTML = svg; /* mermaid securityLevel 'strict' sanitizes labels */ cb.before(d); cb.querySelector('pre').hidden = true; }
+      try { const { svg } = await mermaid.render('mm' + uid(), fixMermaid(cb.querySelector('code').textContent)); const d = document.createElement('div'); d.className = 'diagram'; d.innerHTML = svg; /* mermaid securityLevel 'strict' sanitizes labels */ cb.before(d); cb.querySelector('pre').hidden = true; }
       catch { /* leave code visible */ }
     }
   }
@@ -120,11 +127,12 @@
   // ---------- rendering ----------
   function stepHtml(s) {
     const [ic, nm] = TOOLS[s.name] || ['🛠️', s.name];
-    const arg = s.args?.query || s.args?.url || '';
+    const arg = (s.args?.arg || s.args?.query || s.args?.url || '').split('\n')[0];
     let body = '';
     if (s.error) body = `<div class="sb">⚠️ ${esc(s.error)}</div>`;
     else if (s.results) body = `<div class="sb"><ol>${s.results.length ? s.results.map(x => `<li value="${x.n}"><a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener">${esc(x.title)}</a><span class="host">${esc(host(x.url))}</span></li>`).join('') : '<li>결과 없음</li>'}</ol></div>`;
     else if (s.data?.now) body = `<div class="sb">${esc(s.data.place)} · 지금 ${esc(s.data.now.desc)}<div class="wx"><div><b>${s.data.now.temp}°</b>현재 (체감 ${s.data.now.feels}°)</div>${s.data.days.map(d => `<div><b>${Math.round(d.max)}° / ${Math.round(d.min)}°</b>${esc(d.date.slice(5))} ${esc(d.desc)} · ☔${d.rain}%</div>`).join('')}</div></div>`;
+    else if (s.text && s.name?.startsWith('computer_')) body = `<pre class="sb vm-sb">${esc(s.text.slice(0, 1500))}</pre>`;
     else if (s.text) body = `<div class="sb">${s.url ? `<a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">${esc(s.title || s.url)}</a>\n` : ''}${esc(s.text.slice(0, 600))}</div>`;
     const st = s.error ? '실패' : s.done ? (s.results ? `결과 ${s.results.length}개` : '완료') : '실행 중';
     return `<details class="step ${s.error ? 'err' : s.done ? '' : 'run'}"><summary><span class="sic">${ic}</span><span class="sn">${nm}</span><span class="sa">${esc(arg)}</span><span class="ss">${st}</span>${ICON.chev}</summary>${body}</details>`;
@@ -135,12 +143,12 @@
   function msgEl(m, i) {
     const d = document.createElement('div'); d.className = 'msg ' + (m.role === 'user' ? 'user' : 'bot'); d.dataset.i = i;
     if (m.role === 'user') {
-      d.innerHTML = `<div class="bub"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="edit" title="수정" aria-label="수정">${ICON.edit}</button></div>`;
+      d.innerHTML = `<div class="bub"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="edit" title="수정해서 다시 보내기 (새 분기)" aria-label="수정">${ICON.edit}</button>${bnav(m)}</div>`;
       d.querySelector('.bub').textContent = m.content;
       if (m.doc) { const f = document.createElement('div'); f.className = 'doc-chip'; f.textContent = '📎 ' + m.doc.name + ' · ' + m.doc.text.length.toLocaleString() + '자'; d.prepend(f); }
       if (m.thumbs?.length) { const g = document.createElement('div'); g.className = 'thumbs'; m.thumbs.forEach(u => { const im = new Image(); im.src = u; im.alt = '첨부 이미지'; g.appendChild(im); }); d.prepend(g); }
     } else {
-      d.innerHTML = `<div class="av" aria-hidden="true"><img src="/assets/brand/logo-128.png" alt=""></div><div class="bot-col"><details class="think" hidden><summary>💭 <span class="tl">생각 과정</span></summary><div class="think-body"></div></details><div class="steps"></div><div class="status"></div><div class="md"></div><div class="srcs"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="regen" title="다시 생성" aria-label="다시 생성">${ICON.redo}</button><button type="button" data-act="speak" title="소리내어 읽기" aria-label="소리내어 읽기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button><button type="button" data-act="up" title="좋아요" aria-label="좋은 답변">👍</button><button type="button" data-act="down" title="별로예요" aria-label="아쉬운 답변">👎</button><span class="meta"></span></div></div>`;
+      d.innerHTML = `<div class="av" aria-hidden="true"><img src="/assets/brand/logo-128.png" alt=""></div><div class="bot-col"><details class="think" hidden><summary>💭 <span class="tl">생각 과정</span></summary><div class="think-body"></div></details><div class="steps"></div><div class="status"></div><div class="md"></div><div class="srcs"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="regen" title="다시 생성 (새 분기)" aria-label="다시 생성">${ICON.redo}</button><button type="button" data-act="fork" title="여기까지 새 대화로 분기" aria-label="새 대화로 분기">${ICON.fork}</button><button type="button" data-act="speak" title="소리내어 읽기" aria-label="소리내어 읽기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button><button type="button" data-act="up" title="좋아요" aria-label="좋은 답변">👍</button><button type="button" data-act="down" title="별로예요" aria-label="아쉬운 답변">👎</button>${bnav(m)}<span class="meta"></span></div><div class="sugg"></div></div>`;
       fillBot(d, m, false);
     }
     return d;
@@ -152,6 +160,8 @@
     const body = d.querySelector('.md');
     if (m.error) body.innerHTML = `<div class="err-box">⚠️ ${esc(m.error)}</div>`;
     else { body.innerHTML = md(m.content || '', m.sources, streaming); body.classList.toggle('cursor', !!streaming); }
+    if (m.image) { const fig = document.createElement('figure'); fig.className = 'gen-img'; fig.innerHTML = `<img alt="생성된 이미지" src="${esc(m.image)}"><figcaption>${esc(m.imageCap || '')}</figcaption>`; body.appendChild(fig); }
+    const sg = d.querySelector('.sugg'); if (sg) sg.innerHTML = !streaming && m.sugg?.length ? m.sugg.map(t => `<button type="button" class="schip" data-act="sugg">${esc(t)}</button>`).join('') : '';
     if (!streaming) { decorateArtifacts(body); highlight(body); renderDiagrams(body); }
     d.querySelector('.srcs').innerHTML = streaming ? '' : srcHtml(m.sources);
     d.querySelector('.meta').textContent = m.meta || '';
@@ -163,12 +173,16 @@
     const msgs = cur?.msgs || [];
     msgs.forEach((m, i) => box.appendChild(msgEl(m, i)));
     $('empty').hidden = msgs.length > 0;
-    box.querySelectorAll('.msg.bot .acts [data-act=regen]').forEach((b, k, all) => b.hidden = k !== all.length - 1);
-    box.querySelectorAll('.msg.user .acts [data-act=edit]').forEach((b, k, all) => b.hidden = k !== all.length - 1);
+    box.querySelectorAll('.msg.bot .sugg').forEach((b, k, all) => b.hidden = k !== all.length - 1);
+    updatePin();
     renderConvs(); toBottom(true);
   }
   function renderConvs() {
-    $('convs').innerHTML = convs.filter(c => c.msgs.length).map(c => `<div class="conv${c === cur ? ' on' : ''}" data-id="${c.id}" role="button" tabindex="0"><span class="t">${esc(c.title)}</span><span class="a"><button type="button" data-cact="rename" title="이름 바꾸기" aria-label="이름 바꾸기">${ICON.edit}</button><button type="button" data-cact="del" title="삭제" aria-label="삭제">${ICON.trash}</button></span></div>`).join('') || '<div class="side-label" style="font-weight:400">아직 대화가 없어요</div>';
+    const qq = ($('conv-search').value || '').trim().toLowerCase();
+    const hit = c => !qq || c.title.toLowerCase().includes(qq) || c.msgs.some(m => (m.content || '').toLowerCase().includes(qq));
+    const list = convs.filter(c => c.msgs.length && hit(c)).sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.ts - a.ts);
+    const snip = c => { if (!qq) return ''; const m = c.msgs.find(x => (x.content || '').toLowerCase().includes(qq)); if (!m) return ''; const t = m.content, k = t.toLowerCase().indexOf(qq); return `<small class="snip">…${esc(t.slice(Math.max(0, k - 12), k + 28))}…</small>`; };
+    $('convs').innerHTML = list.map(c => `<div class="conv${c === cur ? ' on' : ''}${c.pinned ? ' pinned' : ''}" data-id="${c.id}" role="button" tabindex="0"><span class="t">${c.pinned ? '📌 ' : ''}${esc(c.title)}${snip(c)}</span><span class="a"><button type="button" data-cact="pin" title="${c.pinned ? '고정 해제' : '고정'}" aria-label="고정">📌</button><button type="button" data-cact="rename" title="이름 바꾸기" aria-label="이름 바꾸기">${ICON.edit}</button><button type="button" data-cact="del" title="삭제" aria-label="삭제">${ICON.trash}</button></span></div>`).join('') || `<div class="side-label" style="font-weight:400">${qq ? '검색 결과가 없어요' : '아직 대화가 없어요'}</div>`;
   }
 
   // ---------- artifact panel ----------
@@ -285,12 +299,15 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (act === 'up' || act === 'down') return feedback(m, i, act, b);
     if (act === 'copy') return copy(m.content, b);
     if (act === 'speak') return speak(m.content, b);
-    if (act === 'regen' && !busy) { cur.msgs.splice(i); renderAll(); return run(); }
+    if (act === 'sugg') return ask(b.textContent);
+    if (act === 'bprev' || act === 'bnext') { if (!busy) switchBranch(i, act === 'bnext' ? 1 : -1); return; }
+    if (act === 'fork') return forkAt(i);
+    if (act === 'regen' && !busy) { const slot = branchPoint(i); cur.msgs.splice(i); sibs(slot).tails.push([]); sibs(slot).cur = sibs(slot).tails.length - 1; run.slot = slot; renderAll(); return run(); }
     if (act === 'edit' && !busy) {
       const bub = msgDiv.querySelector('.bub'); const box = document.createElement('div'); box.className = 'edit-box'; box.style.width = '100%';
       box.innerHTML = `<textarea></textarea><div><button type="button" class="btn sm" data-e="no">취소</button><button type="button" class="btn sm primary" data-e="ok">보내기</button></div>`;
       box.querySelector('textarea').value = m.content; bub.replaceWith(box); msgDiv.querySelector('.acts').hidden = true; box.querySelector('textarea').focus();
-      box.onclick = ev => { const k = ev.target.dataset.e; if (k === 'no') renderAll(); if (k === 'ok') { const v = box.querySelector('textarea').value.trim(); if (!v) return; cur.msgs.splice(i); cur.msgs.push({ role: 'user', content: v }); renderAll(); run(); } };
+      box.onclick = ev => { const k = ev.target.dataset.e; if (k === 'no') renderAll(); if (k === 'ok') { const v = box.querySelector('textarea').value.trim(); if (!v) return; const slot = branchPoint(i); const nm = { role: 'user', content: v, slot, doc: m.doc }; cur.msgs.splice(i); cur.msgs.push(nm); const S = sibs(slot); S.tails.push([nm]); S.cur = S.tails.length - 1; renderAll(); run(); } };
     }
   });
 
@@ -301,6 +318,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   $('convs').addEventListener('click', e => {
     const row = e.target.closest('.conv'); if (!row) return; const c = convs.find(x => x.id === row.dataset.id); if (!c) return;
     const a = e.target.closest('[data-cact]')?.dataset.cact;
+    if (a === 'pin') { c.pinned = !c.pinned; persist(); renderConvs(); updatePin(); return; }
     if (a === 'rename') { const t = prompt('대화 이름', c.title); if (t?.trim()) { c.title = titleOf(t); persist(); renderConvs(); } return; }
     if (a === 'del') { if (!confirm('이 대화를 삭제할까요?')) return; convs = convs.filter(x => x !== c); if (c === cur) cur = null; persist(); renderAll(); return; }
     select(c);
@@ -337,17 +355,6 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   if (/iP(hone|ad|od)/.test(navigator.userAgent) && !navigator.standalone) $('ios-hint').hidden = false;
   $('tools').onchange = () => localStorage.setItem(LS.tools, $('tools').checked ? '1' : '0');
 
-  async function check() {
-    const ep = endpoint();
-    if (!ep) return setStatus('bad', '서버 주소가 없어요');
-    setStatus('wait', '연결 확인 중…');
-    try {
-      const j = await (await fetch(ep + '/health', { signal: AbortSignal.timeout(8000) })).json();
-      if (!j.llm) return setStatus('bad', '모델 서버 꺼짐 · 자동 재시작 중');
-      setStatus('ok', j.busy ? '응답 중' + (j.queue ? ` · 대기 ${j.queue}` : '') : '온라인' + (j.tools ? ` · 도구 ${j.tools.length}개` : ''));
-    } catch { setStatus('bad', '오프라인 (서버 꺼짐 또는 주소 변경)'); }
-  }
-
   // ---------- composer ----------
   const q = $('q');
   const grow = () => { q.style.height = 'auto'; q.style.height = Math.min(q.scrollHeight, 220) + 'px'; $('send').disabled = !busy && !q.value.trim() && !pending.length && !pendingDoc; };
@@ -364,7 +371,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     ['/검색', '웹에서 검색해서 출처와 함께 알려줘: ', '웹검색'], ['/뉴스', '최신 뉴스를 찾아서 정리해줘: ', '뉴스'], ['/시세', '현재 시세를 알려줘: ', '주식·코인'],
     ['/코드', 'CSS와 JS를 포함한 단일 HTML 파일로 만들어줘: ', '미리보기 실행'], ['/번역', '다음 글을 자연스럽게 번역해줘 (한국어면 영어로, 그 외는 한국어로). 번역문만 써줘:\n', '한↔영'],
     ['/요약', '다음 URL이나 글을 읽고 핵심을 5줄로 요약해줘: ', 'URL·글 요약'], ['/수식', '수식은 LaTeX($...$, $$...$$)로 써서 설명해줘: ', 'KaTeX'],
-    ['/다이어그램', 'mermaid 코드 블록(```mermaid)으로 다이어그램을 그려줘: ', 'mermaid'], ['/qr', 'QR 코드를 만들어줘: ', 'QR 코드'], ['/리서치', '', '딥 리서치 모드'], ['/파이썬', '```python 코드 블록으로 작성해줘(브라우저에서 실행돼요): ', 'Python 실행'], ['/기억', '', '나에 대해 기억시키기'],
+    ['/다이어그램', 'mermaid 코드 블록(```mermaid)으로 다이어그램을 그려줘: ', 'mermaid'], ['/qr', 'QR 코드를 만들어줘: ', 'QR 코드'], ['/리서치', '', '딥 리서치 모드'], ['/파이썬', '```python 코드 블록으로 작성해줘(브라우저에서 실행돼요): ', 'Python 실행'], ['/기억', '', '나에 대해 기억시키기'], ['/컴퓨터', '', '가상 컴퓨터에서 실제 실행'], ['/이미지', '', '이미지 생성 (SDXL-Turbo)'],
   ];
   const slashBox = $('slash');
   function hideSlash() { slashBox.hidden = true; }
@@ -378,6 +385,8 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     const m = t.match(/^(\/\S+)\s*([\s\S]*)$/); if (!m) return { text: t };
     if (m[1] === '/리서치') return { text: m[2] || t, mode: 'research' };
     if (m[1] === '/기억') return { text: m[2], remember: true };
+    if (m[1] === '/컴퓨터') { vmOnce = true; return { text: m[2] || t }; }
+    if (m[1] === '/이미지') return { text: m[2], image: true };
     const c = SLASH.find(x => x[0] === m[1]); return c ? { text: c[1] + m[2] } : { text: t };
   }
   // image attach (resized client-side to ≤1024px JPEG)
@@ -523,14 +532,15 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   // mode
   const modeSel = $('mode'); modeSel.value = localStorage.getItem('ae.mode') || 'fast'; modeSel.onchange = () => localStorage.setItem('ae.mode', modeSel.value);
   document.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => ask(b.dataset.q)));
-  function setBusy(v) { busy = v; $('form').classList.toggle('busy', v); $('send').setAttribute('aria-label', v ? '중지' : '전송'); grow(); }
+  function setBusy(v) { busy = v; $('form').classList.toggle('busy', v); document.body.classList.toggle('glow', v); $('send').setAttribute('aria-label', v ? '중지' : '전송'); grow(); }
 
   function ask(raw) {
     if (busy) return;
-    const { text, mode, remember: rem } = expandSlash(raw);
+    const { text, mode, remember: rem, image } = expandSlash(raw);
+    if (image) { openGen(text, !!text.trim()); return; }
     if (rem) { if (text.trim()) remember(text.trim()); else toast('/기억 다음에 기억할 내용을 써 주세요'); return; }
     const c = conv(); if (!c.msgs.length) c.title = titleOf(raw);
-    const um = { role: 'user', content: text };
+    const um = { role: 'user', content: text }; if (vmOnce) { run.vm = true; vmOnce = false; }
     if (pendingDoc) { um.doc = { name: pendingDoc.name, text: pendingDoc.text }; pendingDoc = null; drawPending(); }
     if (pending.length) { um.thumbs = pending.map(p => p.thumb); run.images = pending.map(p => p.full); pending = []; drawPending(); } else run.images = null;
     run.mode = mode || null;
@@ -543,9 +553,10 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (!key) { setStatus('bad', '접속 키를 입력해 주세요'); return openSettings(); }
     setBusy(true);
     const m = { role: 'assistant', content: '', steps: [], sources: [], status: '연결 중…', thinking: '' };
-    const mode = run.mode || (modeSel.value === 'research' ? 'research' : null), images = run.images; run.mode = run.images = null;
+    const mode = run.mode || (modeSel.value === 'research' ? 'research' : null), images = run.images, useVm = run.vm || $('use-vm').checked; run.mode = run.images = run.vm = null;
+    if (run.slot) { m.slot = run.slot; run.slot = null; }
     let artifact = null;
-    const history = c.msgs.map(({ role, content, doc }) => ({ role, content: doc ? `[첨부 파일: ${doc.name}]\n<문서 시작>\n${doc.text}\n<문서 끝>\n\n${content}` : content }));
+    const history = c.msgs.map(({ role, content, doc, image, imageCap }) => ({ role, content: image ? `[이미지를 생성해 보여줌: ${imageCap || ''}]` : doc ? `[첨부 파일: ${doc.name}]\n<문서 시작>\n${doc.text}\n<문서 끝>\n\n${content}` : content }));
     liveCode = ''; liveT = 0; let idle = 0; const IDLE_MS = mode === 'research' ? 240000 : 120000; let timedOut = false;
     const kick = () => { clearTimeout(idle); idle = setTimeout(() => { timedOut = true; ctrl?.abort(); }, IDLE_MS); };
     c.msgs.push(m); const i = c.msgs.length - 1;
@@ -554,8 +565,8 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     const schedule = () => { if (!raf) raf = requestAnimationFrame(paint); };
     ctrl = new AbortController(); kick();
     try {
-      const r = await fetch(ep + '/api/chat', { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
-        body: JSON.stringify({ messages: history, tools: $('tools').checked, think: modeSel.value === 'think', mode, images: images || undefined, custom: customText() || undefined }) });
+      const r = await fetchFailover('/api/chat', { method: 'POST', signal: ctrl.signal, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+        body: JSON.stringify({ messages: history, tools: $('tools').checked, think: modeSel.value === 'think', mode, images: images || undefined, custom: customText() || undefined, temperature: +($('temp').value || 0.6), computer: useVm || undefined, sid: useVm ? vmSid() : undefined, computer_net: useVm && $('vm-net').checked || undefined }) });
       if (!r.ok) throw new Error(r.status === 401 ? '접속 키가 올바르지 않아요. 연결 설정에서 키를 확인해 주세요.' : r.status === 429 ? '요청이 너무 많아요. 1분 뒤 다시 시도해 주세요.' : '서버 오류 ' + r.status);
       const rd = r.body.getReader(), dec = new TextDecoder(); let buf = '';
       for (;;) {
@@ -576,10 +587,12 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
         }
       }
       if (!m.content.trim()) m.error = '빈 응답이 왔어요. 다시 생성해 보세요.';
+      else if (localStorage.getItem(LS.sugg) !== '0' && !mode) suggestFor(c, m);
     } catch (err) {
       if (timedOut) { m.meta = '시간 초과'; if (!m.content) m.error = `응답이 ${IDLE_MS / 60000}분 넘게 없어서 멈췄어요. 서버가 바쁘거나 꺼졌을 수 있어요. 잠시 뒤 다시 생성해 보세요.`; }
       else if (err.name === 'AbortError') m.meta = '중지됨';
       else if (err.code === 'model_down') m.error = '모델 서버가 꺼져 있어요. 자동으로 다시 켜는 중이니 1~2분 뒤 다시 시도해 주세요.';
+      else if (m.content && (err.message === 'Failed to fetch' || err.name === 'TypeError' || /network|terminated/i.test(err.message))) { m.meta = '연결이 끊겨 답변이 중간에 멈췄어요 · 다시 생성을 눌러 주세요'; }
       else if (!m.content) m.error = err.message === 'Failed to fetch' || err.name === 'TypeError' ? '서버에 연결할 수 없어요. 서버가 꺼져 있거나 주소가 바뀌었을 수 있어요. 연결 설정에서 주소를 확인하고, 상태 페이지(/status/)도 확인해 보세요.' : err.message;
       check();
     } finally {
@@ -597,6 +610,247 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     }
   }
 
+  // ================= v5 =================
+  let vmOnce = false;
+  window.__ae = { fixMermaid };
+  // ---- branching: each branch point (slot) keeps alternative tails; ‹ k/n › swaps them ----
+  function sibs(slot) { cur.sibs = cur.sibs || {}; return cur.sibs[slot] || (cur.sibs[slot] = { tails: [], cur: 0 }); }
+  function branchPoint(i) { // make msgs[i] a branch point; store the current tail as alternative #0 if new
+    const m = cur.msgs[i]; if (!m.slot) m.slot = uid();
+    const S = sibs(m.slot); const tail = clone(cur.msgs.slice(i));
+    if (!S.tails.length) S.tails.push(tail); else S.tails[S.cur] = tail;
+    return m.slot;
+  }
+  const clone = o => JSON.parse(JSON.stringify(o));
+  function bnav(m) {
+    const S = m.slot && cur?.sibs?.[m.slot]; if (!S || S.tails.length < 2) return '';
+    return `<span class="bnav" title="다른 버전 보기"><button type="button" data-act="bprev" aria-label="이전 버전"${S.cur ? '' : ' disabled'}>‹</button><span>${S.cur + 1}/${S.tails.length}</span><button type="button" data-act="bnext" aria-label="다음 버전"${S.cur < S.tails.length - 1 ? '' : ' disabled'}>›</button></span>`;
+  }
+  function switchBranch(i, dir) {
+    const m = cur.msgs[i], S = sibs(m.slot), n = S.cur + dir; if (n < 0 || n >= S.tails.length) return;
+    S.tails[S.cur] = clone(cur.msgs.slice(i)); S.cur = n; cur.msgs.splice(i, Infinity, ...clone(S.tails[n]));
+    persist(); renderAll();
+  }
+  function forkAt(i) {
+    if (busy) return; const src = cur;
+    const nc = { id: uid(), title: titleOf('↳ ' + src.title.replace(/^↳\s*/, '')), ts: Date.now(), msgs: clone(src.msgs.slice(0, i + 1)).map(x => (delete x.slot, x)), forkOf: src.id };
+    convs.unshift(nc); persist(); select(nc); toast('여기까지 복사해 새 대화로 분기했어요');
+  }
+  // ---- endpoint failover ----
+  const epList = () => { const man = $('ep').value.trim().replace(/\/+$/, ''); return man ? [man] : [...new Set([activeEp, ...eps.map(e => e.url), defaultEp].filter(Boolean))]; };
+  const epLabel = u => eps.find(e => e.url === u)?.label || (u ? new URL(u).host : '');
+  function useEp(u) { if ($('ep').value.trim()) return; activeEp = u; localStorage.setItem(LS.aep, u); renderEps(); }
+  async function fetchFailover(path, opts) {
+    const list = epList(); let lastErr;
+    for (const [k, ep] of list.entries()) {
+      try { const r = await fetch(ep + path, opts); if (k) { useEp(ep); toast('예비 주소로 전환했어요: ' + epLabel(ep), 2600); } return r; }
+      catch (e) { lastErr = e; if (e.name === 'AbortError' || opts.signal?.aborted) throw e; }
+    }
+    throw lastErr || new Error('Failed to fetch');
+  }
+  async function probe(ep) { const t = performance.now(); const j = await (await fetch(ep + '/health', { signal: AbortSignal.timeout(7000), cache: 'no-store' })).json(); return { j, ms: Math.round(performance.now() - t) }; }
+  const health = {};
+  function renderEps() {
+    const el = $('ep-list'); if (!el) return;
+    el.innerHTML = epList().map(u => `<li class="${u === endpoint() ? 'on' : ''}"><span class="dot ${health[u]?.ok ? 'ok' : health[u] ? 'bad' : 'wait'}"></span><b>${esc(epLabel(u))}</b><small>${health[u]?.ok ? health[u].ms + 'ms' : health[u] ? '응답 없음' : '확인 전'}</small>${u === endpoint() ? '<em>사용 중</em>' : ''}</li>`).join('');
+  }
+  async function check() {
+    const list = epList();
+    if (!list.length) return setStatus('bad', '서버 주소가 없어요');
+    if (!navigator.onLine) return setStatus('bad', '인터넷 연결이 끊겼어요');
+    setStatus('wait', '연결 확인 중…');
+    for (const ep of list) {
+      try {
+        const { j, ms } = await probe(ep); health[ep] = { ok: true, ms }; lastHealth = j; useEp(ep);
+        applyHealth(j);
+        const where = list.length > 1 || eps.length > 1 ? ' · ' + epLabel(ep).replace(/\s*\(.*\)/, '') : '';
+        const ph = j.engine?.phase;
+        if (ph === 'image') setStatus('wait', '그림 그리는 중 · 채팅은 잠시 대기' + where);
+        else if (ph === 'switching' || ph === 'reloading') setStatus('wait', '모델 불러오는 중' + where);
+        else if (!j.llm) setStatus('bad', '모델 서버 꺼짐 · 자동 재시작 중' + where);
+        else setStatus('ok', (j.busy ? '응답 중' + (j.queue ? ` · 대기 ${j.queue}` : '') : '온라인') + where);
+        renderEps(); return;
+      } catch { health[ep] = { ok: false }; }
+    }
+    renderEps(); setStatus('bad', '오프라인 (모든 서버 주소가 응답 없음)');
+  }
+  function applyHealth(j) { if (j.model) $('chip-name').textContent = j.model.replace(/^Google\s+/, ''); }
+  // offline banner
+  function netBanner() { const b = $('net-banner'); if (navigator.onLine) { if (!b.hidden) { b.hidden = true; check(); } } else { b.textContent = '📡 인터넷 연결이 끊겼어요. 다시 연결되면 자동으로 이어서 확인해요.'; b.hidden = false; setStatus('bad', '인터넷 연결이 끊겼어요'); } }
+  addEventListener('online', netBanner); addEventListener('offline', netBanner); netBanner();
+
+  // ---- popover menus (+ and ⋯) ----
+  function bindPop(btnId, menuId) {
+    const b = $(btnId), m = $(menuId);
+    b.addEventListener('click', e => { e.stopPropagation(); const open = m.hidden; closePops(); m.hidden = !open; b.setAttribute('aria-expanded', String(open)); });
+    m.addEventListener('click', e => { if (e.target.closest('button')) closePops(); });
+  }
+  function closePops() { document.querySelectorAll('.pop').forEach(p => p.hidden = true); document.querySelectorAll('[aria-haspopup=menu]').forEach(b => b.setAttribute('aria-expanded', 'false')); }
+  document.addEventListener('click', e => { if (!e.target.closest('.pop')) closePops(); });
+  bindPop('plus', 'plus-menu'); bindPop('more', 'more-menu');
+  $('settings-open2').onclick = () => openSettings();
+  $('model-chip').onclick = () => { openSettings(); stab('model'); };
+  function updatePin() { $('pin-cur-t').textContent = cur?.pinned ? '고정 해제' : '고정하기'; $('pin-cur').disabled = !cur?.msgs.length; }
+  $('pin-cur').onclick = () => { if (!cur) return; cur.pinned = !cur.pinned; persist(); renderConvs(); updatePin(); toast(cur.pinned ? '대화를 고정했어요' : '고정을 풀었어요'); };
+  // tool badges next to + so active tools stay visible
+  function badges() { $('tool-badges').innerHTML = ($('tools').checked ? '<span class="tb" title="웹 도구 켜짐">🔎 도구</span>' : '') + ($('use-vm').checked ? '<span class="tb vm" title="가상 컴퓨터 켜짐">🖥️ 컴퓨터</span>' : ''); }
+  $('use-vm').checked = localStorage.getItem(LS.usevm) === '1';
+  $('use-vm').addEventListener('change', () => { localStorage.setItem(LS.usevm, $('use-vm').checked ? '1' : '0'); badges(); });
+  $('tools').addEventListener('change', badges); badges();
+
+  // ---- settings tabs, temperature, follow-ups ----
+  function stab(id) { document.querySelectorAll('.stab').forEach(t => t.classList.toggle('on', t.dataset.st === id)); document.querySelectorAll('.spane').forEach(p => p.hidden = p.dataset.sp !== id); if (id === 'model') loadModels(); if (id === 'conn') renderEps(); }
+  document.querySelector('.stabs').addEventListener('click', e => { const t = e.target.closest('.stab'); if (t) stab(t.dataset.st); });
+  $('temp').value = localStorage.getItem(LS.temp) || '0.6'; $('temp-v').textContent = $('temp').value;
+  $('temp').oninput = () => { $('temp-v').textContent = $('temp').value; localStorage.setItem(LS.temp, $('temp').value); };
+  $('sugg-on').checked = localStorage.getItem(LS.sugg) !== '0'; $('sugg-on').onchange = () => localStorage.setItem(LS.sugg, $('sugg-on').checked ? '1' : '0');
+
+  async function suggestFor(c, m) {
+    const ep = endpoint(), key = keyVal(); if (!ep || !key) return;
+    const qm = [...c.msgs].reverse().find(x => x.role === 'user');
+    try {
+      const r = await fetch(ep + '/api/suggest', { method: 'POST', headers: authH(), body: JSON.stringify({ q: (qm?.content || '').slice(0, 800), a: (m.content || '').slice(0, 1500) }), signal: AbortSignal.timeout(30000) });
+      if (!r.ok) return; const j = await r.json();
+      const list = (j.suggestions || []).filter(t => typeof t === 'string' && t.trim()).slice(0, 3);
+      if (!list.length || busy) return; m.sugg = list; persist();
+      if (cur === c && c.msgs[c.msgs.length - 1] === m) renderAll();
+    } catch {}
+  }
+
+  // ---- model switcher ----
+  async function loadModels() {
+    const ep = endpoint(), key = keyVal(), box = $('model-list');
+    if (!ep || !key) { box.innerHTML = '<p class="muted">접속 키를 넣고 연결하면 목록이 보여요.</p>'; return; }
+    try {
+      const j = await (await fetch(ep + '/api/models', { headers: authH(), signal: AbortSignal.timeout(8000) })).json();
+      box.innerHTML = j.models.map(md_ => `<button type="button" class="mopt${md_.id === j.current ? ' on' : ''}" data-mid="${esc(md_.id)}"${j.phase !== 'ready' ? ' disabled' : ''}><b>${esc(md_.label || md_.name)}</b><small>${esc(md_.note || '')}${md_.vision ? ' · 이미지 이해' : ''}</small><small class="lic">${esc(md_.license || '')}</small>${md_.id === j.current ? '<em>사용 중</em>' : ''}</button>`).join('')
+        + (j.image ? `<p class="muted">이미지 생성: ${esc(j.image.label || j.image.name || '')}</p>` : '');
+    } catch { box.innerHTML = '<p class="muted">모델 목록을 못 불러왔어요 (키나 연결을 확인해 주세요).</p>'; }
+  }
+  $('model-list').addEventListener('click', async e => {
+    const b = e.target.closest('.mopt'); if (!b || b.classList.contains('on') || busy) return;
+    if (!confirm('모델을 바꿀까요? 바꾸는 동안(보통 몇 초) 채팅이 잠시 멈춰요.')) return;
+    $('model-list').querySelectorAll('.mopt').forEach(x => x.disabled = true);
+    await sse('/api/models', { id: b.dataset.mid }, ev => {
+      if (ev.type === 'progress') toast('모델 전환: ' + ({ queued: '대기 중', unload: '기존 모델 내리는 중', load: '새 모델 불러오는 중' }[ev.stage] || ev.stage), 60000);
+      if (ev.type === 'done') toast(`모델을 바꿨어요 (${((ev.ms || 0) / 1000).toFixed(1)}초)`, 3000);
+      if (ev.type === 'error') toast('모델 전환 실패: ' + ev.message, 4000);
+    });
+    loadModels(); check();
+  });
+  // generic SSE POST reader for /api/models and /api/image
+  async function sse(path, body, on, signal) {
+    try {
+      const r = await fetch(endpoint() + path, { method: 'POST', headers: authH(), body: JSON.stringify(body), signal });
+      if (!r.ok || !r.body) { let msg = 'HTTP ' + r.status; try { msg = (await r.json()).error || msg; } catch {} on({ type: 'error', message: msg }); return; }
+      const rd = r.body.getReader(), dec = new TextDecoder(); let buf = '';
+      for (;;) {
+        const { value, done } = await rd.read(); if (done) break; buf += dec.decode(value, { stream: true });
+        let k; while ((k = buf.indexOf('\n\n')) >= 0) { const chunk = buf.slice(0, k); buf = buf.slice(k + 2); const line = chunk.split('\n').find(l => l.startsWith('data:')); if (!line) continue; try { on(JSON.parse(line.slice(5))); } catch {} }
+      }
+    } catch (e) { if (e.name !== 'AbortError') on({ type: 'error', message: '연결이 끊겼어요' }); }
+  }
+
+  // ---- image generation ----
+  let genCtrl = null;
+  function openGen(prompt, auto) { closePops(); if (prompt) $('gen-p').value = prompt; const d = $('gen'); d.showModal ? d.showModal() : d.setAttribute('open', ''); if (auto) $('gen-go').click(); else $('gen-p').focus(); }
+  $('gen-btn').onclick = () => openGen(); $('gen-open2').onclick = () => openGen();
+  $('gen').addEventListener('close', () => { /* keep running in background; result lands in chat */ });
+  $('gen-go').onclick = async () => {
+    const prompt = $('gen-p').value.trim(); if (!prompt) return $('gen-p').focus();
+    if (!keyVal()) { toast('설정에서 접속 키를 먼저 넣어 주세요'); return; }
+    if (genCtrl) return;
+    const steps = +$('gen-steps').value, size = +$('gen-size').value;
+    const c = conv(); if (c.title === '새 대화') c.title = titleOf('🎨 ' + prompt);
+    c.msgs.push({ role: 'user', content: '/이미지 ' + prompt });
+    const m = { role: 'assistant', content: '', imageCap: prompt, meta: '' }; c.msgs.push(m); c.ts = Date.now(); persist(); renderAll();
+    const box = $('msgs').lastElementChild, setProg = (pct, t) => { $('gen-prog').hidden = false; $('gen-bar').style.width = pct + '%'; $('gen-txt').textContent = t; m.content = '🎨 ' + t; fillBot(box, m, true); };
+    genCtrl = new AbortController(); $('gen-go').disabled = true; document.body.classList.add('glow');
+    setProg(2, '요청 보내는 중…'); const t0 = performance.now();
+    await sse('/api/image', { prompt, steps, size }, ev => {
+      if (ev.type === 'progress') {
+        if (ev.stage === 'queued') setProg(3, `대기 중${ev.ahead ? ` (앞에 ${ev.ahead}개)` : ''}…`);
+        else if (ev.stage === 'unload') setProg(8, '언어 모델을 잠시 내려 메모리 확보 중…');
+        else if (ev.stage === 'load') setProg(15, '그림 모델 불러오는 중…');
+        else if (ev.stage === 'sampling') setProg(20 + 55 * (ev.step || 0) / (ev.steps || steps), `그리는 중 ${ev.step || 0}/${ev.steps || steps}단계…`);
+        else if (ev.stage === 'decode') setProg(80, '이미지로 변환(디코딩) 중…');
+        else if (ev.stage === 'reload') setProg(95, '언어 모델 다시 올리는 중…');
+      } else if (ev.type === 'done') {
+        const t = ev.timings || {}; const sec = v => v != null ? (v / 1000).toFixed(1) + '초' : '-';
+        m.content = ''; m.meta = `SDXL-Turbo · ${size}px · ${steps}단계 · 그리기 ${sec(t.sample_ms)} · 변환 ${sec(t.decode_ms)} · 전체 ${sec(t.total_ms || (performance.now() - t0))}`;
+        toJpeg(ev.image).then(u => { m.image = u; persist(); renderAll(); });
+        setProg(100, '완료 · ' + m.meta);
+      } else if (ev.type === 'error') { m.content = ''; m.error = '이미지 생성 실패: ' + ev.message; persist(); renderAll(); $('gen-txt').textContent = m.error; }
+    }, genCtrl.signal);
+    genCtrl = null; $('gen-go').disabled = false; document.body.classList.remove('glow'); c.ts = Date.now(); persist(); check();
+  };
+  function toJpeg(dataUrl) { return new Promise(res => { const im = new Image(); im.onload = () => { const cv = document.createElement('canvas'); cv.width = im.width; cv.height = im.height; cv.getContext('2d').drawImage(im, 0, 0); res(cv.toDataURL('image/jpeg', 0.86)); }; im.onerror = () => res(dataUrl); im.src = dataUrl; }); }
+
+  // ---- virtual computer panel ----
+  function vmSid() { let s = localStorage.getItem(LS.vm); if (!/^[a-z0-9]{16}$/.test(s || '')) { s = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => 'abcdefghijklmnopqrstuvwxyz0123456789'[b % 36]).join(''); localStorage.setItem(LS.vm, s); } return s; }
+  async function vmApi(op, extra) {
+    const r = await fetch(endpoint() + '/api/computer', { method: 'POST', headers: authH(), body: JSON.stringify({ sid: vmSid(), op, net: $('vm-net').checked, ...extra }), signal: AbortSignal.timeout(90000) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status); return j;
+  }
+  const vmOut = t => { const o = $('vm-out'); o.textContent += t; if (o.textContent.length > 40000) o.textContent = o.textContent.slice(-30000); o.scrollTop = o.scrollHeight; };
+  async function vmFiles() { try { const j = await vmApi('list'); const fs = (j.files || []).filter(f => f.type === 'file').map(f => f.path.replace(/^\/home\/agent\/work\//, '')).slice(0, 40); $('vm-files').innerHTML = fs.length ? fs.map(f => `<button type="button" class="vf" data-f="${esc(f)}">📄 ${esc(f)}</button>`).join('') : '<small class="muted">~/work 비어 있음</small>'; } catch {} }
+  async function openVm() {
+    closePops(); const d = $('vm'); d.showModal ? d.showModal() : d.setAttribute('open', '');
+    if (!keyVal()) { $('vm-st').textContent = '· 접속 키 필요'; return; }
+    $('vm-st').textContent = '· 연결 중…';
+    try { const j = await vmApi('status'); $('vm-st').textContent = j.available ? '· 준비됨 (첫 명령 때 켜져요)' : '· 서버에 가상 컴퓨터가 없어요'; vmFiles(); } catch (e) { $('vm-st').textContent = '· ' + e.message; }
+    $('vm-cmd').focus();
+  }
+  $('vm-btn').onclick = openVm; $('vm-open2').onclick = openVm;
+  async function vmRun() {
+    const cmd = $('vm-cmd').value.trim(); if (!cmd) return; $('vm-cmd').value = ''; vmOut('$ ' + cmd + '\n'); $('vm-run').disabled = true;
+    try { const j = await vmApi('exec', { cmd }); const o = (j.stdout || '') + (j.stderr || ''); vmOut(o + (o && !o.endsWith('\n') ? '\n' : '') + (j.exit ? `[종료 코드 ${j.exit}]\n` : '') + (j.truncated ? '[출력이 길어 잘렸어요]\n' : '')); $('vm-st').textContent = '· 켜짐'; vmFiles(); }
+    catch (e) { vmOut('[오류] ' + e.message + '\n'); }
+    $('vm-run').disabled = false; $('vm-cmd').focus();
+  }
+  $('vm-run').onclick = vmRun;
+  $('vm-cmd').addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); vmRun(); } });
+  $('vm-reset').onclick = async () => { if (!confirm('가상 컴퓨터를 초기화할까요? ~/work 파일이 모두 지워져요.')) return; try { await vmApi('reset'); $('vm-out').textContent = ''; vmOut('초기화했어요.\n'); vmFiles(); } catch (e) { vmOut('[오류] ' + e.message + '\n'); } };
+  $('vm-files').addEventListener('click', async e => { const f = e.target.closest('.vf')?.dataset.f; if (!f) return; try { const j = await vmApi('read', { path: f }); vmOut(`--- ${f} ---\n${j.content ?? ''}\n`); } catch (er) { vmOut('[오류] ' + er.message + '\n'); } });
+
+  // ---- writing tools on selected answer text ----
+  const W = { explain: '다음 부분을 더 자세히 설명해줘', summary: '다음 부분을 3줄로 요약해줘', simple: '다음 부분을 중학생도 이해하게 쉽게 풀어줘', polish: '다음 글을 자연스럽고 매끄럽게 다듬어줘', translate: '다음 부분을 번역해줘 (한국어면 영어로, 그 외는 한국어로)', ask: '' };
+  let selText = '', selTimer = 0;
+  document.addEventListener('selectionchange', () => {
+    clearTimeout(selTimer);
+    selTimer = setTimeout(() => {
+      const s = getSelection(), t = s?.toString().trim() || '', tb = $('seltools');
+      const inMd = s?.rangeCount && s.anchorNode && s.anchorNode.parentElement?.closest('.msg .md');
+      if (!t || t.length < 2 || !inMd) { tb.hidden = true; return; }
+      selText = t;
+      const r = s.getRangeAt(0).getBoundingClientRect(); tb.hidden = false;
+      const w = tb.offsetWidth; tb.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+      tb.style.top = (r.top > 60 ? r.top - 46 : r.bottom + 8) + 'px';
+    }, 180);
+  });
+  $('seltools').addEventListener('mousedown', e => e.preventDefault());
+  $('seltools').addEventListener('click', e => {
+    const k = e.target.closest('[data-w]')?.dataset.w; if (!k) return; const t = String(selText).slice(0, 2000); $('seltools').hidden = true; getSelection()?.removeAllRanges();
+    const quote = '> ' + t.replace(/\n/g, '\n> ');
+    if (k === 'ask') { q.value = quote + '\n\n'; grow(); q.focus(); return; }
+    if (busy) return toast('답변이 끝난 뒤에 써 주세요'); ask(W[k] + ':\n\n' + quote);
+  });
+
+  // ---- sidebar search + shortcuts ----
+  $('conv-search').addEventListener('input', renderConvs);
+  $('conv-search').addEventListener('keydown', e => { if (e.key === 'Escape') { $('conv-search').value = ''; renderConvs(); q.focus(); } if (e.key === 'Enter') $('convs').querySelector('.conv')?.click(); });
+  const openKeys = () => { closePops(); const d = $('keys'); d.showModal ? d.showModal() : d.setAttribute('open', ''); };
+  $('keys-open').onclick = openKeys;
+  document.addEventListener('keydown', e => {
+    const mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
+    if (mod && k === 'k') { e.preventDefault(); if (isMobile()) app.classList.add('side-open'); else app.classList.remove('side-hidden'); $('conv-search').focus(); $('conv-search').select(); }
+    else if (mod && e.shiftKey && k === 'o') { e.preventDefault(); newChat(); }
+    else if (mod && k === ',') { e.preventDefault(); openSettings(); }
+    else if (mod && k === '/') { e.preventDefault(); openKeys(); }
+    else if (mod && e.shiftKey && k === 'c') { const last = [...(cur?.msgs || [])].reverse().find(m => m.role === 'assistant' && m.content); if (last) { e.preventDefault(); navigator.clipboard?.writeText(last.content).then(() => toast('마지막 답변을 복사했어요')); } }
+    else if (e.key === 'Escape') { closePops(); $('seltools').hidden = true; if (busy && !document.querySelector('dialog[open]')) ctrl?.abort(); }
+  });
+
   // ---------- PWA ----------
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js').catch(() => {});
   // ---------- boot ----------
@@ -605,5 +859,10 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   if (isMobile()) app.classList.remove('side-hidden');
   window.addEventListener('load', () => { renderAll(); grow(); });
   drawMem(); renderAll(); grow();
-  fetch('/config/endpoint.json', { cache: 'no-store' }).then(r => r.json()).then(j => { defaultEp = j.endpoint || ''; if (defaultEp) $('ep').placeholder = defaultEp; }).catch(() => {}).finally(check);
+  fetch('/config/endpoint.json', { cache: 'no-store' }).then(r => r.json()).then(j => {
+    defaultEp = j.endpoint || ''; eps = (j.endpoints || []).map(e => ({ url: String(e.url || '').replace(/\/+$/, ''), label: e.label || '' })).filter(e => /^https:\/\//.test(e.url));
+    if (!eps.length && defaultEp) eps = [{ url: defaultEp, label: '기본' }];
+    if (activeEp && !eps.some(e => e.url === activeEp)) activeEp = '';
+    if (defaultEp) $('ep').placeholder = defaultEp + ' (자동)';
+  }).catch(() => {}).finally(() => { check(); setInterval(() => { if (!busy && document.visibilityState === 'visible') check(); }, 60000); });
 })();
