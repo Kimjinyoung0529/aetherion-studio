@@ -6,7 +6,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIR = join(ROOT, 'content/posts'), SITE = 'https://hii.o-r.kr';
-const TYPES = { patch: '패치 노트', blog: '블로그', event: '이벤트' };
+const TYPES = { patch: '패치 노트', blog: '블로그', event: '이벤트', notice: '공지' };
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const inline = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
   .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, t, u) => /^(https?:\/\/|\/)/.test(u.replace(/&amp;/g, '&')) ? `<a href="${u}"${u.startsWith('http') ? ' rel="noopener"' : ''}>${t}</a>` : t);
@@ -29,16 +29,17 @@ export function parse(file, raw) {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/); if (!m) throw Error(file + ': missing front-matter');
   const fm = Object.fromEntries(m[1].split('\n').filter(Boolean).map(l => { const i = l.indexOf(':'); return [l.slice(0, i).trim(), l.slice(i + 1).trim()]; }));
   for (const k of ['type', 'title', 'date', 'summary']) if (!fm[k]) throw Error(`${file}: front-matter "${k}" is required`);
-  if (!TYPES[fm.type]) throw Error(`${file}: type must be patch|blog|event`);
+  if (!TYPES[fm.type]) throw Error(`${file}: type must be patch|blog|event|notice`);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(fm.date)) throw Error(`${file}: date must be YYYY-MM-DD`);
   if (fm.type === 'patch') { for (const s of ['신규', '개선', '수정', '알려진 문제']) if (!new RegExp('^## ' + s + '\\s*$', 'm').test(m[2])) throw Error(`${file}: patch note needs "## ${s}" section`); if (!/AETHERION 팀/.test(m[2])) throw Error(`${file}: patch note must be signed "AETHERION 팀"`); }
   const slug = file.replace(/\.md$/, '');
-  return { slug, type: fm.type, type_label: TYPES[fm.type], title: fm.title, date: fm.date, version: fm.version || null, summary: fm.summary, url: `/news/post/?p=${slug}`, html: md(m[2].trim()) };
+  return { slug, type: fm.type, type_label: TYPES[fm.type], title: fm.title, date: fm.date, version: fm.version || null, pinned: fm.pinned === 'true', summary: fm.summary, url: `/news/post/?p=${slug}`, html: md(m[2].trim()) };
 }
 const vnum = p => +(p.version || 'v0').replace(/\D/g, '') || 0;
 function build() {
   const posts = readdirSync(DIR).filter(f => f.endsWith('.md')).map(f => parse(f, readFileSync(join(DIR, f), 'utf8')))
-    .sort((a, b) => b.date.localeCompare(a.date) || vnum(b) - vnum(a) || a.type.localeCompare(b.type) || b.slug.localeCompare(a.slug));
+    
+    .sort((a, b) => (b.pinned - a.pinned) || b.date.localeCompare(a.date) || vnum(b) - vnum(a) || a.type.localeCompare(b.type) || b.slug.localeCompare(a.slug));
   const index = JSON.stringify({ generated_from: 'content/posts', count: posts.length, posts }, null, 1) + '\n';
   const rfc = d => new Date(d + 'T09:00:00+09:00').toUTCString();
   const feed = `<?xml version="1.0" encoding="UTF-8"?>
