@@ -23,6 +23,8 @@
 <link rel="stylesheet" href="/assets/vendor/lenis.css">
 <link rel="stylesheet" href="/assets/v17.css?v=1">
 <link rel="stylesheet" href="/assets/v18.css?v=1">
+<link rel="stylesheet" href="/assets/vendor/driver.min.css">
+<link rel="stylesheet" href="/assets/v19.css?v=1">
 </head>
 <body class="pg">
 <a class="skip" href="#q">입력창으로 바로가기</a>
@@ -63,8 +65,8 @@
             <button type="button" role="menuitem" id="vm-open2"><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg> 가상 컴퓨터</button>
             <button type="button" role="menuitem" id="gen-open2"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 생성</button>
             <div class="pop-h">앱</div>
-            <button type="button" role="menuitem" id="keys-open">⌨ 단축키 <kbd>Ctrl /</kbd></button>
-            <button type="button" role="menuitem" id="settings-open2">≡ 설정</button>
+            <button type="button" role="menuitem" id="keys-open"><svg class="ic" aria-hidden="true"><use href="#i-keyboard"/></svg> 단축키 <kbd>Ctrl /</kbd></button>
+            <button type="button" role="menuitem" id="settings-open2"><svg class="ic" aria-hidden="true"><use href="#i-settings-2"/></svg> 설정</button>
           </div>
         </div>
       </div>
@@ -103,7 +105,7 @@
             <div class="pop up" id="plus-menu" role="menu" hidden>
               <div class="pop-h">첨부</div>
               <button type="button" role="menuitem" id="img-btn"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 첨부</button><input type="file" id="img-in" accept="image/*" multiple hidden>
-              <button type="button" role="menuitem" id="file-btn">+ 파일 · PDF 첨부</button><input type="file" id="file-in" accept=".pdf,.txt,.md,.csv,.tsv,.json,.js,.ts,.py,.html,.css,.java,.c,.cpp,.go,.rs,.sql,.xml,.yaml,.yml,application/pdf,text/*" hidden>
+              <button type="button" role="menuitem" id="file-btn"><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> 파일 · PDF 첨부</button><input type="file" id="file-in" accept=".pdf,.txt,.md,.csv,.tsv,.json,.js,.ts,.py,.html,.css,.java,.c,.cpp,.go,.rs,.sql,.xml,.yaml,.yml,application/pdf,text/*" hidden>
               <button type="button" role="menuitem" id="tpl-btn"><svg class="ic" aria-hidden="true"><use href="#i-layout-panel-top"/></svg> 템플릿</button>
               <div class="pop-h">만들기</div>
               <button type="button" role="menuitem" id="gen-btn"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 생성</button>
@@ -124,6 +126,7 @@
             </div>
           </div>
           <span class="tool-badges" id="tool-badges"></span>
+          <button class="ic sm" id="voice-mode" type="button" title="음성 대화" aria-label="음성 대화 시작"><svg class="ic" aria-hidden="true"><use href="#i-audio-lines"/></svg></button>
           <button class="ic sm" id="mic" type="button" title="음성 입력" aria-label="음성 입력"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></button>
           <select id="mode" class="mode" aria-label="응답 모드"><option value="fast">빠른 답변</option><option value="think">생각하기</option><option value="research">딥 리서치</option></select>
           <span class="hint">Enter 전송 · / 명령어 · Ctrl / 단축키</span>
@@ -214,7 +217,7 @@
 </dialog>
 <dialog class="dlg" id="keys">
   <form method="dialog" class="dlg-in">
-    <h2>⌨ 단축키</h2>
+    <h2>단축키</h2>
     <dl class="keys"><dt><kbd>Ctrl</kbd>+<kbd>K</kbd></dt><dd>대화 검색</dd><dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>O</kbd></dt><dd>새 대화</dd><dt><kbd>Ctrl</kbd>+<kbd>,</kbd></dt><dd>설정</dd><dt><kbd>Ctrl</kbd>+<kbd>/</kbd></dt><dd>단축키 보기</dd><dt><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>C</kbd></dt><dd>마지막 답변 복사</dd><dt><kbd>Esc</kbd></dt><dd>생성 중지 · 메뉴 닫기</dd><dt><kbd>/</kbd></dt><dd>명령어</dd><dt><kbd>Shift</kbd>+<kbd>Enter</kbd></dt><dd>줄바꿈</dd></dl>
     <p class="muted">Mac은 Ctrl 대신 ⌘.</p>
     <div class="dlg-acts"><span style="flex:1"></span><button value="cancel" class="btn">닫기</button></div>
@@ -238,7 +241,13 @@
 <script src="/assets/vendor/marked.min.js" defer></script>
 <script src="/assets/vendor/purify.min.js" defer></script>
 <script src="/assets/vendor/highlight.min.js" defer></script>
-<script src="/assets/playground.js?v=107" defer></script>
+<script src="/assets/playground.js?v=108" defer></script>
+<script src="/assets/vendor/floating-ui.core.umd.min.js" defer></script>
+<script src="/assets/vendor/floating-ui.dom.umd.min.js" defer></script>
+<script src="/assets/vendor/aa-numberflow.min.js" defer></script>
+<script src="/assets/vendor/driver.js.iife.js" defer></script>
+<script src="/assets/vendor/siriwave.umd.min.js" defer></script>
+<script src="/assets/v19.js?v=1" defer></script>
 <script src="/assets/notice-banner.js?v=3" defer></script>
 </body>
 </html>
