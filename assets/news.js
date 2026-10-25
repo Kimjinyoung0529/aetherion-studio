@@ -5,7 +5,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const getPosts = () => fetch('/content/index.json', { cache: 'no-cache' }).then(r => { if (!r.ok) throw Error(r.status); return r.json(); }).then(j => j.posts);
   const fail = el => { el.innerHTML = '<p class="muted">소식을 불러오지 못했어요. 잠시 뒤 새로고침해 주세요.</p>'; };
-  const card = (p, h = 'h2') => `<a class="pcard${p.pinned ? ' pinned' : ''}" href="${esc(p.url)}">${p.pinned ? '<span class="tag pin">📌 고정</span>' : ''}<span class="tag ${esc(p.type)}">${esc(p.type_label)}</span><time datetime="${esc(p.date)}">${esc(p.date)}</time><${h}>${esc(p.title)}</${h}><p>${esc(p.summary)}</p></a>`;
+  const card = (p, h = 'h2') => `<a class="pcard${p.pinned ? ' pinned' : ''}" href="${esc(p.url)}">${p.pinned ? '<span class="tag pin">▲ 고정</span>' : ''}<span class="tag ${esc(p.type)}">${esc(p.type_label)}</span><time datetime="${esc(p.date)}">${esc(p.date)}</time><${h}>${esc(p.title)}</${h}><p>${esc(p.summary)}</p></a>`;
 
   // home strip
   const ns = $('ns-list');
