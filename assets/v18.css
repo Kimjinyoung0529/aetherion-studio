@@ -1,0 +1,18 @@
+/* AETHERION v0.18 — Open Props tokens (MIT) unify spacing/radius/shadow/easing; Paper Shaders mesh background. */
+:root{
+  --r-xs:var(--size-2);--r-sm:var(--size-3);--r-md:var(--size-4);--r-lg:var(--size-5);--r-xl:var(--size-7);--r-pill:var(--radius-round);
+  --sp-1:var(--size-1);--sp-2:var(--size-2);--sp-3:var(--size-3);--sp-4:var(--size-5);--sp-5:var(--size-7);--sp-6:var(--size-9);
+  --ease:var(--ease-out-3);--ease-spring:var(--ease-spring-2);
+}
+html[data-theme=light]{--shadow-color:220 3% 15%;--shadow-strength:1%}
+html[data-theme=dark]{--shadow-color:220 40% 2%;--shadow-strength:25%}
+.lg{box-shadow:var(--shadow-3),inset 0 1px 0 rgba(255,255,255,.5)!important}
+html[data-theme=dark] .lg{box-shadow:var(--shadow-3),inset 0 1px 0 rgba(255,255,255,.10)!important}
+.ae-mesh{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict;opacity:.0;transition:opacity .8s var(--ease)}
+.ae-mesh.in-main{position:absolute;border-radius:inherit}
+.ae-mesh canvas{display:block;width:100%!important;height:100%!important}
+.ae-mesh-on .ae-mesh{opacity:.85}
+html[data-theme=dark].ae-mesh-on .ae-mesh{opacity:.9}
+.ae-mesh-on .ae-mesh.in-main{opacity:.55}
+.ae-mesh::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0,transparent 35%,var(--bg) 92%)}
+.ae-mesh-on .ae-glow i,.ae-mesh-on .pg-glow i{display:none}
