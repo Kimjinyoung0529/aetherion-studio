@@ -22,6 +22,7 @@
 </div></header>
 <main id="main" class="page"><div class="wrap">
 <h1>모델 · 모드별 사양</h1>
+<p class="lead"><b>임시 안내 (2026-10-25부터 약 한 달):</b> 속도 개선을 위해 High · Medium · Low 모드 전환을 잠시 멈추고, 모든 대화를 <a href="https://huggingface.co/google/gemma-4-E2B-it" rel="noopener">Google Gemma 4 E2B</a> (Q8_0 · 약 5GB, Apache 2.0) 한 모델로 처리해요. 문맥 길이는 32,768 토큰이에요. 아래 표는 일시 중단된 모드의 사양이에요.</p>
 <p class="lead">채팅 화면에서는 모델 이름 대신 <b>High · Medium · Low</b> 모드만 보여요. 모드마다 실제로 어떤 모델이 도는지는 여기에 그대로 적어 둬요. AETHERION은 이 모델들을 직접 학습하지 않았고, 공개 가중치를 양자화해서 우리 서버에서 돌려요.</p>
 <table class="spec"><thead><tr><th>모드</th><th>모델</th><th>양자화 · 크기</th><th>측정 속도*</th><th>특징</th><th>라이선스</th></tr></thead><tbody>
 <tr><td><b>High · 깊게 생각</b> (기본)</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google Gemma 4 26B-A4B</a> · MoE, 활성 약 4B</td><td>UD-IQ3_S (3.44bit) · 11.3GB</td><td>초당 약 11 토큰</td><td>이미지 이해, 생각 모드</td><td>Apache 2.0</td></tr>

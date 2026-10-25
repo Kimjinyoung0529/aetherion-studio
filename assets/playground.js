@@ -706,8 +706,10 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   }
   function applyHealth(j) { const t = TIER_OF[j.model_id]; if (t) setTierUI(t); }
   // ---- reasoning tiers (High / Medium / Low). Chat UI never shows model names; /models/ lists them. ----
-  const TIERS = { high: { id: 'gemma4', label: 'High · 깊게 생각', short: 'High', vision: true }, medium: { id: 'gptoss', label: 'Medium · 균형', short: 'Medium' }, low: { id: 'kanana15', label: 'Low · 빠르게', short: 'Low' } };
-  const TIER_OF = { gemma4: 'high', gptoss: 'medium', kanana15: 'low' };
+  // TEMP (~1 month from 2026-10-25): reasoning-level switching paused; one fast model with long context.
+  const TIERS = { single: { id: 'gemma2b', label: '빠른 단일 모드 (임시)', short: '단일', vision: true } };
+  const TIER_OF = { gemma2b: 'single' };
+  { const tb = $('tier'); if (tb) tb.hidden = true; }
   let curTier = null, tierBusy = false;
   function setTierUI(t) { curTier = t; const b = $('tier'); b.dataset.tier = t; $('tier-t').textContent = TIERS[t].short; b.title = '추론 모드: ' + TIERS[t].label; $('chip-name').textContent = TIERS[t].label; document.querySelectorAll('#tier-menu [data-tier]').forEach(x => x.setAttribute('aria-checked', String(x.dataset.tier === t))); }
   async function switchTier(t) {
@@ -771,7 +773,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (!ep || !key) { box.innerHTML = '<p class="muted">접속 키를 넣고 연결하면 목록이 보여요.</p>'; return; }
     try {
       const j = await (await fetch(ep + '/api/models', { headers: authH(), signal: AbortSignal.timeout(8000) })).json();
-      const cur_ = TIER_OF[j.current]; box.innerHTML = Object.entries(TIERS).map(([t, v]) => `<button type="button" class="mopt${t === cur_ ? ' on' : ''}" data-tier="${t}"${j.phase !== 'ready' ? ' disabled' : ''}><b>${esc(v.label)}</b><small>${v.vision ? '이미지 이해 · 생각 모드' : '텍스트 전용'}</small>${t === cur_ ? '<em>사용 중</em>' : ''}</button>`).join('') + '<p class="muted">모드별 모델과 양자화는 <a href="/models/" target="_blank" rel="noopener">모드별 사양</a>에 공개돼 있어요.</p>';
+      const cur_ = TIER_OF[j.current]; box.innerHTML = Object.entries(TIERS).map(([t, v]) => `<button type="button" class="mopt${t === cur_ ? ' on' : ''}" data-tier="${t}"${j.phase !== 'ready' ? ' disabled' : ''}><b>${esc(v.label)}</b><small>${v.vision ? '이미지 이해 · 긴 문맥' : '텍스트 전용'}</small>${t === cur_ ? '<em>사용 중</em>' : ''}</button>`).join('') + '<p class="muted">추론 강도 변경은 약 한 달간 잠시 멈췄어요. 모델과 양자화는 <a href="/models/" target="_blank" rel="noopener">모드별 사양</a>에 공개돼 있어요.</p>';
     } catch { box.innerHTML = '<p class="muted">모델 목록을 못 불러왔어요 (키나 연결을 확인해 주세요).</p>'; }
   }
   $('model-list').addEventListener('click', async e => { const b = e.target.closest('.mopt'); if (!b || b.classList.contains('on')) return; $('model-list').querySelectorAll('.mopt').forEach(x => x.disabled = true); await switchTier(b.dataset.tier); loadModels(); });
