@@ -1,5 +1,5 @@
 /* AETHERION service worker: offline shell only. Never caches API/model traffic or cross-origin requests. */
-const V = 'ae-v6-6';
+const V = 'ae-v6-7';
 const SHELL = ['/', '/playground/', '/assets/brand.css?v=3', '/assets/site.css?v=6', '/assets/playground.css?v=7', '/assets/playground.js?v=8', '/assets/brand/icon-192.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).catch(() => {})); self.skipWaiting(); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

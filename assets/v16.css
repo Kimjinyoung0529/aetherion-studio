@@ -1,0 +1,118 @@
+/* AETHERION v0.16 — refined type, light/dark base, flowing glow, liquid glass, rounded tokens.
+   Liquid glass refraction approach adapted from rdev/liquid-glass-react (MIT) and shuding/liquid-glass (MIT) as a vanilla SVG-filter port. */
+:root{
+  --font-sans:"Inter Variable","Inter","Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;
+  --font-mono:"Geist Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r-xs:8px;--r-sm:12px;--r-md:16px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --ease:cubic-bezier(.2,.8,.2,1);--dur:.22s;
+  --g1:#4285f4;--g2:#9b72cb;--g3:#d96570;--g4:#34a8eb;
+  --lg-tint:rgba(255,255,255,.55);--lg-edge:rgba(255,255,255,.7);--lg-shadow:0 8px 32px rgba(20,24,40,.10),0 1px 2px rgba(20,24,40,.06);
+}
+html[data-theme=light]{--bg:#ffffff;--bg2:#f7f8fa;--card:#ffffff;--line:#e8eaef;--text:#15171c;--dim:#5c6370;--ae-paper:#fff;--ae-white:#fff;color-scheme:light}
+html[data-theme=dark]{--bg:#0b0b0d;--bg2:#121317;--card:#16171b;--line:#26282f;--text:#ececf1;--dim:#9a9fab;--side:#0f1013;--card2:#1b1c21;--line2:#30323a;
+  --lg-tint:rgba(28,29,34,.55);--lg-edge:rgba(255,255,255,.12);--lg-shadow:0 8px 32px rgba(0,0,0,.45),0 1px 2px rgba(0,0,0,.3);color-scheme:dark}
+html[data-theme=dark] body.s{--ae-ink:#ececf1;--ae-paper:#0b0b0d;--ae-white:#16171b;--ae-border:#26282f;--ae-soft:#1b1c21;--ae-muted:#9a9fab}
+/* typography */
+html{font-variant-emoji:text;-webkit-text-size-adjust:100%}
+body,body.s,button,input,select,textarea{font-family:var(--font-sans);font-feature-settings:"ss01","cv11";font-optical-sizing:auto}
+body.s{background:var(--bg);color:var(--text);line-height:1.6;letter-spacing:-.006em;font-size:16px;text-rendering:optimizeLegibility}
+body.s h1,body.s h2,body.s h3{font-weight:650;letter-spacing:-.025em;line-height:1.15;word-break:keep-all}
+body.s .hero h1{font-weight:640;letter-spacing:-.04em;line-height:1.04}
+body.s .sec h2{font-size:clamp(28px,3.4vw,48px)}
+body.s p,body.s li{word-break:keep-all}
+code,pre,kbd,.sc-k{font-family:var(--font-mono)}
+.eyebrow,.label{letter-spacing:.02em;font-weight:560}
+/* icons */
+.ic{width:1.15em;height:1.15em;flex:none;display:inline-block;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ico .ic{width:22px;height:22px}.ci .ic{width:20px;height:20px}.lab i .ic{width:20px;height:20px}
+.g15{font:inherit}.g15 .ic{width:18px;height:18px}
+.chips span{display:inline-flex;align-items:center;gap:.45em}
+.chips span .ic{opacity:.75}
+.st .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#2fbf8f;margin-right:6px;vertical-align:1px;box-shadow:0 0 0 3px rgba(47,191,143,.18)}
+summary .ic,button .ic{pointer-events:none}
+.mmenu summary{display:grid;place-items:center}.mmenu summary .ic{width:22px;height:22px}
+/* backgrounds: clean base + flowing glow */
+body.s{background:var(--bg)!important}
+.ae-glow{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict}
+.ae-glow i{position:absolute;left:50%;top:-20vmax;width:120vmax;height:120vmax;margin-left:-60vmax;border-radius:50%;
+  background:conic-gradient(from 0deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));filter:blur(90px);opacity:.16;will-change:transform;
+  transform:translateZ(0) rotate(0deg) scale(1);animation:aeSpin 38s linear infinite}
+.ae-glow i+i{top:auto;bottom:-70vmax;width:90vmax;height:90vmax;margin-left:-45vmax;opacity:.10;animation-duration:52s;animation-direction:reverse}
+html[data-theme=dark] .ae-glow i{opacity:.22}html[data-theme=dark] .ae-glow i+i{opacity:.14}
+.ae-glow::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 0,var(--bg) 85%)}
+@keyframes aeSpin{to{transform:translateZ(0) rotate(360deg) scale(1)}}
+.ae-paused .ae-glow i,.ae-paused .lg-sheen{animation-play-state:paused}
+body.s .hero{background:transparent!important}
+body.s .hero-img{opacity:.0;display:none}
+/* playground glow (behind empty state only, subtle) */
+.pg .main{isolation:isolate;background:var(--bg)!important}
+.pg-glow{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden;contain:strict;border-radius:inherit}
+.pg-glow i{position:absolute;left:50%;top:-45%;width:90vmax;height:90vmax;margin-left:-45vmax;border-radius:50%;background:conic-gradient(from 90deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g1));filter:blur(100px);opacity:.10;will-change:transform;animation:aeSpin 44s linear infinite}
+html[data-theme=dark] .pg-glow i{opacity:.15}
+/* liquid glass */
+.lg{position:relative;isolation:isolate;background:var(--lg-tint)!important;border:1px solid var(--lg-edge)!important;box-shadow:var(--lg-shadow),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.08)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(180%);backdrop-filter:blur(18px) saturate(180%)}
+html[data-theme=dark] .lg{box-shadow:var(--lg-shadow),inset 0 1px 0 rgba(255,255,255,.10)!important}
+.lg-refract.lg{backdrop-filter:url(#ae-lg-filter) blur(10px) saturate(180%)}
+.lg::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;
+  background:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.35),transparent 55%),radial-gradient(80% 60% at 100% 100%,rgba(255,255,255,.12),transparent 60%)}
+html[data-theme=dark] .lg::before{background:radial-gradient(120% 80% at 20% 0%,rgba(255,255,255,.08),transparent 55%)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.lg{background:var(--card)!important}}
+/* header */
+body.s .hdr{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important}
+body.s .hdr .nav{margin-top:10px;border-radius:var(--r-pill);min-height:58px}
+/* rounded tokens everywhere */
+body.s .btn,body.s .cta a,.chips span,.tb,.tabs button,.stabs button{border-radius:var(--r-pill)!important}
+body.s .prod,body.s .feat,body.s .stat,body.s .lab,body.s .paper,body.s .panel,body.s .sc-card,body.s details,body.s table,body.s .card,body.s img:not(.brand img),.post,.patch-list>*,.status-card{border-radius:var(--r-lg)!important}
+body.s table{overflow:hidden;border-collapse:separate;border-spacing:0}
+body.s .ico{border-radius:var(--r-md)!important;display:grid;place-items:center}
+input,select,textarea{border-radius:var(--r-sm)}
+.composer,.card,.pop,dialog,.slash,.seltools,.toast,.step,.src,.cb,pre,.art,.tpl,.model-list button,.convs a,.convs button{border-radius:var(--r-md)}
+.composer{border-radius:var(--r-xl)!important}
+dialog{border-radius:var(--r-xl)!important}
+/* micro-interactions: transform/opacity only */
+body.s .btn,body.s .prod,body.s .paper,body.s .sc-card,.card,.tpl{transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease),background-color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+@media (hover:hover){body.s .btn:hover,body.s .paper:hover,.card:hover,.tpl:hover{transform:translateY(-2px)}body.s .prod:hover,body.s .sc-card:hover{transform:translateY(-3px)}}
+body.s .btn:active,.card:active,.tpl:active,button:active{transform:scale(.98)}
+body.s .btn.pri{background:var(--text)!important;color:var(--bg)!important;border-color:transparent!important;box-shadow:none!important}
+body.s .grad{background:linear-gradient(90deg,var(--g1),var(--g2) 45%,var(--g3));-webkit-background-clip:text;background-clip:text;color:transparent}
+:focus-visible{outline:2px solid var(--g1);outline-offset:2px;border-radius:var(--r-xs)}
+/* theme toggle */
+.th-tg{all:unset;cursor:pointer;display:inline-grid;place-items:center;width:38px;height:38px;border-radius:50%;color:inherit;transition:background-color var(--dur) var(--ease)}
+.th-tg:hover{background:color-mix(in srgb,currentColor 8%,transparent)}
+.th-tg .ic{width:19px;height:19px}
+html[data-theme=dark] .th-tg .i-sun{display:inline-block}html[data-theme=dark] .th-tg .i-moon,.th-tg .i-sun{display:none}
+html[data-theme=dark] body.s .hdr .nav a,html[data-theme=dark] body.s .brand{color:var(--text)}
+html[data-theme=dark] body.s .prod,html[data-theme=dark] body.s .feat,html[data-theme=dark] body.s .stat,html[data-theme=dark] body.s .lab,html[data-theme=dark] body.s .paper,html[data-theme=dark] body.s .panel,html[data-theme=dark] body.s details,html[data-theme=dark] body.s table,html[data-theme=dark] body.s td,html[data-theme=dark] body.s th{background-color:var(--card);border-color:var(--line);color:var(--text)}
+html[data-theme=dark] body.s .ae-footer,html[data-theme=dark] body.s footer{background:var(--bg2);color:var(--dim)}
+@media (prefers-reduced-motion:reduce){.ae-glow i,.pg-glow i{animation:none}*{transition-duration:.01ms!important;scroll-behavior:auto!important}.rv{opacity:1!important;transform:none!important}}
+body.s .hero .wrap::before,body.s .hero::before,body.s .hero::after{display:none!important}
+body.s .hero p.lead{color:var(--dim)}
+body.s .links a{color:color-mix(in srgb,var(--text) 72%,transparent)!important;font-weight:520}
+body.s .links a:hover{color:var(--text)!important}
+.ae-glow i{opacity:.28}.ae-glow i+i{opacity:.16}
+html[data-theme=dark] .ae-glow i{opacity:.26}
+body.s .stat{border:1px solid var(--line)}
+body.s .stat b{background:linear-gradient(90deg,var(--g1),var(--g2));-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-theme=dark] body.s .btn:not(.pri){background:var(--card)!important;color:var(--text)!important;border-color:var(--line)!important}
+html[data-theme=dark] body.s .eyebrow{background:var(--card);border-color:var(--line)}
+/* glow v2: soft color fields (no blur filter = cheaper), slowly rotating */
+.ae-glow i,.pg-glow i{filter:none!important;background:
+ radial-gradient(closest-side at 30% 35%,rgba(66,133,244,.55),transparent),
+ radial-gradient(closest-side at 70% 30%,rgba(155,114,203,.45),transparent),
+ radial-gradient(closest-side at 60% 70%,rgba(217,101,112,.35),transparent),
+ radial-gradient(closest-side at 35% 70%,rgba(52,168,235,.35),transparent)!important}
+.ae-glow i{opacity:.35!important;top:-60vmax}.ae-glow i+i{opacity:.2!important}
+html[data-theme=dark] .ae-glow i{opacity:.32!important}
+html[data-theme=dark] .pg-glow i{opacity:.22!important}.pg-glow i{opacity:.18!important}
+html[data-theme=dark] body.s .panel::before{opacity:.08}
+/* perf: glass blur only on small chrome (nav, composer); cards use static tinted glass */
+body.s .prod.lg,body.s .sc-card.lg,body.s .stat.lg,body.s .lab.lg,body.s .paper.lg,body.s .feat.lg,.side-search.lg,header.top.lg{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:color-mix(in srgb,var(--card) 78%,transparent)!important}
+body.s .sc-card{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* perf: glow is a tiny raster scaled up on the compositor */
+.ae-glow i,.pg-glow i{width:24vmax!important;height:24vmax!important;margin-left:-12vmax!important;top:-12vmax!important;transform-origin:50% 50%;animation-name:aeSpin5!important}
+.ae-glow i+i{top:auto!important;bottom:-8vmax;width:18vmax!important;height:18vmax!important;margin-left:-9vmax!important}
+@keyframes aeSpin5{from{transform:translateZ(0) rotate(0) scale(5)}to{transform:translateZ(0) rotate(360deg) scale(5)}}
+/* adaptive: weak devices get a static glow (set by v16.js frame governor) */
+.ae-lite .ae-glow i,.ae-lite .pg-glow i{animation:none!important}
+.ae-lite .lg-refract.lg{backdrop-filter:blur(14px) saturate(160%)!important}

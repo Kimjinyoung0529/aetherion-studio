@@ -15,6 +15,10 @@
 <link rel="manifest" href="/manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="AETHERION"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="stylesheet" href="/assets/playground.css?v=9">
 <link rel="stylesheet" href="/assets/v15.css?v=1">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5.2.5/index.css">
+<link rel="stylesheet" href="/assets/v16.css?v=1">
 </head>
 <body class="pg">
 <a class="skip" href="#q">입력창으로 바로가기</a>
@@ -50,10 +54,10 @@
           <div class="pop right" id="more-menu" role="menu" hidden>
             <div class="pop-h">이 대화</div>
             <button type="button" role="menuitem" id="pin-cur">▲ <span id="pin-cur-t">고정하기</span></button>
-            <button type="button" role="menuitem" id="export">↓ 마크다운으로 내보내기</button>
+            <button type="button" role="menuitem" id="export"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg> 마크다운으로 내보내기</button>
             <div class="pop-h">도구</div>
-            <button type="button" role="menuitem" id="vm-open2">▣ 가상 컴퓨터</button>
-            <button type="button" role="menuitem" id="gen-open2">◑ 이미지 생성</button>
+            <button type="button" role="menuitem" id="vm-open2"><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg> 가상 컴퓨터</button>
+            <button type="button" role="menuitem" id="gen-open2"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 생성</button>
             <div class="pop-h">앱</div>
             <button type="button" role="menuitem" id="keys-open">⌨ 단축키 <kbd>Ctrl /</kbd></button>
             <button type="button" role="menuitem" id="settings-open2">≡ 설정</button>
@@ -70,16 +74,16 @@
         <h1>무엇을 도와드릴까요?</h1>
         <p>웹 도구로 찾아보고, 가상 컴퓨터에서 코드를 실제로 돌리고, 그림도 그려요. 어떤 답이든 <b>‹ 1/2 ›</b>로 다른 버전을 만들거나 새 대화로 분기할 수 있어요. <kbd>/</kbd> 명령어, <kbd>Ctrl /</kbd> 단축키.</p>
         <div class="cards">
-          <button type="button" class="card" data-q="오늘 서울이랑 부산 날씨 비교해서 표로 정리해줘"><span class="ci">◐</span><b>날씨 비교</b><small>서울·부산 날씨를 표로</small></button>
-          <button type="button" class="card" data-q="HTML로 반짝이는 별이 떨어지는 애니메이션 배경 페이지 만들어줘"><span class="ci">✦</span><b>웹페이지 만들기</b><small>실시간 미리보기로 실행</small></button>
-          <button type="button" class="card" data-q="크래프톤 Raon-1 mini가 뭔지 검색해서 핵심만 정리해줘"><span class="ci">⌕</span><b>웹검색 정리</b><small>출처와 함께 요약</small></button>
-          <button type="button" class="card" data-q="100달러는 지금 원화로 얼마야? 그리고 30평은 몇 제곱미터야?"><span class="ci">¤</span><b>환율·단위 변환</b><small>실시간 환율 적용</small></button>
-          <button type="button" class="card" data-q="/리서치 2026년 오픈소스 LLM 동향"><span class="ci">◎</span><b>딥 리서치</b><small>여러 출처를 읽고 보고서로</small></button>
-          <button type="button" class="card" data-q="오늘 AI 관련 뉴스 3개 요약하고, 삼성전자 주가도 알려줘"><span class="ci">¶</span><b>뉴스·시세</b><small>실시간 뉴스와 주가</small></button>
-          <button type="button" class="card" data-q="/다이어그램 웹 요청이 서버에서 처리되는 흐름"><span class="ci">◇</span><b>다이어그램</b><small>mermaid로 그리기</small></button>
-          <button type="button" class="card" data-q="HTML 캔버스로 간단한 벽돌깨기 게임 만들어줘"><span class="ci">▷</span><b>미니 게임</b><small>바로 플레이</small></button>
-          <button type="button" class="card" data-q="/컴퓨터 파이썬으로 1부터 10000까지 소수 개수를 실제로 계산하고 걸린 시간도 알려줘"><span class="ci">▣</span><b>가상 컴퓨터</b><small>코드를 실제로 실행</small></button>
-          <button type="button" class="card" data-q="/이미지 햇살 가득한 숲속 오두막, 수채화 느낌"><span class="ci">◑</span><b>이미지 생성</b><small>서버 CPU에서 그려요</small></button>
+          <button type="button" class="card" data-q="오늘 서울이랑 부산 날씨 비교해서 표로 정리해줘"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-cloud-sun"/></svg></span><b>날씨 비교</b><small>서울·부산 날씨를 표로</small></button>
+          <button type="button" class="card" data-q="HTML로 반짝이는 별이 떨어지는 애니메이션 배경 페이지 만들어줘"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg></span><b>웹페이지 만들기</b><small>실시간 미리보기로 실행</small></button>
+          <button type="button" class="card" data-q="크래프톤 Raon-1 mini가 뭔지 검색해서 핵심만 정리해줘"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span><b>웹검색 정리</b><small>출처와 함께 요약</small></button>
+          <button type="button" class="card" data-q="100달러는 지금 원화로 얼마야? 그리고 30평은 몇 제곱미터야?"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-repeat"/></svg></span><b>환율·단위 변환</b><small>실시간 환율 적용</small></button>
+          <button type="button" class="card" data-q="/리서치 2026년 오픈소스 LLM 동향"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-telescope"/></svg></span><b>딥 리서치</b><small>여러 출처를 읽고 보고서로</small></button>
+          <button type="button" class="card" data-q="오늘 AI 관련 뉴스 3개 요약하고, 삼성전자 주가도 알려줘"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-newspaper"/></svg></span><b>뉴스·시세</b><small>실시간 뉴스와 주가</small></button>
+          <button type="button" class="card" data-q="/다이어그램 웹 요청이 서버에서 처리되는 흐름"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-workflow"/></svg></span><b>다이어그램</b><small>mermaid로 그리기</small></button>
+          <button type="button" class="card" data-q="HTML 캔버스로 간단한 벽돌깨기 게임 만들어줘"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg></span><b>미니 게임</b><small>바로 플레이</small></button>
+          <button type="button" class="card" data-q="/컴퓨터 파이썬으로 1부터 10000까지 소수 개수를 실제로 계산하고 걸린 시간도 알려줘"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg></span><b>가상 컴퓨터</b><small>코드를 실제로 실행</small></button>
+          <button type="button" class="card" data-q="/이미지 햇살 가득한 숲속 오두막, 수채화 느낌"><span class="ci"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg></span><b>이미지 생성</b><small>서버 CPU에서 그려요</small></button>
         </div>
       </section>
     </div>
@@ -94,12 +98,12 @@
             <button class="ic sm plus" id="plus" type="button" title="첨부 · 도구" aria-label="첨부와 도구 메뉴" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
             <div class="pop up" id="plus-menu" role="menu" hidden>
               <div class="pop-h">첨부</div>
-              <button type="button" role="menuitem" id="img-btn">◑ 이미지 첨부</button><input type="file" id="img-in" accept="image/*" multiple hidden>
+              <button type="button" role="menuitem" id="img-btn"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 첨부</button><input type="file" id="img-in" accept="image/*" multiple hidden>
               <button type="button" role="menuitem" id="file-btn">+ 파일 · PDF 첨부</button><input type="file" id="file-in" accept=".pdf,.txt,.md,.csv,.tsv,.json,.js,.ts,.py,.html,.css,.java,.c,.cpp,.go,.rs,.sql,.xml,.yaml,.yml,application/pdf,text/*" hidden>
-              <button type="button" role="menuitem" id="tpl-btn">◇ 템플릿</button>
+              <button type="button" role="menuitem" id="tpl-btn"><svg class="ic" aria-hidden="true"><use href="#i-layout-panel-top"/></svg> 템플릿</button>
               <div class="pop-h">만들기</div>
-              <button type="button" role="menuitem" id="gen-btn">◑ 이미지 생성</button>
-              <button type="button" role="menuitem" id="vm-btn">▣ 가상 컴퓨터 열기</button>
+              <button type="button" role="menuitem" id="gen-btn"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 생성</button>
+              <button type="button" role="menuitem" id="vm-btn"><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg> 가상 컴퓨터 열기</button>
               <div class="pop-h">에이전트가 쓸 수 있는 것</div>
               <label class="pop-chk"><input type="checkbox" id="tools" checked> 웹 도구 (검색·뉴스·날씨 등)</label>
               <label class="pop-chk"><input type="checkbox" id="use-vm"> 가상 컴퓨터에서 코드 실행</label>
@@ -117,12 +121,12 @@
           </div>
           <span class="tool-badges" id="tool-badges"></span>
           <button class="ic sm" id="mic" type="button" title="음성 입력" aria-label="음성 입력"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></button>
-          <select id="mode" class="mode" aria-label="응답 모드"><option value="fast">ϟ 빠른 답변</option><option value="think">… 생각하기</option><option value="research">◎ 딥 리서치</option></select>
+          <select id="mode" class="mode" aria-label="응답 모드"><option value="fast">빠른 답변</option><option value="think">생각하기</option><option value="research">딥 리서치</option></select>
           <span class="hint">Enter 전송 · / 명령어 · Ctrl / 단축키</span>
           <button class="send" id="send" type="submit" aria-label="전송"><svg class="i-send" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg><svg class="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/></svg></button>
         </div>
       </form>
-      <div class="seltools" id="seltools" hidden role="toolbar" aria-label="글쓰기 도구"><button type="button" data-w="explain">※ 설명</button><button type="button" data-w="summary">✎ 요약</button><button type="button" data-w="simple">○ 쉽게</button><button type="button" data-w="polish">✦ 다듬기</button><button type="button" data-w="translate">⌕ 번역</button><button type="button" data-w="ask">“ 인용해 묻기</button></div>
+      <div class="seltools" id="seltools" hidden role="toolbar" aria-label="글쓰기 도구"><button type="button" data-w="explain"><svg class="ic" aria-hidden="true"><use href="#i-lightbulb"/></svg> 설명</button><button type="button" data-w="summary"><svg class="ic" aria-hidden="true"><use href="#i-pencil-line"/></svg> 요약</button><button type="button" data-w="simple"><svg class="ic" aria-hidden="true"><use href="#i-circle"/></svg> 쉽게</button><button type="button" data-w="polish"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg> 다듬기</button><button type="button" data-w="translate"><svg class="ic" aria-hidden="true"><use href="#i-languages"/></svg> 번역</button><button type="button" data-w="ask"><svg class="ic" aria-hidden="true"><use href="#i-quote"/></svg> 인용해 묻기</button></div>
       <p class="disclaimer">AI 답변은 틀릴 수 있어요. 중요한 정보는 출처를 확인하세요.</p>
     </div>
   </main>
@@ -174,7 +178,7 @@
       <label for="voice">목소리</label><select id="voice"><option value="">자동 (한국어)</option></select>
       <label for="rate">속도</label><select id="rate"><option value="0.85">느리게</option><option value="1.05">보통</option><option value="1.3">빠르게</option></select>
       <label class="row-chk"><input type="checkbox" id="autoread"> 답변이 끝나면 자동으로 읽기</label>
-      <button type="button" class="btn" id="tts-test">♪ 읽어주기 테스트</button>
+      <button type="button" class="btn" id="tts-test"><svg class="ic" aria-hidden="true"><use href="#i-volume-2"/></svg> 읽어주기 테스트</button>
       <p class="muted" id="ios-hint" hidden>아이폰: 무음 모드(옆 스위치)가 켜져 있으면 소리가 안 나요. 홈 화면에 추가하면 앱처럼 쓸 수 있어요.</p>
     </section>
     <section class="spane" data-sp="data" hidden>
@@ -186,7 +190,7 @@
 </dialog>
 <dialog class="dlg" id="vm">
   <form method="dialog" class="dlg-in wide">
-    <h2>▣ 가상 컴퓨터 <small class="muted" id="vm-st"></small></h2>
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg> 가상 컴퓨터 <small class="muted" id="vm-st"></small></h2>
     <p class="muted">서버의 격리된 리눅스 컨테이너예요 (Python·Node·git·numpy). 메모리 768MB · CPU 1.5 · 명령당 60초 · 10분 쉬면 자동 정리. 서버 파일과 내부망에는 접근할 수 없어요.</p>
     <div class="vm-files" id="vm-files"></div>
     <pre class="vm-out" id="vm-out" aria-live="polite"></pre>
@@ -196,7 +200,7 @@
 </dialog>
 <dialog class="dlg" id="gen">
   <form method="dialog" class="dlg-in">
-    <h2>◑ 이미지 생성</h2>
+    <h2><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 생성</h2>
     <p class="muted">서버 CPU에서 직접 그려서 512px 한 장에 2~3분 걸려요. 그리는 동안 채팅은 잠시 멈춰요. 사용하는 모델은 <a href="/models/" target="_blank" rel="noopener">모드별 사양</a>에 공개돼 있어요.</p>
     <label for="gen-p">무엇을 그릴까요? (한국어로 써도 돼요)</label><textarea id="gen-p" rows="3" maxlength="600" placeholder="예: a cozy cabin in a sunny forest, watercolor"></textarea>
     <div class="gen-opts"><label>품질 <select id="gen-steps"><option value="8">빠르게 (8단계)</option><option value="12">보통 (12단계)</option><option value="16" selected>기본 (16단계)</option></select></label><label>크기 <select id="gen-size"><option value="384">384</option><option value="512" selected>512</option></select></label></div>
@@ -221,10 +225,12 @@
 </dialog>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="/assets/icons.js?v=1" defer></script>
+<script src="/assets/v16.js?v=1" defer></script>
 <script src="/assets/vendor/marked.min.js" defer></script>
 <script src="/assets/vendor/purify.min.js" defer></script>
 <script src="/assets/vendor/highlight.min.js" defer></script>
-<script src="/assets/playground.js?v=105" defer></script>
+<script src="/assets/playground.js?v=106" defer></script>
 <script src="/assets/notice-banner.js?v=2" defer></script>
 </body>
 </html>

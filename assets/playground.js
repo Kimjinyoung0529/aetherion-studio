@@ -20,9 +20,9 @@
     fork: '<svg viewBox="0 0 24 24"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="8" r="2"/><path d="M6 7v10M18 10c0 4-6 3-12 7"/></svg>',
   };
   const TOOLS = {
-    web_search: ['⌕', '웹검색'], fetch_url: ['▤', '페이지 읽기'], weather: ['◐', '날씨'], calculator: ['∑', '계산기'],
-    datetime: ['◷', '날짜·시간'], wikipedia: ['▤', '위키백과'], convert: ['¤', '변환'], news: ['¶', '뉴스'], price: ['∿', '시세'], qr: ['▦', 'QR 코드'],
-    computer_exec: ['▣', '가상 컴퓨터 실행'], computer_write_file: ['↓', '파일 저장'], computer_read_file: ['▤', '파일 읽기'],
+    web_search: ['search', '웹검색'], fetch_url: ['file-text', '페이지 읽기'], weather: ['cloud-sun', '날씨'], calculator: ['sigma', '계산기'],
+    datetime: ['clock', '날짜·시간'], wikipedia: ['book-open', '위키백과'], convert: ['repeat', '변환'], news: ['newspaper', '뉴스'], price: ['chart-line', '시세'], qr: ['qr-code', 'QR 코드'],
+    computer_exec: ['terminal', '가상 컴퓨터 실행'], computer_write_file: ['download', '파일 저장'], computer_read_file: ['file-text', '파일 읽기'],
   };
 
   // ---------- state ----------
@@ -126,16 +126,16 @@
 
   // ---------- rendering ----------
   function stepHtml(s) {
-    const [ic, nm] = TOOLS[s.name] || ['≡', s.name];
+    const [ic, nm] = TOOLS[s.name] || ['wrench', s.name];
     const arg = (s.args?.arg || s.args?.query || s.args?.url || '').split('\n')[0];
     let body = '';
     if (s.error) body = `<div class="sb">! ${esc(s.error)}</div>`;
     else if (s.results) body = `<div class="sb"><ol>${s.results.length ? s.results.map(x => `<li value="${x.n}"><a href="${esc(safeUrl(x.url))}" target="_blank" rel="noopener">${esc(x.title)}</a><span class="host">${esc(host(x.url))}</span></li>`).join('') : '<li>결과 없음</li>'}</ol></div>`;
-    else if (s.data?.now) body = `<div class="sb">${esc(s.data.place)} · 지금 ${esc(s.data.now.desc)}<div class="wx"><div><b>${s.data.now.temp}°</b>현재 (체감 ${s.data.now.feels}°)</div>${s.data.days.map(d => `<div><b>${Math.round(d.max)}° / ${Math.round(d.min)}°</b>${esc(d.date.slice(5))} ${esc(d.desc)} · ◐${d.rain}%</div>`).join('')}</div></div>`;
+    else if (s.data?.now) body = `<div class="sb">${esc(s.data.place)} · 지금 ${esc(s.data.now.desc)}<div class="wx"><div><b>${s.data.now.temp}°</b>현재 (체감 ${s.data.now.feels}°)</div>${s.data.days.map(d => `<div><b>${Math.round(d.max)}° / ${Math.round(d.min)}°</b>${esc(d.date.slice(5))} ${esc(d.desc)} · 강수 ${d.rain}%</div>`).join('')}</div></div>`;
     else if (s.text && s.name?.startsWith('computer_')) body = `<pre class="sb vm-sb">${esc(s.text.slice(0, 1500))}</pre>`;
     else if (s.text) body = `<div class="sb">${s.url ? `<a href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener">${esc(s.title || s.url)}</a>\n` : ''}${esc(s.text.slice(0, 600))}</div>`;
     const st = s.error ? '실패' : s.done ? (s.results ? `결과 ${s.results.length}개` : '완료') : '실행 중';
-    return `<details class="step ${s.error ? 'err' : s.done ? '' : 'run'}"><summary><span class="sic">${ic}</span><span class="sn">${nm}</span><span class="sa">${esc(arg)}</span><span class="ss">${st}</span>${ICON.chev}</summary>${body}</details>`;
+    return `<details class="step ${s.error ? 'err' : s.done ? '' : 'run'}"><summary><span class="sic">${window.AEIcon ? AEIcon(ic) : ""}</span><span class="sn">${nm}</span><span class="sa">${esc(arg)}</span><span class="ss">${st}</span>${ICON.chev}</summary>${body}</details>`;
   }
   function srcHtml(sources) {
     return (sources || []).map(s => `<a class="src" href="${esc(safeUrl(s.url))}" target="_blank" rel="noopener" title="${esc(s.title)}"><span class="n">${s.n}</span><img alt="" loading="lazy" src="https://www.google.com/s2/favicons?sz=32&domain=${encodeURIComponent(host(s.url))}"><span class="st">${esc(host(s.url) || s.title)}</span></a>`).join('');
@@ -148,7 +148,7 @@
       if (m.doc) { const f = document.createElement('div'); f.className = 'doc-chip'; f.textContent = '+ ' + m.doc.name + ' · ' + m.doc.text.length.toLocaleString() + '자'; d.prepend(f); }
       if (m.thumbs?.length) { const g = document.createElement('div'); g.className = 'thumbs'; m.thumbs.forEach(u => { const im = new Image(); im.src = u; im.alt = '첨부 이미지'; g.appendChild(im); }); d.prepend(g); }
     } else {
-      d.innerHTML = `<div class="av" aria-hidden="true"><img src="/assets/brand/logo-128.png" alt=""></div><div class="bot-col"><details class="think" hidden><summary>… <span class="tl">생각 과정</span></summary><div class="think-body"></div></details><div class="steps"></div><div class="status"></div><div class="md"></div><div class="srcs"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="regen" title="다시 생성 (새 분기)" aria-label="다시 생성">${ICON.redo}</button><button type="button" data-act="fork" title="여기까지 새 대화로 분기" aria-label="새 대화로 분기">${ICON.fork}</button><span class="wt-wrap"><button type="button" data-act="wt" title="글쓰기 도구 · 실험실" aria-label="글쓰기 도구" aria-haspopup="menu">✦</button><span class="wt-menu" role="menu" hidden><b>글쓰기 도구</b><button type="button" role="menuitem" data-act="wt:short">더 짧게</button><button type="button" role="menuitem" data-act="wt:long">더 자세히</button><button type="button" role="menuitem" data-act="wt:easy">쉽게 풀어서</button><button type="button" role="menuitem" data-act="wt:formal">격식체로</button><button type="button" role="menuitem" data-act="wt:en">영어로</button><b>실험실 △</b><button type="button" role="menuitem" data-act="wt:verify">스스로 검증하기</button><button type="button" role="menuitem" data-act="wt:map">대화 지도 그리기</button></span></span><button type="button" data-act="speak" title="소리내어 읽기" aria-label="소리내어 읽기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button><button type="button" data-act="up" title="좋아요" aria-label="좋은 답변">▲</button><button type="button" data-act="down" title="별로예요" aria-label="아쉬운 답변">▼</button>${bnav(m)}<span class="meta"></span></div><div class="sugg"></div></div>`;
+      d.innerHTML = `<div class="av" aria-hidden="true"><img src="/assets/brand/logo-128.png" alt=""></div><div class="bot-col"><details class="think" hidden><summary>${window.AEIcon?AEIcon("brain"):""} <span class="tl">생각 과정</span></summary><div class="think-body"></div></details><div class="steps"></div><div class="status"></div><div class="md"></div><div class="srcs"></div><div class="acts"><button type="button" data-act="copy" title="복사" aria-label="복사">${ICON.copy}</button><button type="button" data-act="regen" title="다시 생성 (새 분기)" aria-label="다시 생성">${ICON.redo}</button><button type="button" data-act="fork" title="여기까지 새 대화로 분기" aria-label="새 대화로 분기">${ICON.fork}</button><span class="wt-wrap"><button type="button" data-act="wt" title="글쓰기 도구 · 실험실" aria-label="글쓰기 도구" aria-haspopup="menu">${window.AEIcon?AEIcon("sparkles"):""}</button><span class="wt-menu" role="menu" hidden><b>글쓰기 도구</b><button type="button" role="menuitem" data-act="wt:short">더 짧게</button><button type="button" role="menuitem" data-act="wt:long">더 자세히</button><button type="button" role="menuitem" data-act="wt:easy">쉽게 풀어서</button><button type="button" role="menuitem" data-act="wt:formal">격식체로</button><button type="button" role="menuitem" data-act="wt:en">영어로</button><b>실험실 △</b><button type="button" role="menuitem" data-act="wt:verify">스스로 검증하기</button><button type="button" role="menuitem" data-act="wt:map">대화 지도 그리기</button></span></span><button type="button" data-act="speak" title="소리내어 읽기" aria-label="소리내어 읽기"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg></button><button type="button" data-act="up" title="좋아요" aria-label="좋은 답변">▲</button><button type="button" data-act="down" title="별로예요" aria-label="아쉬운 답변">▼</button>${bnav(m)}<span class="meta"></span></div><div class="sugg"></div></div>`;
       fillBot(d, m, false);
     }
     return d;
@@ -515,26 +515,26 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   const customText = () => { const c = (localStorage.getItem(LS.custom) || '').trim(), mm = memList(); return [c && '지시사항: ' + c, mm.length && '사용자에 대해 기억할 것:\n- ' + mm.join('\n- ')].filter(Boolean).join('\n').slice(0, 1500); };
   // prompt template gallery
   const TPL = [
-    ['글쓰기', '@', '정중한 이메일', '다음 내용을 정중한 업무 이메일로 써줘. 제목도 붙여줘:\n'], ['글쓰기', '✎', '자기소개서 다듬기', '아래 자기소개서를 자연스럽고 설득력 있게 다듬고, 바꾼 이유도 짧게 알려줘:\n'],
-    ['글쓰기', '¶', 'SNS 홍보 문구', '다음 내용을 인스타그램 홍보 문구 3가지 버전(해시태그 포함)으로 써줘:\n'],
-    ['공부', '§', '쉽게 설명', '초등학생도 이해할 수 있게 비유를 들어 설명해줘: '], ['공부', '◉', '퀴즈 만들기', '다음 주제로 객관식 퀴즈 5문제와 정답·해설을 만들어줘: '],
-    ['공부', '▤', '요약 노트', '다음 글을 시험 공부용 요약 노트(핵심 개념·표)로 정리해줘:\n'],
-    ['개발', '×', '코드 리뷰', '다음 코드의 버그와 개선점을 찾아서 고친 코드와 함께 알려줘:\n'], ['개발', 'λ', '파이썬 실행', '/파이썬 계산하고 결과를 matplotlib 그래프로도 보여줘: '],
-    ['개발', '△', '정규식', '다음 조건에 맞는 정규식을 만들고 예시로 설명해줘: '], ['개발', '⌕', '랜딩 페이지', '/코드 다음 서비스의 반응형 랜딩 페이지: '],
-    ['일상', '◦', '냉장고 레시피', '냉장고에 있는 재료로 만들 수 있는 요리 3개를 추천해줘. 재료: '], ['일상', '↗', '여행 일정', '다음 여행지로 2박 3일 일정을 시간대별 표로 짜줘: '],
-    ['분석', '∿', '데이터 분석', '첨부한 CSV를 분석해서 핵심 인사이트 3가지를 알려줘.'], ['분석', '▤', 'PDF 요약', '첨부한 문서를 요약하고, 중요한 숫자와 결론을 표로 정리해줘.'],
-    ['분석', '≶', '장단점 비교', '다음 선택지들의 장단점을 표로 비교하고 추천해줘: '], ['분석', '⌕', '팩트 체크', '/검색 다음 주장이 사실인지 출처와 함께 확인해줘: '],
+    ['글쓰기', 'mail', '정중한 이메일', '다음 내용을 정중한 업무 이메일로 써줘. 제목도 붙여줘:\n'], ['글쓰기', 'pencil-line', '자기소개서 다듬기', '아래 자기소개서를 자연스럽고 설득력 있게 다듬고, 바꾼 이유도 짧게 알려줘:\n'],
+    ['글쓰기', 'newspaper', 'SNS 홍보 문구', '다음 내용을 인스타그램 홍보 문구 3가지 버전(해시태그 포함)으로 써줘:\n'],
+    ['공부', 'book-open', '쉽게 설명', '초등학생도 이해할 수 있게 비유를 들어 설명해줘: '], ['공부', 'list-checks', '퀴즈 만들기', '다음 주제로 객관식 퀴즈 5문제와 정답·해설을 만들어줘: '],
+    ['공부', 'file-text', '요약 노트', '다음 글을 시험 공부용 요약 노트(핵심 개념·표)로 정리해줘:\n'],
+    ['개발', 'bug', '코드 리뷰', '다음 코드의 버그와 개선점을 찾아서 고친 코드와 함께 알려줘:\n'], ['개발', 'code', '파이썬 실행', '/파이썬 계산하고 결과를 matplotlib 그래프로도 보여줘: '],
+    ['개발', 'regex', '정규식', '다음 조건에 맞는 정규식을 만들고 예시로 설명해줘: '], ['개발', 'search', '랜딩 페이지', '/코드 다음 서비스의 반응형 랜딩 페이지: '],
+    ['일상', 'chef-hat', '냉장고 레시피', '냉장고에 있는 재료로 만들 수 있는 요리 3개를 추천해줘. 재료: '], ['일상', 'plane', '여행 일정', '다음 여행지로 2박 3일 일정을 시간대별 표로 짜줘: '],
+    ['분석', 'chart-line', '데이터 분석', '첨부한 CSV를 분석해서 핵심 인사이트 3가지를 알려줘.'], ['분석', 'file-text', 'PDF 요약', '첨부한 문서를 요약하고, 중요한 숫자와 결론을 표로 정리해줘.'],
+    ['분석', 'scale', '장단점 비교', '다음 선택지들의 장단점을 표로 비교하고 추천해줘: '], ['분석', 'search', '팩트 체크', '/검색 다음 주장이 사실인지 출처와 함께 확인해줘: '],
   ];
   function drawTpl() {
     const cats = [...new Set(TPL.map(t => t[0]))];
-    $('tpl-body').innerHTML = cats.map(c => `<h3>${c}</h3><div class="tpl-grid">${TPL.map((t, k) => t[0] === c ? `<button type="button" class="tpl" data-tpl="${k}"><span>${t[1]}</span><b>${t[2]}</b></button>` : '').join('')}</div>`).join('');
+    $('tpl-body').innerHTML = cats.map(c => `<h3>${c}</h3><div class="tpl-grid">${TPL.map((t, k) => t[0] === c ? `<button type="button" class="tpl" data-tpl="${k}"><span>${window.AEIcon?AEIcon(t[1]):""}</span><b>${t[2]}</b></button>` : '').join('')}</div>`).join('');
   }
   $('tpl-btn').onclick = () => { drawTpl(); $('tpl').showModal ? $('tpl').showModal() : $('tpl').setAttribute('open', ''); };
   $('tpl-body').onclick = e => { const b = e.target.closest('[data-tpl]'); if (!b) return; q.value = TPL[+b.dataset.tpl][3]; $('tpl').close?.(); q.focus(); grow(); };
   // export conversation as markdown
   $('export').onclick = () => {
     if (!cur?.msgs.length) return toast('내보낼 대화가 없어요');
-    const md = `# ${cur.title}\n\n_AETHERION AI · ${new Date().toLocaleString('ko-KR')}_\n\n` + cur.msgs.map(m => m.role === 'user' ? `## ? 사용자\n\n${m.content}\n` : `## ✦ AETHERION\n\n${m.content}\n${(m.sources || []).length ? '\n**출처**\n' + m.sources.map(s => `${s.n}. [${s.title}](${s.url})`).join('\n') + '\n' : ''}`).join('\n');
+    const md = `# ${cur.title}\n\n_AETHERION AI · ${new Date().toLocaleString('ko-KR')}_\n\n` + cur.msgs.map(m => m.role === 'user' ? `## 사용자\n\n${m.content}\n` : `## AETHERION\n\n${m.content}\n${(m.sources || []).length ? '\n**출처**\n' + m.sources.map(s => `${s.n}. [${s.title}](${s.url})`).join('\n') + '\n' : ''}`).join('\n');
     const file = new File([md], (cur.title.replace(/[\\/:*?"<>|]/g, '').slice(0, 40) || 'chat') + '.md', { type: 'text/markdown' });
     if (navigator.canShare?.({ files: [file] }) && isMobile()) return navigator.share({ files: [file], title: cur.title }).catch(() => {});
     const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = file.name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000); toast('마크다운으로 저장했어요');
@@ -789,7 +789,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
   function updatePin() { $('pin-cur-t').textContent = cur?.pinned ? '고정 해제' : '고정하기'; $('pin-cur').disabled = !cur?.msgs.length; }
   $('pin-cur').onclick = () => { if (!cur) return; cur.pinned = !cur.pinned; persist(); renderConvs(); updatePin(); toast(cur.pinned ? '대화를 고정했어요' : '고정을 풀었어요'); };
   // tool badges next to + so active tools stay visible
-  function badges() { $('tool-badges').innerHTML = ($('tools').checked ? '<span class="tb" title="웹 도구 켜짐">⌕ 도구</span>' : '') + ($('use-vm').checked ? '<span class="tb vm" title="가상 컴퓨터 켜짐">▣ 컴퓨터</span>' : ''); }
+  function badges() { $('tool-badges').innerHTML = ($('tools').checked ? '<span class="tb" title="웹 도구 켜짐">'+(window.AEIcon?AEIcon('search'):'')+' 도구</span>' : '') + ($('use-vm').checked ? '<span class="tb vm" title="가상 컴퓨터 켜짐">'+(window.AEIcon?AEIcon('terminal'):'')+' 컴퓨터</span>' : ''); }
   $('use-vm').checked = localStorage.getItem(LS.usevm) === '1';
   $('use-vm').addEventListener('change', () => { localStorage.setItem(LS.usevm, $('use-vm').checked ? '1' : '0'); badges(); });
   $('tools').addEventListener('change', badges); badges();
@@ -846,10 +846,10 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     if (!keyVal()) { toast('설정에서 접속 키를 먼저 넣어 주세요'); return; }
     if (genCtrl) return;
     const steps = +$('gen-steps').value, size = +$('gen-size').value;
-    const c = conv(); if (c.title === '새 대화') c.title = titleOf('◑ ' + prompt);
+    const c = conv(); if (c.title === '새 대화') c.title = titleOf(prompt);
     c.msgs.push({ role: 'user', content: '/이미지 ' + prompt });
     const m = { role: 'assistant', content: '', imageCap: prompt, meta: '' }; c.msgs.push(m); c.ts = Date.now(); persist(); renderAll();
-    const box = $('msgs').lastElementChild, setProg = (pct, t) => { $('gen-prog').hidden = false; $('gen-bar').style.width = pct + '%'; $('gen-txt').textContent = t; m.content = '◑ ' + t; fillBot(box, m, true); };
+    const box = $('msgs').lastElementChild, setProg = (pct, t) => { $('gen-prog').hidden = false; $('gen-bar').style.width = pct + '%'; $('gen-txt').textContent = t; m.content = t; fillBot(box, m, true); };
     genCtrl = new AbortController(); $('gen-go').disabled = true; document.body.classList.add('glow');
     setProg(2, '요청 보내는 중…'); const t0 = performance.now();
     await sse('/api/image', { prompt, steps, size }, ev => {
@@ -880,7 +880,7 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status); return j;
   }
   const vmOut = t => { const o = $('vm-out'); o.textContent += t; if (o.textContent.length > 40000) o.textContent = o.textContent.slice(-30000); o.scrollTop = o.scrollHeight; };
-  async function vmFiles() { try { const j = await vmApi('list'); const fs = (j.files || []).filter(f => f.type === 'file').map(f => f.path.replace(/^\/home\/agent\/work\//, '')).slice(0, 40); $('vm-files').innerHTML = fs.length ? fs.map(f => `<button type="button" class="vf" data-f="${esc(f)}">▤ ${esc(f)}</button>`).join('') : '<small class="muted">~/work 비어 있음</small>'; } catch {} }
+  async function vmFiles() { try { const j = await vmApi('list'); const fs = (j.files || []).filter(f => f.type === 'file').map(f => f.path.replace(/^\/home\/agent\/work\//, '')).slice(0, 40); $('vm-files').innerHTML = fs.length ? fs.map(f => `<button type="button" class="vf" data-f="${esc(f)}">${window.AEIcon?AEIcon("file-text"):""} ${esc(f)}</button>`).join('') : '<small class="muted">~/work 비어 있음</small>'; } catch {} }
   async function openVm() {
     closePops(); const d = $('vm'); d.showModal ? d.showModal() : d.setAttribute('open', '');
     if (!keyVal()) { $('vm-st').textContent = '· 접속 키 필요'; return; }
