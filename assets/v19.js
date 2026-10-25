@@ -90,24 +90,21 @@
     var on=false,muted=false,phase='idle',rec=null,playing=null,abortTTS=null,raf=0;
     function setPhase(p,msg){phase=p;ov.dataset.phase=p;st.textContent=msg;}
     function level(a){if(!a)return 0;var b=new Uint8Array(a.fftSize);a.getByteTimeDomainData(b);var s=0;for(var i=0;i<b.length;i++){var v=(b[i]-128)/128;s+=v*v;}return Math.sqrt(s/b.length);}
-    function loop(){raf=requestAnimationFrame(loop);var l=phase==='speaking'?level(an):phase==='listening'?level(micAn):0;var amp=phase==='thinking'?.5:Math.min(3,.25+l*12);
+    function loop(){raf=requestAnimationFrame(loop);var l=phase==='speaking'?.04+.03*Math.sin(Date.now()/120):phase==='listening'?lv:0;var amp=phase==='thinking'?.5:Math.min(3,.25+l*12);
       if(wave){wave.setAmplitude(amp);wave.setSpeed(phase==='thinking'?.12:.2);}orb.style.setProperty('--lv',Math.min(1,l*6).toFixed(3));}
-    function ensureAudio(){ // must run inside the tap (iOS)
-      if(!ac){var C=w.AudioContext||w.webkitAudioContext;ac=new C();an=ac.createAnalyser();an.fftSize=512;an.connect(ac.destination);}
-      if(ac.state==='suspended')ac.resume();
-      var b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0);
-      if(!micStream&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}}).then(function(m){micStream=m;micAn=ac.createAnalyser();micAn.fftSize=512;ac.createMediaStreamSource(m).connect(micAn);}).catch(function(){});}
+    var lv=0;
+    function ensureAudio(){ // inside the tap: unlock the shared HTMLAudioElement (iOS)
+      w.AEAudio&&w.AEAudio.unlock();
       if(!wave&&w.SiriWave){wave=new w.SiriWave({container:ov.querySelector('.vc-wave'),style:'ios9',width:240,height:120,amplitude:.3,speed:.2,autostart:true,cover:true});}
     }
     function listen(){
       if(!on)return;if(muted)return setPhase('muted','마이크 꺼짐 · 눌러서 켜기');
-      if(!SR){setPhase('idle','이 브라우저는 음성 인식을 지원하지 않아요');return;}
-      try{rec=new SR();}catch(e){return setPhase('idle','음성 인식을 시작하지 못했어요');}
-      rec.lang='ko-KR';rec.interimResults=true;rec.continuous=false;var fin='',got=false;
-      rec.onresult=function(ev){var t='';for(var i=0;i<ev.results.length;i++)t+=ev.results[i][0].transcript;said.textContent=t;fin=t;got=true;};
-      rec.onerror=function(ev){if(ev.error==='not-allowed'||ev.error==='service-not-allowed'){on&&setPhase('idle','마이크 권한이 필요해요 (설정 > Safari > 마이크)');on=false;}};
-      rec.onend=function(){rec=null;if(!on)return;if(got&&fin.trim())ask(fin.trim());else if(phase==='listening')setTimeout(listen,250);};
-      try{rec.start();setPhase('listening','듣고 있어요');}catch(e){setTimeout(listen,400);}
+      if(!w.AESTT){setPhase('idle','이 브라우저는 음성 인식을 지원하지 않아요');return;}
+      said.textContent='';lv=0;
+      rec=w.AESTT.listen({onStart:function(){setPhase('listening','듣고 있어요');},onBusy:function(){setPhase('thinking','받아 적는 중');},onLevel:function(l){lv=l;},onPartial:function(t){said.textContent=t;}});
+      var me=rec;
+      me.promise.then(function(t){if(rec===me)rec=null;if(!on||me.aborted)return;if(t){said.textContent=t;ask(t);}else setPhase('idle','말소리가 들리지 않았어요 · 눌러서 다시 말하기');})
+        .catch(function(e){if(rec===me)rec=null;if(on)setPhase('idle',(e&&e.message)||'음성 인식 오류 · 눌러서 다시');});
     }
     function lastBot(){var a=d.querySelectorAll('#msgs .msg.bot .md');return a.length?a[a.length-1]:null;}
     function ask(text){
@@ -118,12 +115,12 @@
         if((seenBusy&&!busy)||Date.now()-t0>180000||(!seenBusy&&Date.now()-t0>8000)){clearInterval(iv);var m=lastBot();speakAll(m&&m!==before?m.innerText:(m?m.innerText:''));}
       },300);
     }
-    function tts(text,sig){var P=w.AEPG;return fetch(P.endpoint()+'/api/tts',{method:'POST',signal:sig,headers:{'Content-Type':'application/json',Authorization:'Bearer '+P.key()},body:JSON.stringify({text:text,lang:'ko'})}).then(function(r){if(!r.ok)throw new Error('tts '+r.status);return r.arrayBuffer();}).then(function(b){return new Promise(function(ok,no){ac.decodeAudioData(b,ok,no);});});}
-    function play(buf){return new Promise(function(ok){var s=ac.createBufferSource();s.buffer=buf;s.connect(an);s.onended=function(){playing=null;ok();};playing=s;s.start(0);});}
+    function tts(text,sig){return w.AEAudio.tts(text,sig);}
+    function play(blob){playing={stop:function(){w.AEAudio.stop();}};return w.AEAudio.playBlob(blob).then(function(){playing=null;});}
     function fallback(t){return new Promise(function(ok){var S=w.speechSynthesis;if(!S)return ok();var u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';u.onend=u.onerror=function(){ok();};playing={stop:function(){S.cancel();ok();}};S.speak(u);});}
     function speakAll(text){
       if(!on)return;var parts=(w.AEPG.chunks(text||'')||[]).slice(0,12);if(!parts.length)return listen();
-      var ctl=new AbortController();abortTTS=ctl;setPhase('speaking','말하는 중 · 눌러서 끊기');var useFb=false;
+      if(w.AEAudio&&w.AEAudio.isIOS&&w.AESTT)w.AESTT.release();var ctl=new AbortController();abortTTS=ctl;setPhase('speaking','말하는 중 · 눌러서 끊기');var useFb=false;
       var queue=parts.map(function(){return null;});function fetchAt(i){if(i<parts.length&&!queue[i])queue[i]=tts(parts[i],ctl.signal).catch(function(){useFb=true;return null;});return queue[i];}
       (function next(i){if(!on||ctl.signal.aborted)return;if(i>=parts.length){abortTTS=null;return listen();}
         fetchAt(i);fetchAt(i+1);
@@ -131,11 +128,11 @@
     }
     function interrupt(){if(abortTTS){abortTTS.abort();abortTTS=null;}if(playing){try{playing.stop();}catch(e){}playing=null;}try{w.speechSynthesis&&w.speechSynthesis.cancel();}catch(e){}}
     function open(){ensureAudio();on=true;ov.hidden=false;d.body.classList.add('vc-open');said.textContent='';if(!raf)loop();w.AEPG&&w.AEPG.stopSpeak();listen();}
-    function close(){on=false;interrupt();if(rec){try{rec.abort();}catch(e){}rec=null;}if(micStream){micStream.getTracks().forEach(function(t){t.stop();});micStream=null;micAn=null;}cancelAnimationFrame(raf);raf=0;ov.hidden=true;d.body.classList.remove('vc-open');setPhase('idle','눌러서 시작');btn.focus();}
+    function close(){on=false;interrupt();if(rec){try{rec.abort();}catch(e){}rec=null;}w.AESTT&&w.AESTT.release();cancelAnimationFrame(raf);raf=0;ov.hidden=true;d.body.classList.remove('vc-open');setPhase('idle','눌러서 시작');btn.focus();}
     btn.addEventListener('click',open);
     ov.querySelector('.vc-x').onclick=close;ov.querySelector('.vc-end').onclick=close;
-    ov.querySelector('.vc-mute').onclick=function(){ensureAudio();muted=!muted;this.innerHTML=I(muted?'mic-off':'mic');this.classList.toggle('on',muted);if(muted){if(rec)try{rec.abort();}catch(e){}setPhase('muted','마이크 꺼짐 · 눌러서 켜기');}else if(phase==='muted')listen();};
-    function tapOrb(){ensureAudio();if(phase==='speaking'){interrupt();listen();}else if(phase==='idle'||phase==='muted'){muted=false;listen();}else if(phase==='listening'&&rec){try{rec.stop();}catch(e){}}}
+    ov.querySelector('.vc-mute').onclick=function(){ensureAudio();muted=!muted;this.innerHTML=I(muted?'mic-off':'mic');this.classList.toggle('on',muted);if(muted){if(rec){try{rec.abort();}catch(e){}rec=null;}setPhase('muted','마이크 꺼짐 · 눌러서 켜기');}else if(phase==='muted')listen();};
+    function tapOrb(){ensureAudio();if(phase==='speaking'){interrupt();listen();}else if(phase==='idle'||phase==='muted'){muted=false;listen();}else if(phase==='listening'&&rec){try{rec.stop();}catch(e){}}else if(phase==='thinking'&&!rec){}}
     orb.addEventListener('click',tapOrb);orb.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tapOrb();}});
     d.addEventListener('keydown',function(e){if(e.key==='Escape'&&on)close();});
     w.AEVoice={open:open,close:close,state:function(){return phase;}};

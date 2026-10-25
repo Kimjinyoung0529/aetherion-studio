@@ -443,8 +443,10 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     const out = []; for (const sent of plain.split(/(?<=[.!?。…요다죠니까])\s+|\n+/)) { let t = sent.trim(); while (t.length > 180) { const sp = t.lastIndexOf(' ', 180); const cut = sp > 60 ? sp : 180; out.push(t.slice(0, cut)); t = t.slice(cut).trim(); } if (t) out.push(t); }
     return out;
   }
+  window.AEToast = toast;
   window.AEPG = { endpoint: () => endpoint(), key: () => $('key').value.trim(), chunks, isBusy: () => busy, stopSpeak: () => stopSpeak() };
-  function stopSpeak() { ttsOn = false; ttsQ = []; try { TTS?.cancel(); } catch {} ttsBtn?.classList.remove('on'); ttsBtn = null; }
+  let ttsCtl = null;
+  function stopSpeak() { ttsOn = false; ttsQ = []; try { ttsCtl?.abort(); } catch {} ttsCtl = null; try { window.AEAudio?.stop(); } catch {} try { TTS?.cancel(); } catch {} ttsBtn?.classList.remove('on'); ttsBtn = null; }
   function speakNext() {
     if (!ttsOn || !ttsQ.length) return stopSpeak();
     const u = new SpeechSynthesisUtterance(ttsQ.shift()); u.lang = 'ko-KR'; u.rate = +(localStorage.getItem(LS.rate) || 1.05);
@@ -452,7 +454,25 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
     u.onend = () => speakNext(); u.onerror = e => { if (e.error !== 'interrupted' && e.error !== 'canceled') toast('읽기 오류: ' + e.error); if (ttsOn) speakNext(); };
     TTS.speak(u);
   }
+  // server voice through one HTMLAudioElement (works on iPhone even with the silent switch on)
+  function speakServer(text, btn) {
+    const A = window.AEAudio; A.unlock();
+    ttsQ = chunks(text).slice(0, 30); if (!ttsQ.length) return; ttsOn = true; ttsBtn = btn; btn?.classList.add('on');
+    const ctl = new AbortController(); ttsCtl = ctl; const parts = ttsQ.slice(); const q = [];
+    const get = i => { if (i < parts.length && !q[i]) q[i] = A.tts(parts[i], ctl.signal).catch(() => null); return q[i]; };
+    (async () => {
+      for (let i = 0; i < parts.length; i++) {
+        get(i); get(i + 1); const blob = await q[i]; if (!ttsOn || ctl.signal.aborted) return;
+        if (blob) await A.playBlob(blob);
+        else if (TTS) await new Promise(ok => { const u = new SpeechSynthesisUtterance(parts[i]); u.lang = 'ko-KR'; u.onend = u.onerror = ok; TTS.speak(u); });
+        if (!ttsOn || ctl.signal.aborted) return;
+      }
+      if (ttsCtl === ctl) stopSpeak();
+    })();
+    if (btn) toast('읽는 중이에요. 다시 누르면 멈춰요');
+  }
   function speak(text, btn) {
+    if (window.AEAudio && endpoint() && $('key').value.trim()) { if (ttsOn) { const same = ttsBtn === btn; stopSpeak(); if (same) return; } return speakServer(text, btn); }
     if (!TTS) return toast('이 브라우저는 읽어주기를 지원하지 않아요');
     if (ttsOn) { const same = ttsBtn === btn; stopSpeak(); if (same) return; }
     try { TTS.cancel(); } catch {}
