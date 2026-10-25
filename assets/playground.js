@@ -238,7 +238,7 @@ st.textContent='패키지 확인 중…';await py.loadPackagesFromImports(CODE);
 if(/matplotlib/.test(CODE)){await py.runPythonAsync("import matplotlib\\nmatplotlib.use('Agg')");}
 st.textContent='실행 중…';const t0=performance.now();const r=await py.runPythonAsync(CODE);if(r!==undefined&&r!==null)out.textContent+=String(r)+'\\n';
 if(/matplotlib/.test(CODE)){const imgs=await py.runPythonAsync("import io,base64\\nimport matplotlib.pyplot as plt\\n_r=[]\\nfor n in plt.get_fignums():\\n  b=io.BytesIO();plt.figure(n).savefig(b,format='png',dpi=110,bbox_inches='tight');_r.append(base64.b64encode(b.getvalue()).decode())\\nplt.close('all')\\n_r");for(const b of imgs.toJs()){const i=new Image();i.src='data:image/png;base64,'+b;document.getElementById('figs').appendChild(i);}}
-st.textContent='✓ 완료 ('+((performance.now()-t0)/1000).toFixed(2)+'초)';}catch(e){st.textContent='오류';out.innerHTML+='<span class=err>'+String(e.message||e).replace(/</g,'&lt;')+'</span>';}})();
+st.textContent='완료 ('+((performance.now()-t0)/1000).toFixed(2)+'초)';}catch(e){st.textContent='오류';out.innerHTML+='<span class=err>'+String(e.message||e).replace(/</g,'&lt;')+'</span>';}})();
 <\/script></body></html>`;
   }
   // CSV -> chart (no library, canvas)
@@ -595,6 +595,8 @@ ys.onchange=draw;document.getElementById('ty').onchange=draw;addEventListener('r
       delete m.job; if (!m.thinking) delete m.thinking; bgJobs.del(j.job); c.ts = Date.now(); persist(); if (cur === c) renderAll();
     }
   }
+  // v0.17 (iOS Safari): fetch is frozen when the tab is backgrounded; pick the job back up on return
+  addEventListener('pageshow', e => { if (e.persisted && !busy && bgJobs.all().length) resumeJobs(); });
   // ---------- streaming ----------
   async function run() {
     const ep = endpoint(), key = $('key').value.trim(), c = cur;

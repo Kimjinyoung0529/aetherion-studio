@@ -21,6 +21,9 @@
   function init(){
     meta();
     var refr=lgFilter();
+    // v0.17: no SVG-in-backdrop support (Safari/iOS, Firefox) -> layered specular glass path
+    if(!refr)root.classList.add('ae-glass-alt');
+    if(/AppleWebKit/.test(navigator.userAgent)&&!/Chrome\//.test(navigator.userAgent))root.classList.add('ae-webkit');
     if(isSite){
       glow(d.body,'ae-glow');
       var nav=d.querySelector('.hdr .nav');
