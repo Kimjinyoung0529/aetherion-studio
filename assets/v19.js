@@ -94,7 +94,7 @@
       if(wave){wave.setAmplitude(amp);wave.setSpeed(phase==='thinking'?.12:.2);}orb.style.setProperty('--lv',Math.min(1,l*6).toFixed(3));}
     var lv=0;
     function ensureAudio(){ // inside the tap: unlock the shared HTMLAudioElement (iOS)
-      w.AEAudio&&w.AEAudio.unlock();
+      w.AEAudio&&w.AEAudio.unlock('rec');
       if(!wave&&w.SiriWave){wave=new w.SiriWave({container:ov.querySelector('.vc-wave'),style:'ios9',width:240,height:120,amplitude:.3,speed:.2,autostart:true,cover:true});}
     }
     function listen(){
