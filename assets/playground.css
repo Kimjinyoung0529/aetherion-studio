@@ -9,7 +9,7 @@ button{font:inherit;color:inherit}
 a{color:var(--acc2)}
 [data-theme=light] a{color:var(--acc)}
 .skip{position:absolute;left:-999px}.skip:focus{left:10px;top:10px;z-index:99;background:#fff;color:#000;padding:6px}
-.app{display:flex;height:100dvh;width:100%}
+.app{display:flex;height:100vh;height:100dvh;width:100%}
 /* sidebar */
 .side{width:268px;flex:none;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px;gap:6px;transition:margin .25s,transform .25s;z-index:40}
 .app.side-hidden .side{margin-left:-268px}

@@ -1,0 +1,45 @@
+/* AETHERION v0.17 — Safari/iOS glass path, WebKit fixes, polish, cheaper glow. */
+/* 1) Glass for browsers without SVG backdrop refraction (Safari macOS/iOS, Firefox):
+   blur+saturate backdrop, a specular sheen, an edge ring that is bright top-left / dark bottom-right
+   (fakes the refracted rim), and inner shadows for thickness. Pure CSS, no filters on content. */
+.ae-glass-alt .lg{-webkit-backdrop-filter:blur(20px) saturate(190%) brightness(1.04);backdrop-filter:blur(20px) saturate(190%) brightness(1.04);
+  box-shadow:var(--lg-shadow),inset 0 1px 1px rgba(255,255,255,.75),inset 0 -1px 1px rgba(0,0,0,.05),inset 0 0 14px rgba(255,255,255,.22)!important}
+html[data-theme=dark].ae-glass-alt .lg{-webkit-backdrop-filter:blur(20px) saturate(170%) brightness(.96);backdrop-filter:blur(20px) saturate(170%) brightness(.96);
+  box-shadow:var(--lg-shadow),inset 0 1px 1px rgba(255,255,255,.14),inset 0 -1px 1px rgba(0,0,0,.35),inset 0 0 14px rgba(255,255,255,.04)!important}
+.ae-glass-alt .lg::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1px;
+  background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.15) 38%,rgba(255,255,255,0) 60%,rgba(255,255,255,.45));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+html[data-theme=dark].ae-glass-alt .lg::after{background:linear-gradient(135deg,rgba(255,255,255,.35),rgba(255,255,255,.04) 40%,transparent 60%,rgba(255,255,255,.14))}
+/* static cards keep no backdrop (perf) even on the alt path */
+.ae-glass-alt body.s .prod.lg,.ae-glass-alt body.s .sc-card.lg,.ae-glass-alt body.s .stat.lg,.ae-glass-alt body.s .lab.lg,.ae-glass-alt body.s .paper.lg,.ae-glass-alt body.s .feat.lg,.ae-glass-alt .side-search.lg,.ae-glass-alt header.top.lg{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* 2) WebKit fixes */
+.ae-webkit .lg{-webkit-transform:translateZ(0)} /* Safari: keep backdrop clipped to rounded corners */
+@supports (-webkit-touch-callout:none){input,select,textarea{font-size:max(16px,1em)!important}} /* iOS: no zoom on focus */
+body.pg .composer{margin-bottom:max(0px,env(safe-area-inset-bottom))}
+body.s .hdr .nav{margin-left:max(12px,env(safe-area-inset-left));margin-right:max(12px,env(safe-area-inset-right))}
+button,a{-webkit-tap-highlight-color:transparent}
+summary::-webkit-details-marker{display:none}
+/* 3) Cheaper glow: one compositor layer per blob, no full-screen fade layer repaint */
+.ae-glow{will-change:auto;transform:translateZ(0)}
+.ae-glow i{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.ae-glow::after{will-change:transform;transform:translateZ(0)}
+/* 4) Polish */
+body.s .btn .ic,.ns-head a .ic{width:1em;height:1em;vertical-align:-.12em;margin-left:.35em;transition:transform var(--dur) var(--ease)}
+@media (hover:hover){body.s .btn:hover .ic,.ns-head a:hover .ic{transform:translateX(2px)}}
+body.s .btn{display:inline-flex;align-items:center;justify-content:center;gap:.1em}
+.ns-head a{display:inline-flex;align-items:center}
+.ae-notice a{display:flex!important;align-items:center;gap:6px}
+.ae-notice a .ic{width:15px;height:15px;opacity:.7;flex:none}
+.ae-notice b{font-weight:600}
+.ae-notice button{display:grid;place-items:center;border-radius:50%!important;width:28px;height:28px}
+.ae-notice button .ic{width:16px;height:16px}
+body.s .sec{scroll-margin-top:84px}
+body.s h1,body.s h2,body.s h3{text-wrap:balance}
+body.s p{text-wrap:pretty}
+/* hidden attr must win over component display rules (reasoning-mode button stays hidden while one model runs) */
+body.pg [hidden]{display:none!important}
+/* WebKit native select chrome -> flat pill like the rest of the composer */
+body.pg select{-webkit-appearance:none;appearance:none;background-color:transparent;border:1px solid var(--line);border-radius:var(--r-pill);padding:4px 26px 4px 12px;color:inherit;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;background-size:14px}
+/* weak devices on the alt path: keep rim + specular, drop the live backdrop blur (biggest per-frame cost in WebKit) */
+.ae-lite.ae-glass-alt .lg{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:color-mix(in srgb,var(--card) 92%,transparent)!important}
