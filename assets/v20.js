@@ -1,4 +1,4 @@
-/* AETHERION v0.20 - Safari-safe audio output and speech input */
+/* AETHERION v0.20–0.21 - Safari-safe audio output and speech input */
 (function(){
   var w=window,d=document,nav=navigator;
   var ua=nav.userAgent||'';
@@ -6,24 +6,50 @@
   var isSafari=/Safari/.test(ua)&&!/Chrome|CriOS|Chromium|Edg|FxiOS|Android/.test(ua);
   var SR=w.SpeechRecognition||w.webkitSpeechRecognition;
   /* ---------- output: one HTMLAudioElement (plays even with the silent switch on) ---------- */
-  var SILENT='data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQIAAAAAAA==';
-  var el=null,url=null,unlocked=false,stopCb=null;
-  function audio(){if(!el){el=new Audio();el.setAttribute('playsinline','');el.preload='auto';el.id='ae-audio';}return el;}
+  /* v0.21: real 0.2s silent WAV (iOS refused the old 1-sample clip, so the element never unlocked) */
+  function mkSilent(){var n=4800,buf=new ArrayBuffer(44+n*2),v=new DataView(buf),o=0;function S(t){for(var i=0;i<t.length;i++)v.setUint8(o++,t.charCodeAt(i));}function U32(x){v.setUint32(o,x,true);o+=4;}function U16(x){v.setUint16(o,x,true);o+=2;}
+    S('RIFF');U32(36+n*2);S('WAVE');S('fmt ');U32(16);U16(1);U16(1);U32(24000);U32(48000);U16(2);U16(16);S('data');U32(n*2);
+    var bin='',u=new Uint8Array(buf);for(var i=0;i<u.length;i++)bin+=String.fromCharCode(u[i]);return 'data:audio/wav;base64,'+btoa(bin);}
+  var SILENT=mkSilent();
+  var el=null,url=null,unlocked=false,stopCb=null,ctx=null,src=null,tapEl=null;
+  function audio(){if(!el){el=new Audio();el.setAttribute('playsinline','');el.setAttribute('webkit-playsinline','');el.preload='auto';el.id='ae-audio';el.style.display='none';(d.body||d.documentElement).appendChild(el);}return el;}
   function unlock(){ /* call synchronously inside a tap */
+    try{if(nav.audioSession)nav.audioSession.type='playback';}catch(e){} /* iOS 17+: play through the silent switch */
+    try{var C=w.AudioContext||w.webkitAudioContext;if(C){if(!ctx)ctx=new C();if(ctx.state!=='running')ctx.resume();var bs=ctx.createBufferSource();bs.buffer=ctx.createBuffer(1,1,22050);bs.connect(ctx.destination);bs.start(0);}}catch(e){}
     var a=audio();if(unlocked&&!a.paused)return;
-    try{a.muted=false;a.src=SILENT;var p=a.play();if(p&&p.then)p.then(function(){unlocked=true;}).catch(function(){});}catch(e){}
+    try{a.muted=false;a.volume=1;a.src=SILENT;var p=a.play();if(p&&p.then)p.then(function(){unlocked=true;}).catch(function(e){console.warn('[audio] unlock',e&&e.name);});else unlocked=true;}catch(e){}
   }
-  function playBlob(blob){
-    return new Promise(function(ok){
-      var a=audio();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(blob);
-      var done=function(){a.onended=a.onerror=null;stopCb=null;ok();};
-      a.onended=done;a.onerror=done;stopCb=done;a.src=url;
-      var p=a.play();if(p&&p.catch)p.catch(function(){done();});
+  function viaContext(blob){ /* fallback path: Web Audio (context was resumed during the tap) */
+    if(!ctx||ctx.state!=='running')return Promise.reject(new Error('ctx'));
+    return blob.arrayBuffer().then(function(ab){return new Promise(function(ok,no){ctx.decodeAudioData(ab,ok,no);});}).then(function(buf){
+      return new Promise(function(ok){src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);var fin=function(){src=null;stopCb=null;ok();};src.onended=fin;stopCb=fin;src.start(0);});
     });
   }
-  function stop(){var a=el;if(a){try{a.pause();}catch(e){}}if(stopCb)stopCb();}
+  function askTap(blob){ /* last resort: visible button so the play() happens inside a real tap */
+    return new Promise(function(ok){
+      if(tapEl)tapEl.remove();tapEl=d.createElement('button');tapEl.type='button';tapEl.className='ae-tap-play';tapEl.textContent='눌러서 듣기';
+      tapEl.style.cssText='position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;padding:12px 22px;border-radius:999px;border:1px solid rgba(127,127,127,.3);background:rgba(20,20,24,.86);color:#fff;font:600 15px/1 inherit;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)';
+      var fin=function(){if(tapEl){tapEl.remove();tapEl=null;}stopCb=null;ok();};stopCb=fin;
+      tapEl.onclick=function(){var t=tapEl;tapEl=null;t.remove();unlock();var a=audio();a.onended=a.onerror=function(){a.onended=a.onerror=null;stopCb=null;ok();};stopCb=function(){a.onended=a.onerror=null;stopCb=null;ok();};a.src=url;var p=a.play();if(p&&p.catch)p.catch(function(){stopCb&&stopCb();});};
+      d.body.appendChild(tapEl);
+    });
+  }
+  function playBlob(blob){
+    var a=audio();if(url)URL.revokeObjectURL(url);
+    if(!/^audio\//.test(blob.type||''))blob=new Blob([blob],{type:'audio/wav'});
+    url=URL.createObjectURL(blob);
+    return new Promise(function(ok){
+      var settled=false,started=false;
+      var done=function(){if(settled)return;settled=true;a.onended=a.onerror=a.onplaying=null;stopCb=null;ok();};
+      var fail=function(why){if(settled||started)return done();settled=true;a.onended=a.onerror=a.onplaying=null;console.warn('[audio] element failed:',why);
+        viaContext(blob).catch(function(){return askTap(blob);}).then(ok,ok);};
+      a.onplaying=function(){started=true;};a.onended=done;a.onerror=function(){fail('error '+(a.error&&a.error.code));};stopCb=done;
+      a.src=url;var p=a.play();if(p&&p.catch)p.catch(function(e){fail(e&&e.name);});
+    });
+  }
+  function stop(){var a=el;if(a){try{a.pause();}catch(e){}}try{src&&src.stop();}catch(e){}if(tapEl){tapEl.remove();tapEl=null;}if(stopCb)stopCb();}
   function ttsFetch(text,sig){var P=w.AEPG;return fetch(P.endpoint()+'/api/tts',{method:'POST',signal:sig,headers:{'Content-Type':'application/json',Authorization:'Bearer '+P.key()},body:JSON.stringify({text:text,lang:'ko'})}).then(function(r){if(!r.ok)throw new Error('tts '+r.status);return r.blob();});}
-  w.AEAudio={unlock:unlock,playBlob:playBlob,stop:stop,tts:ttsFetch,el:audio,isIOS:isIOS,isSafari:isSafari};
+  w.AEAudio={version:'0.21',unlock:unlock,playBlob:playBlob,stop:stop,tts:ttsFetch,el:audio,isIOS:isIOS,isSafari:isSafari};
 
   /* ---------- input: Web Speech first (Chrome), server STT for Safari or on failure ---------- */
   var SR_MSG={'not-allowed':'마이크 권한이 꺼져 있어요. 설정 > Safari > 마이크에서 허용해 주세요.','service-not-allowed':'기기 음성 인식이 꺼져 있어요. 서버 음성 인식으로 바꿔서 들을게요.','audio-capture':'마이크를 찾을 수 없어요.','no-speech':'말소리가 들리지 않았어요.'};
