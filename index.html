@@ -11,19 +11,23 @@
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://aetherion.o-r.kr/assets/img/og.jpg">
 <link rel="canonical" href="https://aetherion.o-r.kr/">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" type="image/png" sizes="32x32" href="/assets/brand/icon-32.png"><link rel="apple-touch-icon" href="/assets/brand/icon-180.png">
-<link rel="preload" as="image" href="/assets/img/hero.webp">
 <link rel="stylesheet" href="/assets/brand.css?v=3">
 <link rel="stylesheet" href="/assets/site.css?v=9">
 <link rel="stylesheet" href="/assets/news.css?v=1">
 <link rel="manifest" href="/manifest.webmanifest"><link rel="alternate" type="application/rss+xml" title="AETHERION 소식" href="/feed.xml">
 <link rel="stylesheet" href="/assets/v15.css?v=1">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/inter@5.2.5/index.css">
+<link rel="stylesheet" href="/assets/v16.css?v=1">
+<script>try{var t=localStorage.getItem('ae.theme');document.documentElement.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light')}catch(e){}</script>
 </head>
 <body class="s">
 <a class="skip" href="#main">본문 바로가기</a>
 <header class="hdr ae-header"><div class="nav">
 <a href="/" class="brand" aria-label="AETHERION AI 홈"><img src="/assets/brand/logo-128.png" alt="" width="34" height="34">AETHERION</a>
 <nav class="links ae-header__links" aria-label="주요 메뉴"><a href="#products">제품</a><a href="#models">모델</a><a href="#roadmap">로드맵</a><a href="#research">연구</a><a href="#company">회사</a><a href="/platform/">API</a><a href="/pricing/">플랜</a><a href="/news/">소식</a><a href="/opensource/">오픈소스</a><a href="/playground/" class="btn pri">써보기</a></nav>
-<details class="ae-menu mmenu"><summary aria-label="메뉴 열기">☰</summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="#products">제품</a><a href="#models">모델</a><a href="/models/">모드별 사양</a><a href="#roadmap">로드맵</a><a href="#research">연구</a><a href="#company">회사</a><a href="#careers">채용</a><a href="/news/">소식</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/opensource/">오픈소스</a><a href="/playground/">써보기</a></nav></details>
+<details class="ae-menu mmenu"><summary aria-label="메뉴 열기"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg></summary><nav class="ae-drawer" aria-label="모바일 메뉴"><a href="#products">제품</a><a href="#models">모델</a><a href="/models/">모드별 사양</a><a href="#roadmap">로드맵</a><a href="#research">연구</a><a href="#company">회사</a><a href="#careers">채용</a><a href="/news/">소식</a><a href="/platform/">API 문서</a><a href="/pricing/">플랜</a><a href="/security/">보안·신뢰</a><a href="/press/">프레스 킷</a><a href="/patch-notes/">패치 노트</a><a href="/status/">서버 상태</a><a href="/opensource/">오픈소스</a><a href="/playground/">써보기</a></nav></details>
 </div></header>
 <main id="main">
 <section class="hero">
@@ -31,13 +35,13 @@
 <div class="wrap">
 <span class="eyebrow">AETHERION · 한국어 에이전트 플랫폼</span>
 <h1>찾고, 실행하고, 그려 내는<br><span class="grad">한국어 AI</span></h1>
-<p class="lead">오픈 모델을 직접 운영해 하나의 플랫폼으로 묶었어요. 출처 달린 검색, 격리된 가상 컴퓨터에서의 실제 코드 실행, 이미지 생성까지. 기반 모델은 Google Gemma 4 26B-A4B예요.</p>
+<p class="lead">오픈 모델을 직접 운영해 하나의 플랫폼으로 묶었어요. 출처 달린 검색, 격리된 가상 컴퓨터에서의 실제 코드 실행, 이미지 생성까지. 지금은 임시로 Google Gemma 4 E2B 하나를 32K 컨텍스트로 운영하고 있어요.</p>
 <div class="cta"><a class="btn pri" href="/playground/">플레이그라운드 열기 →</a><a class="btn" href="#models">모델 사양 보기</a></div>
 <div class="stats">
-<div class="stat"><b>26B</b><span>전체 파라미터 (MoE)</span></div>
-<div class="stat"><b>~4B</b><span>토큰당 활성 파라미터</span></div>
-<div class="stat"><b>~10</b><span>초당 토큰 · CPU 8코어 실측</span></div>
-<div class="stat"><b>3+1</b><span>언어 모델 3종 + 이미지 모델</span></div>
+<div class="stat"><b>E2B</b><span>현재 임시 모델 (Gemma 4)</span></div>
+<div class="stat"><b>32K</b><span>컨텍스트 토큰</span></div>
+<div class="stat"><b>17–31</b><span>초당 토큰 · CPU 8코어 실측</span></div>
+<div class="stat"><b>1+1</b><span>언어 모델 1종(임시) + 이미지 모델</span></div>
 </div>
 </div></section>
 
@@ -50,12 +54,12 @@
 <h2 id="prod-h">하나의 에이전트, 여섯 가지 제품 영역</h2>
 <p class="sub">모두 같은 서버에서 실제로 돌아가는 기능이에요. 상태 표시는 지금 기준이에요.</p>
 <div class="lineup">
-<div class="prod"><div class="ico c1">“</div><h3>에이전트 채팅</h3><p>웹검색·뉴스·시세 등 10가지 도구를 스스로 골라 쓰고 출처를 달아요. 어떤 답이든 다시 만들거나 새 대화로 분기할 수 있어요.</p><span class="st live">서비스 중</span></div>
-<div class="prod"><div class="ico c2">▣</div><h3>가상 컴퓨터</h3><p>에이전트 전용 리눅스 컨테이너에서 파이썬·노드 코드를 실제로 실행해요. 메모리 768MB, 네트워크 기본 차단.</p><span class="st beta">미리보기</span></div>
-<div class="prod"><div class="ico c3">◑</div><h3>이미지 생성</h3><p>Black Forest Labs의 FLUX 3 Image Klein(오픈 가중치, Q4_K)을 CPU에서 돌려요. 512px 한 장에 약 2분 반, 진행률을 실시간으로 보여줘요.</p><span class="st beta">미리보기</span></div>
-<div class="prod"><div class="ico c4">◎</div><h3>딥 리서치</h3><p>검색 계획부터 여러 페이지 읽기, 인용 보고서까지 로컬 모델 하나로 끝까지 해요.</p><span class="st beta">실험 기능</span></div>
-<div class="prod"><div class="ico c5">⇄</div><h3>모델 전환</h3><p>Gemma 4 26B(기본), Kanana 1.5 15.7B(4bit), Gemma 4 12B, Kanana 2 3B 중 하나를 골라 써요. 메모리를 지키려고 한 번에 하나만 올려요.</p><span class="st live">서비스 중</span></div>
-<div class="prod"><div class="ico c6">▶</div><h3>코드 미리보기 · 파일</h3><p>만든 HTML은 옆 창에서 바로 실행하고, PDF·CSV는 읽어서 답하고 차트로 그려요.</p><span class="st live">서비스 중</span></div>
+<div class="prod"><div class="ico c1"><svg class="ic" aria-hidden="true"><use href="#i-message-circle"/></svg></div><h3>에이전트 채팅</h3><p>웹검색·뉴스·시세 등 10가지 도구를 스스로 골라 쓰고 출처를 달아요. 어떤 답이든 다시 만들거나 새 대화로 분기할 수 있어요.</p><span class="st live">서비스 중</span></div>
+<div class="prod"><div class="ico c2"><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg></div><h3>가상 컴퓨터</h3><p>에이전트 전용 리눅스 컨테이너에서 파이썬·노드 코드를 실제로 실행해요. 메모리 768MB, 네트워크 기본 차단.</p><span class="st beta">미리보기</span></div>
+<div class="prod"><div class="ico c3"><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg></div><h3>이미지 생성</h3><p>Black Forest Labs의 FLUX 3 Image Klein(오픈 가중치, Q4_K)을 CPU에서 돌려요. 512px 한 장에 약 2분 반, 진행률을 실시간으로 보여줘요.</p><span class="st beta">미리보기</span></div>
+<div class="prod"><div class="ico c4"><svg class="ic" aria-hidden="true"><use href="#i-telescope"/></svg></div><h3>딥 리서치</h3><p>검색 계획부터 여러 페이지 읽기, 인용 보고서까지 로컬 모델 하나로 끝까지 해요.</p><span class="st beta">실험 기능</span></div>
+<div class="prod"><div class="ico c5"><svg class="ic" aria-hidden="true"><use href="#i-arrow-left-right"/></svg></div><h3>모델 전환</h3><p>평소엔 여러 모델 중 하나를 골라 써요. 지금은 속도를 위해 한동안 Gemma 4 E2B 하나로 고정했고, 전환은 잠시 꺼 뒀어요.</p><span class="st">일시 중지</span></div>
+<div class="prod"><div class="ico c6"><svg class="ic" aria-hidden="true"><use href="#i-app-window"/></svg></div><h3>코드 미리보기 · 파일</h3><p>만든 HTML은 옆 창에서 바로 실행하고, PDF·CSV는 읽어서 답하고 차트로 그려요.</p><span class="st live">서비스 중</span></div>
 </div>
 </div></section>
 
@@ -70,7 +74,8 @@
 <p class="note" style="margin-top:4px">생성 속도는 2026.10.24 같은 서버에서 llama.cpp로 직접 잰 값이에요 (짧은 한국어 답변 기준).</p>
 <table class="spec"><tbody>
 <tr><td>Low · Kanana 1.5 15.7B-A3B</td><td><a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener">Kakao</a> · MoE(활성 약 3B) · IQ4_XS 4.25bit · 8.7GB · 초당 약 19 토큰 · 텍스트 전용 · Kanana License</td></tr>
-<tr><td>High(기본) · Gemma 4 26B-A4B</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google</a> · MoE(활성 약 4B) · UD-IQ3_S 3.44bit · 11.3GB · 초당 약 11 토큰 · 이미지 이해·생각 모드 · Apache 2.0. 4비트(약 17GB)는 RAM에 안 들어가서 3비트를 써요.</td></tr>
+<tr><td>현재(임시, 약 한 달) · Gemma 4 E2B</td><td><a href="https://huggingface.co/google/gemma-4-E2B-it" rel="noopener">Google</a> · Q8 · 32K 컨텍스트 · 초당 약 17~31 토큰(학습 작업과 함께 돌 때 실측) · Apache 2.0. 속도를 위해 아래 모드 대신 한동안 이 모델 하나만 써요.</td></tr>
+<tr><td>High(평소 기본) · Gemma 4 26B-A4B</td><td><a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener">Google</a> · MoE(활성 약 4B) · UD-IQ3_S 3.44bit · 11.3GB · 초당 약 11 토큰 · 이미지 이해·생각 모드 · Apache 2.0. 4비트(약 17GB)는 RAM에 안 들어가서 3비트를 써요.</td></tr>
 <tr><td>Medium · gpt-oss-20b</td><td><a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener">OpenAI</a> · MoE(전체 21B, 활성 약 3.6B) · MXFP4 · 12.1GB · 초당 약 9 토큰 · 텍스트 전용 · Apache 2.0</td></tr>
 <tr><td>Gemma 4 12B (API 전용)</td><td>Google · Dense · Q4_K_M · 7.1GB · 초당 약 5 토큰 · 이미지 이해 · Apache 2.0</td></tr>
 <tr><td>Kanana 2 3B</td><td>Kakao · Q4_K_M · 2.2GB · 가볍고 빠름 · Kanana License</td></tr>
@@ -81,9 +86,9 @@
 <div class="panel">
 <h3>에이전트 도구</h3>
 <p class="note">모델이 필요할 때 스스로 골라 쓰고, 과정은 화면에 그대로 보여줘요.</p>
-<div class="chips"><span>▣ 가상 컴퓨터 실행</span><span>↓ 파일 저장·읽기</span><span>⌕ 웹검색</span><span>▤ 페이지 읽기</span><span>¶ 뉴스</span><span>∿ 주식·코인 시세</span><span>◐ 날씨</span><span>∑ 계산기</span><span>¤ 환율·단위</span><span>▤ 위키백과</span><span>◷ 날짜·시간</span><span>▦ QR 코드</span></div>
+<div class="chips"><span><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg> 가상 컴퓨터 실행</span><span><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg> 파일 저장·읽기</span><span><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg> 웹검색</span><span><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> 페이지 읽기</span><span><svg class="ic" aria-hidden="true"><use href="#i-newspaper"/></svg> 뉴스</span><span><svg class="ic" aria-hidden="true"><use href="#i-chart-line"/></svg> 주식·코인 시세</span><span><svg class="ic" aria-hidden="true"><use href="#i-cloud-sun"/></svg> 날씨</span><span><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg> 계산기</span><span><svg class="ic" aria-hidden="true"><use href="#i-repeat"/></svg> 환율·단위</span><span><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg> 위키백과</span><span><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg> 날짜·시간</span><span><svg class="ic" aria-hidden="true"><use href="#i-qr-code"/></svg> QR 코드</span></div>
 <h3 style="margin-top:30px">플레이그라운드 기능</h3>
-<div class="chips"><span>◑ 이미지 이해</span><span>… 생각 과정 보기</span><span>◎ 딥 리서치</span><span>∑ KaTeX 수식</span><span>◇ mermaid 다이어그램</span><span>▶ 코드 미리보기</span><span>♪ 음성 입력</span><span>♪ 읽어주기</span><span>/ 슬래시 명령</span><span>↓ 마크다운 내보내기</span><span>⇄ ‹1/2› 분기</span><span>✦ 글쓰기 도구</span><span>※ 후속 질문 추천</span><span>⊙ 예비 서버 자동 전환</span></div>
+<div class="chips"><span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 이해</span><span><svg class="ic" aria-hidden="true"><use href="#i-brain"/></svg> 생각 과정 보기</span><span><svg class="ic" aria-hidden="true"><use href="#i-telescope"/></svg> 딥 리서치</span><span><svg class="ic" aria-hidden="true"><use href="#i-sigma"/></svg> KaTeX 수식</span><span><svg class="ic" aria-hidden="true"><use href="#i-workflow"/></svg> mermaid 다이어그램</span><span><svg class="ic" aria-hidden="true"><use href="#i-app-window"/></svg> 코드 미리보기</span><span><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg> 음성 입력</span><span><svg class="ic" aria-hidden="true"><use href="#i-mic"/></svg> 읽어주기</span><span><svg class="ic" aria-hidden="true"><use href="#i-slash"/></svg> 슬래시 명령</span><span><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg> 마크다운 내보내기</span><span><svg class="ic" aria-hidden="true"><use href="#i-arrow-left-right"/></svg> ‹1/2› 분기</span><span><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg> 글쓰기 도구</span><span><svg class="ic" aria-hidden="true"><use href="#i-quote"/></svg> 후속 질문 추천</span><span><svg class="ic" aria-hidden="true"><use href="#i-server"/></svg> 예비 서버 자동 전환</span></div>
 </div>
 </div>
 </div></section>
@@ -96,11 +101,11 @@
       <div class="sc-card">
         <span class="sc-k">Pipeline</span><h3>추론 파이프라인</h3><p>라우터 → 도구 → 모델 → 스트리밍 → 출처</p>
         <div class="pipe" id="pipe" role="group" aria-label="파이프라인 단계">
-          <button type="button" data-k="route" aria-pressed="true"><span class="g15">→</span><b>라우터</b><small>도구 판단</small></button>
-          <button type="button" data-k="tool" aria-pressed="false"><span class="g15">⌕</span><b>도구</b><small>검색 · 날씨</small></button>
-          <button type="button" data-k="model" aria-pressed="false"><span class="g15">◉</span><b>모델</b><small>32K 문맥</small></button>
-          <button type="button" data-k="stream" aria-pressed="false"><span class="g15">≋</span><b>스트리밍</b><small>백그라운드</small></button>
-          <button type="button" data-k="cite" aria-pressed="false"><span class="g15">※</span><b>출처</b><small>번호 인용</small></button>
+          <button type="button" data-k="route" aria-pressed="true"><span class="g15"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg></span><b>라우터</b><small>도구 판단</small></button>
+          <button type="button" data-k="tool" aria-pressed="false"><span class="g15"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></span><b>도구</b><small>검색 · 날씨</small></button>
+          <button type="button" data-k="model" aria-pressed="false"><span class="g15"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg></span><b>모델</b><small>32K 문맥</small></button>
+          <button type="button" data-k="stream" aria-pressed="false"><span class="g15"><svg class="ic" aria-hidden="true"><use href="#i-sparkles"/></svg></span><b>스트리밍</b><small>백그라운드</small></button>
+          <button type="button" data-k="cite" aria-pressed="false"><span class="g15"><svg class="ic" aria-hidden="true"><use href="#i-quote"/></svg></span><b>출처</b><small>번호 인용</small></button>
         </div>
         <div class="pipe-line" aria-hidden="true"></div>
         <p class="pipe-desc" id="pipe-desc" aria-live="polite">질문이 들어오면 작은 라우터 모델(270M)이 먼저 읽고, 도구가 필요한지 0.2~0.4초 안에 판단해요. 확신이 없으면 메인 모델에 넘겨요.</p>
@@ -109,13 +114,13 @@
         <span class="sc-k">Streaming</span><h3>토큰 단위로 흘러나오는 답</h3><p>답은 한 번에 오지 않고 토큰 단위로 나와요. 아래는 브라우저에서만 도는 예시 재생이에요.</p>
         <div class="tok" id="tok" aria-live="off"></div>
         <div class="tok-meta" id="tok-meta"></div>
-        <button type="button" class="btn" id="tok-play" style="margin-top:14px;padding:8px 16px">↻ 다시 재생</button>
+        <button type="button" class="btn" id="tok-play" style="margin-top:14px;padding:8px 16px"><svg class="ic" aria-hidden="true"><use href="#i-rotate-ccw"/></svg> 다시 재생</button>
       </div>
     </div>
     <div class="sc-row">
       <div class="sc-card"><span class="sc-k">Context</span><h3>한 번에 기억하는 길이</h3><p>지금 문맥은 32,768 토큰이에요. 막대를 움직여 크기를 비교해 보세요.</p>
         <div class="ctx"><div class="ctx-bar" id="ctx-bar" aria-hidden="true"></div><input type="range" id="ctx-r" min="1" max="32" value="8" aria-label="문맥 길이"><small id="ctx-o"></small></div></div>
-      <div class="sc-card"><span class="sc-k">Background</span><h3>탭을 떠나도 계속</h3><p>답을 기다리는 동안 다른 탭이나 앱으로 가도 서버가 끝까지 만들어 둬요. 돌아오면 이어서 보여주고, 허용하면 완료 알림도 보내요.</p><span class="g15">◷</span></div>
+      <div class="sc-card"><span class="sc-k">Background</span><h3>탭을 떠나도 계속</h3><p>답을 기다리는 동안 다른 탭이나 앱으로 가도 서버가 끝까지 만들어 둬요. 돌아오면 이어서 보여주고, 허용하면 완료 알림도 보내요.</p><span class="g15"><svg class="ic" aria-hidden="true"><use href="#i-clock"/></svg></span></div>
       <div class="sc-card"><span class="sc-k">WebGPU</span><h3>내 브라우저 가속 확인</h3><p>브라우저의 GPU 가속 지원 여부를 이 자리에서 바로 확인해요.</p><div class="gpu" id="gpu"><span class="dot15"></span><span>확인 중…</span></div></div>
     </div>
   </div>
@@ -148,16 +153,16 @@
 <h2>연구 영역과 노트</h2>
 <p class="sub">작은 팀이 실제로 만들어 보고 기록한 것들이에요. 외부 평가나 논문이 아니라 실험 기록이에요.</p>
 <div class="labs" style="margin-bottom:24px">
-<div class="lab"><i>≡</i><b>추론 효율</b><span>CPU 한 대에서 큰 모델을 돌리는 양자화·메모리 관리.</span></div>
-<div class="lab"><i>◈</i><b>에이전트 안전</b><span>격리 컨테이너, 네트워크 차단, 자원 제한.</span></div>
-<div class="lab"><i>⌕</i><b>검색·리서치</b><span>출처를 지키는 다단계 검색과 요약.</span></div>
-<div class="lab"><i>≡</i><b>인터페이스</b><span>생성 중 표시, 후속 질문, 분기 같은 대화 경험.</span></div>
+<div class="lab"><i><svg class="ic" aria-hidden="true"><use href="#i-gauge"/></svg></i><b>추론 효율</b><span>CPU 한 대에서 큰 모델을 돌리는 양자화·메모리 관리.</span></div>
+<div class="lab"><i><svg class="ic" aria-hidden="true"><use href="#i-shield-check"/></svg></i><b>에이전트 안전</b><span>격리 컨테이너, 네트워크 차단, 자원 제한.</span></div>
+<div class="lab"><i><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></i><b>검색·리서치</b><span>출처를 지키는 다단계 검색과 요약.</span></div>
+<div class="lab"><i><svg class="ic" aria-hidden="true"><use href="#i-gauge"/></svg></i><b>인터페이스</b><span>생성 중 표시, 후속 질문, 분기 같은 대화 경험.</span></div>
 </div>
 <div class="research">
-<a class="paper" href="/playground/"><time>2026.10</time><h3>CPU 한 대로 26B MoE 비전 에이전트 돌리기</h3><p>3비트 양자화 Gemma 4와 비전 인코더를 16GB RAM에 올리고, 도구 호출·생각하기를 스트리밍으로 묶은 기록.</p><span class="st">● 서비스 중</span></a>
-<a class="paper" href="/playground/"><time>2026.10</time><h3>딥 리서치 파이프라인</h3><p>질의 계획 → 다중 검색 → 본문 읽기 → 인용 보고서. 로컬 모델 하나로 끝까지 수행해요.</p><span class="st">● 실험 기능</span></a>
-<a class="paper" href="/news/post/?p=2026-10-24-patch-v5"><time>2026.10</time><h3>16GB에서 LLM과 이미지 모델 번갈아 돌리기</h3><p>그림을 그릴 때 언어 모델을 내리고, 끝나면 다시 올려요. 512px·2단계 기준 전체 약 27초(실측).</p><span class="st">● 서비스 중</span></a>
-<a class="paper" href="/news/"><time>이전</time><h3>삼진 가중치 · WebGPU 실험 (종료)</h3><p>브라우저에서 작은 모델을 돌려 본 초기 실험이에요. v4에서 정리했고, 기록은 GitHub 히스토리에 남아 있어요.</p><span class="st">● 종료</span></a>
+<a class="paper" href="/playground/"><time>2026.10</time><h3>CPU 한 대로 26B MoE 비전 에이전트 돌리기</h3><p>3비트 양자화 Gemma 4와 비전 인코더를 16GB RAM에 올리고, 도구 호출·생각하기를 스트리밍으로 묶은 기록.</p><span class="st"><i class="dot"></i>서비스 중</span></a>
+<a class="paper" href="/playground/"><time>2026.10</time><h3>딥 리서치 파이프라인</h3><p>질의 계획 → 다중 검색 → 본문 읽기 → 인용 보고서. 로컬 모델 하나로 끝까지 수행해요.</p><span class="st"><i class="dot"></i>실험 기능</span></a>
+<a class="paper" href="/news/post/?p=2026-10-24-patch-v5"><time>2026.10</time><h3>16GB에서 LLM과 이미지 모델 번갈아 돌리기</h3><p>그림을 그릴 때 언어 모델을 내리고, 끝나면 다시 올려요. 512px·2단계 기준 전체 약 27초(실측).</p><span class="st"><i class="dot"></i>서비스 중</span></a>
+<a class="paper" href="/news/"><time>이전</time><h3>삼진 가중치 · WebGPU 실험 (종료)</h3><p>브라우저에서 작은 모델을 돌려 본 초기 실험이에요. v4에서 정리했고, 기록은 GitHub 히스토리에 남아 있어요.</p><span class="st"><i class="dot"></i>종료</span></a>
 </div>
 </div></section>
 
@@ -177,7 +182,7 @@
 
 <section class="sec" id="careers"><div class="wrap">
 <div class="careers">
-<div><span class="label">Careers · 함께하기</span><h2>지금은 채용하지 않아요</h2><p class="note" style="font-size:16px">대신 아래 분야의 오픈소스 기여는 언제나 환영해요. 버그 제보나 아이디어는 GitHub로 보내 주세요.</p><div class="areas"><span>≡ 추론·서버</span><span>▣ 샌드박스·보안</span><span>◑ 이미지 생성</span><span>≡ 프론트엔드·UX</span><span>▯ 모바일 웹</span><span>✎ 한국어 문서</span></div></div>
+<div><span class="label">Careers · 함께하기</span><h2>지금은 채용하지 않아요</h2><p class="note" style="font-size:16px">대신 아래 분야의 오픈소스 기여는 언제나 환영해요. 버그 제보나 아이디어는 GitHub로 보내 주세요.</p><div class="areas"><span><svg class="ic" aria-hidden="true"><use href="#i-gauge"/></svg> 추론·서버</span><span><svg class="ic" aria-hidden="true"><use href="#i-terminal"/></svg> 샌드박스·보안</span><span><svg class="ic" aria-hidden="true"><use href="#i-image"/></svg> 이미지 생성</span><span><svg class="ic" aria-hidden="true"><use href="#i-gauge"/></svg> 프론트엔드·UX</span><span>▯ 모바일 웹</span><span><svg class="ic" aria-hidden="true"><use href="#i-pencil-line"/></svg> 한국어 문서</span></div></div>
 <a class="btn pri" href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub에서 기여하기 →</a>
 </div>
 </div></section>
@@ -185,7 +190,7 @@
 <section class="sec faq" id="faq"><div class="wrap">
 <span class="label">FAQ</span>
 <h2>자주 묻는 질문</h2>
-<details><summary>AETHERION 모델은 직접 학습한 건가요?</summary><p>아니요. 기본은 Google의 오픈 모델 Gemma 4 26B-A4B(Apache 2.0), 선택으로 Kakao Kanana 1.5와 Gemma 4 12B를 그대로 쓰고, 양자화·서버·에이전트 도구·리서치 기능을 저희가 만들었어요.</p></details>
+<details><summary>AETHERION 모델은 직접 학습한 건가요?</summary><p>아니요. 지금은 임시로 Google의 오픈 모델 Gemma 4 E2B(Apache 2.0)를 그대로 쓰고, 양자화·서버·에이전트 도구·리서치 기능을 저희가 만들었어요.</p></details>
 <details><summary>누구나 쓸 수 있나요?</summary><p>지금은 접속 키가 있는 사람만 쓰는 비공개 미리보기예요. 플레이그라운드 설정에 키를 넣으면 돼요.</p></details>
 <details><summary>대화 내용은 어디에 저장되나요?</summary><p>내 브라우저에만 남아요. 서버는 답을 만드는 동안만 내용을 다뤄요. 올린 이미지도 저장하지 않아요.</p></details>
 <details><summary>왜 이렇게 느릴 때가 있나요?</summary><p>GPU 없는 서버 한 대에서 한 번에 한 요청씩 처리해요. 초당 10 토큰 안팎이고, 딥 리서치는 여러 페이지를 읽느라 1–3분 걸릴 수 있어요.</p></details>
@@ -194,12 +199,14 @@
 </main>
 <footer class="foot ae-footer"><div class="wrap">
 <div class="cols">
-<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>서비스 모델(<a href="/models/" style="display:inline">모드별 상세</a>): High <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · Medium <a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener" style="display:inline">OpenAI gpt-oss-20b</a> (Apache 2.0) · Low <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5 15.7B-A3B</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
+<div><a href="/" class="brand" style="margin:0 0 12px"><img src="/assets/brand/logo-128.png" alt="" width="28" height="28">AETHERION</a><p>© 2026 AETHERION AI<br>현재 임시 운영: Google Gemma 4 E2B (Apache 2.0). 평소 서비스 모델(<a href="/models/" style="display:inline">모드별 상세</a>): High <a href="https://huggingface.co/google/gemma-4-26B-A4B-it" rel="noopener" style="display:inline">Google Gemma 4 26B-A4B</a> (Apache 2.0) · Medium <a href="https://huggingface.co/openai/gpt-oss-20b" rel="noopener" style="display:inline">OpenAI gpt-oss-20b</a> (Apache 2.0) · Low <a href="https://huggingface.co/kakaocorp/kanana-1.5-15.7b-a3b-instruct" rel="noopener" style="display:inline">Kakao Kanana 1.5 15.7B-A3B</a> (Kanana License). Gemma는 Google의 상표예요.</p></div>
 <div><h4>제품</h4><a href="/playground/">플레이그라운드</a><a href="/status/">서버 상태</a><a href="/share/">공유된 대화</a></div>
 <div><h4>연구</h4><a href="#research">연구 노트</a><a href="/news/">소식 · 블로그</a><a href="/patch-notes/">패치 노트</a><a href="/feed.xml">RSS</a></div>
 <div><h4>회사</h4><a href="#company">소개</a><a href="#careers">함께하기</a><a href="https://github.com/Kimjinyoung0529/aetherion-studio" rel="noopener">GitHub</a></div>
 <div><h4>관계사 · 오픈소스</h4><a href="https://aetherbio.o-r.kr/" rel="noopener">AETHERBIO (기획 단계)</a><a href="https://aetheros.o-r.kr/" rel="noopener">AETHEROS (디자인 단계)</a><a href="/opensource/">오픈소스 전체 보기</a><a href="https://github.com/Kimjinyoung0529/honest-numbers" rel="noopener">honest-numbers</a><a href="https://github.com/Kimjinyoung0529/ko-agent-tools-mcp" rel="noopener">ko-agent-tools-mcp</a><a href="https://github.com/Kimjinyoung0529/ko-toolcall-bench" rel="noopener">ko-toolcall-bench</a><a href="https://github.com/Kimjinyoung0529/sandbox-runner" rel="noopener">sandbox-runner</a><a href="https://github.com/Kimjinyoung0529/cpu-moe-server-kit" rel="noopener">cpu-moe-server-kit</a><a href="https://github.com/Kimjinyoung0529/small-deep-research" rel="noopener">small-deep-research</a><a href="https://github.com/Kimjinyoung0529/chainlog" rel="noopener">chainlog</a><a href="https://github.com/Kimjinyoung0529/tunnel-watch" rel="noopener">tunnel-watch</a><a href="https://github.com/Kimjinyoung0529/ko-prompt-kit" rel="noopener">ko-prompt-kit</a></div>
 </div></div></footer>
+<script src="/assets/icons.js?v=1" defer></script>
+<script src="/assets/v16.js?v=1" defer></script>
 <script src="/assets/news.js?v=2" defer></script>
 <script src="/assets/v15.js?v=1" defer></script>
 <script>if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('/sw.js').catch(function(){});</script>
