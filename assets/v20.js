@@ -1,4 +1,4 @@
-/* AETHERION v0.20–0.21 - Safari-safe audio output and speech input */
+/* AETHERION v0.20–0.22 - Safari-safe audio output and speech input */
 (function(){
   var w=window,d=document,nav=navigator;
   var ua=nav.userAgent||'';
@@ -13,8 +13,12 @@
   var SILENT=mkSilent();
   var el=null,url=null,unlocked=false,stopCb=null,ctx=null,src=null,tapEl=null;
   function audio(){if(!el){el=new Audio();el.setAttribute('playsinline','');el.setAttribute('webkit-playsinline','');el.preload='auto';el.id='ae-audio';el.style.display='none';(d.body||d.documentElement).appendChild(el);}return el;}
-  function unlock(){ /* call synchronously inside a tap */
-    try{if(nav.audioSession)nav.audioSession.type='playback';}catch(e){} /* iOS 17+: play through the silent switch */
+  /* v0.22: 'playback' blocks the microphone on iOS, so it is only used for read-aloud; capture switches to 'play-and-record' */
+  var micWanted=false;
+  function session(t){try{if(nav.audioSession&&nav.audioSession.type!==t)nav.audioSession.type=t;}catch(e){}}
+  function unlock(mode){ /* call synchronously inside a tap; mode 'rec' = a mic tap */
+    if(mode==='rec')micWanted=true;
+    session(micWanted?'play-and-record':'playback'); /* iOS 17+: playback plays through the silent switch */
     try{var C=w.AudioContext||w.webkitAudioContext;if(C){if(!ctx)ctx=new C();if(ctx.state!=='running')ctx.resume();var bs=ctx.createBufferSource();bs.buffer=ctx.createBuffer(1,1,22050);bs.connect(ctx.destination);bs.start(0);}}catch(e){}
     var a=audio();if(unlocked&&!a.paused)return;
     try{a.muted=false;a.volume=1;a.src=SILENT;var p=a.play();if(p&&p.then)p.then(function(){unlocked=true;}).catch(function(e){console.warn('[audio] unlock',e&&e.name);});else unlocked=true;}catch(e){}
@@ -49,7 +53,7 @@
   }
   function stop(){var a=el;if(a){try{a.pause();}catch(e){}}try{src&&src.stop();}catch(e){}if(tapEl){tapEl.remove();tapEl=null;}if(stopCb)stopCb();}
   function ttsFetch(text,sig){var P=w.AEPG;return fetch(P.endpoint()+'/api/tts',{method:'POST',signal:sig,headers:{'Content-Type':'application/json',Authorization:'Bearer '+P.key()},body:JSON.stringify({text:text,lang:'ko'})}).then(function(r){if(!r.ok)throw new Error('tts '+r.status);return r.blob();});}
-  w.AEAudio={version:'0.21',unlock:unlock,playBlob:playBlob,stop:stop,tts:ttsFetch,el:audio,isIOS:isIOS,isSafari:isSafari};
+  w.AEAudio={version:'0.22',unlock:unlock,playBlob:playBlob,stop:stop,tts:ttsFetch,el:audio,isIOS:isIOS,isSafari:isSafari};
 
   /* ---------- input: Web Speech first (Chrome), server STT for Safari or on failure ---------- */
   var SR_MSG={'not-allowed':'마이크 권한이 꺼져 있어요. 설정 > Safari > 마이크에서 허용해 주세요.','service-not-allowed':'기기 음성 인식이 꺼져 있어요. 서버 음성 인식으로 바꿔서 들을게요.','audio-capture':'마이크를 찾을 수 없어요.','no-speech':'말소리가 들리지 않았어요.'};
@@ -57,8 +61,9 @@
   function pickMime(){var M=w.MediaRecorder;if(!M||!M.isTypeSupported)return '';var c=['audio/mp4','audio/webm;codecs=opus','audio/webm','audio/ogg'];for(var i=0;i<c.length;i++)if(M.isTypeSupported(c[i]))return c[i];return '';}
   /* Record until ~1.2s of silence after speech, max 15s. getUserMedia must be first called in a tap. */
   var stream=null;
-  function getMic(){if(stream&&stream.active)return Promise.resolve(stream);return nav.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}).then(function(s){stream=s;return s;});}
-  function releaseMic(){if(stream){stream.getTracks().forEach(function(t){t.stop();});stream=null;}}
+  function getMic(){micWanted=true;session('play-and-record');if(stream&&stream.active)return Promise.resolve(stream);return nav.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}}).then(function(s){stream=s;return s;});}
+  function releaseMic(){micWanted=false;if(stream){stream.getTracks().forEach(function(t){t.stop();});stream=null;}}
+  function micErr(e){var n=(e&&e.name)||'Error',m={NotAllowedError:'마이크 권한이 막혀 있어요. 설정 > 앱 > Safari > 마이크, 또는 주소창 aA > 웹 사이트 설정 > 마이크에서 허용해 주세요.',NotFoundError:'마이크를 찾을 수 없어요.',NotReadableError:'다른 앱이 마이크를 쓰고 있어요. 통화나 녹음 앱을 닫고 다시 눌러 주세요.',InvalidStateError:'오디오 상태 때문에 마이크를 열지 못했어요. 한 번 더 눌러 주세요.',SecurityError:'보안 설정 때문에 마이크를 열지 못했어요.'};var x=new Error((m[n]||'마이크를 열 수 없어요.')+' ('+n+')');x.code=n;return x;}
   function serverListen(o){
     o=o||{};var ctl={stopped:false,stop:function(){ctl.stopped=true;if(rec&&rec.state==='recording')rec.stop();},abort:function(){ctl.aborted=true;ctl.stop();}};var rec=null,ac=null;
     ctl.promise=new Promise(function(ok,no){
@@ -86,7 +91,7 @@
             .then(function(j){ok(String(j.text||'').trim());}).catch(no);
         };
         rec.start(250);o.onStart&&o.onStart();
-      }).catch(function(e){no(new Error(e&&e.name==='NotAllowedError'?'마이크 권한이 꺼져 있어요. 설정 > Safari > 마이크에서 허용해 주세요.':'마이크를 열지 못했어요'));});
+      }).catch(function(e){console.warn('[mic]',e&&e.name,e&&e.message);if(e&&e.name==='InvalidStateError'&&!o._retry){o._retry=1;releaseMic();var r2=serverListen(o);ctl.stop=r2.stop;ctl.abort=r2.abort;return r2.promise.then(ok,no);}no(micErr(e));});
     });
     return ctl;
   }
@@ -123,7 +128,7 @@
     function toast(m){(w.AEToast||function(x){console.log(x);})(m);}
     nb.addEventListener('click',function(){
       if(cur){cur.stop();return;}
-      unlock();var base=q.value?q.value+' ':'';
+      unlock('rec');var base=q.value?q.value+' ':'';
       nb.classList.add('on');
       cur=listen({release:true,onStart:function(){toast('듣고 있어요. 말이 끝나면 자동으로 멈춰요');},onBusy:function(){toast('받아 적는 중이에요');},onPartial:function(t){q.value=base+t;q.dispatchEvent(new Event('input'));}});
       cur.promise.then(function(t){if(t){q.value=base+t;q.dispatchEvent(new Event('input'));q.focus();}else toast('말소리가 들리지 않았어요');})
