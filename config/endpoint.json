@@ -2,7 +2,7 @@
   "endpoint": "https://aetherion.tailbe77c4.ts.net",
   "endpoints": [
     { "url": "https://aetherion.tailbe77c4.ts.net", "label": "Tailscale Funnel (기본)" },
-    { "url": "https://safe-loris.runlocal.eu", "label": "runlocal 터널 (예비)" }
+    { "url": "https://damp-manatee.runlocal.eu", "label": "runlocal 터널 (예비)" }
   ],
   "note": "기본 주소는 Tailscale Funnel 고정 주소예요. 응답이 없으면 플레이그라운드가 예비 주소로 자동 전환해요. 설정에서 직접 바꿀 수도 있어요."
 }
