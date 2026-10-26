@@ -166,3 +166,5 @@ body{overflow-x:hidden}
  html{scroll-behavior:auto!important}
  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
+/* Text selection: soft brand tint that stays readable on light and dark sections */
+::selection{background:rgba(236,103,70,.26);color:inherit}
